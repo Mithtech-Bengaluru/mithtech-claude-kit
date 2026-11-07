@@ -12,7 +12,7 @@ The kit is not built yet. `ClaudeSetup.md` is the prompt that builds it into `ki
 
 ## Other computers (after `kit/` exists)
 ```
-gh repo clone mithtech-is/mithtech-claude-kit
+gh repo clone Mithtech-Bengaluru/mithtech-claude-kit
 node mithtech-claude-kit/kit/install.mjs
 ```
 Then restart Claude Code. Check the install with `node mithtech-claude-kit/kit/install.mjs --doctor`.
