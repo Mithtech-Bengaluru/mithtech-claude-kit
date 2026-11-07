@@ -1,0 +1,23 @@
+# mithtech-claude-kit
+
+Mithtech's Claude Code development kit: one orchestrator session that plans with approval gates and runs worker sessions, reuse-first and single-source-of-truth rules for Frappe, Medusa, Next.js, Rust and other stacks, model and effort routing for low token use, and guardrail hooks.
+
+## Status
+The kit is not built yet. `ClaudeSetup.md` is the prompt that builds it into `kit/` on the first computer.
+
+## First computer (builds the kit)
+1. Clone this repo into your coding folder.
+2. Open Claude Code in this folder and paste the contents of `ClaudeSetup.md`.
+3. Approve the plan it shows. It builds `kit/`, runs a pilot, and pushes after your yes.
+
+## Other computers (after `kit/` exists)
+```
+gh repo clone mithtech-is/mithtech-claude-kit
+node mithtech-claude-kit/kit/install.mjs
+```
+Then restart Claude Code. Check the install with `node mithtech-claude-kit/kit/install.mjs --doctor`.
+
+## Improving the kit
+Lessons and catalogue entries are submitted automatically to `inbox/` branches. Rule changes reach `main` only through reviewed pull requests.
+
+`archive/ClaudeSetup.v1.md` is the first version of the prompt.

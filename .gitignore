@@ -1,0 +1,7 @@
+.DS_Store
+Icon?
+*.bak-*
+.claude/tasks/
+.claude/index/
+mithtech-kit.local.json
+node_modules/
