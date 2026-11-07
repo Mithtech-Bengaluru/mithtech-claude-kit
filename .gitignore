@@ -5,3 +5,7 @@ Icon?
 .claude/index/
 mithtech-kit.local.json
 node_modules/
+
+inbox/pending/
+catalog/private/
+docs/*.private.md

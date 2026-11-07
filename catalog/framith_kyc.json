@@ -1,0 +1,23 @@
+{
+  "name": "framith_kyc",
+  "stack": "frappe",
+  "repo": "mithtech-is/framith_kyc",
+  "purpose": "Encrypted KYC vault, provider checks, reveal controls and KYC lifecycle on Frappe and ERPNext",
+  "main": [
+    "KYC Check Log",
+    "KYC Check Route",
+    "KYC Consent Request",
+    "KYC Envelope",
+    "KYC Provider Account",
+    "KYC Reveal Log",
+    "KYC Reveal Request",
+    "KYC Risk Grade",
+    "KYC Screening Review",
+    "KYC Settings",
+    "KYC Vault",
+    "KYC Vault Item"
+  ],
+  "domain": "Framith KYC",
+  "status": "active",
+  "updated": "2026-11-07"
+}

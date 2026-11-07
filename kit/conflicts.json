@@ -1,0 +1,50 @@
+{
+  "_doc": "Rules or preferences that contradict the kit. A matching line in a CLAUDE.md, output style, skill or agent is replaced with the kit line; a matching memory file is deleted (backup kept) and its MEMORY.md line removed. Scopes: claude_md, memory, output_style, skill, agent. Patterns are case-insensitive. Keep them specific: a false positive deletes a useful memory.",
+  "rules": [
+    {
+      "id": "prod-without-yes",
+      "re": "(\\b(run|do|execute|apply|deploy)\\b[^.\\n]{0,40}\\b(prod|production|vps|live server|live site)\\b[^.\\n]{0,80}\\b(yourself|without asking|just do it|no need to ask|never ask))|never ask me to run|(deploy|push) (straight |directly )?to (prod|production) (without|freely)",
+      "kit": "Production deploys and production data changes need my explicit yes, every time.",
+      "scopes": ["claude_md", "memory", "output_style", "skill", "agent"]
+    },
+    {
+      "id": "push-main-ok",
+      "re": "\\b(push|commit|merge)\\b[^.\\n]{0,30}\\b(directly |straight )?(to|into|on) (main|master)\\b[^.\\n]{0,40}\\b(is fine|is ok|freely|always|without (a )?(pr|review|asking)|no need)",
+      "kit": "Never push to main/master/production or force-push unless I ask.",
+      "scopes": ["claude_md", "memory", "output_style", "skill", "agent"]
+    },
+    {
+      "id": "force-push-ok",
+      "re": "force[- ]push(ing)?\\b[^.\\n]{0,40}\\b(is fine|is ok|allowed|freely|when needed|as needed)",
+      "kit": "Never push to main/master/production or force-push unless I ask.",
+      "scopes": ["claude_md", "memory", "output_style", "skill", "agent"]
+    },
+    {
+      "id": "skip-tests",
+      "re": "\\b(skip|no need for|don'?t (write|run|bother with)|never write)\\b[^.\\n]{0,15}\\btests?\\b",
+      "kit": "DONE = the project's gate passes, every approved requirement is built and tested.",
+      "scopes": ["claude_md", "memory", "output_style"]
+    },
+    {
+      "id": "edit-vendored-ok",
+      "re": "\\b(edit|patch|modify|change)\\b[^.\\n]{0,30}\\b(erpnext|frappe core|frappe/frappe|hrms|india_compliance|node_modules|@medusajs)\\b[^.\\n]{0,30}\\b(directly|is fine|is ok|freely)",
+      "kit": "Never edit vendored or upstream code (frappe, erpnext, hrms, india_compliance, @medusajs core, node_modules).",
+      "scopes": ["claude_md", "memory", "output_style", "skill", "agent"]
+    },
+    {
+      "id": "verbose-output",
+      "re": "\\b(be verbose|explain (everything|each step) in detail|always give (long|detailed) (answers|explanations)|long(er)? (answers|responses) (are )?(preferred|better))",
+      "kit": "Answer first. At most 10 lines unless I ask for detail.",
+      "scopes": ["claude_md", "memory", "output_style"]
+    },
+    {
+      "id": "copy-db-ok",
+      "re": "\\b(copy|sync|dump|restore)\\b[^.\\n]{0,30}\\b(database|db)\\b[^.\\n]{0,40}\\b(between machines|to the cluster|from prod)\\b[^.\\n]{0,40}\\b(without asking|freely|automatically)",
+      "kit": "Never copy databases between machines without asking.",
+      "scopes": ["claude_md", "memory", "output_style"]
+    }
+  ],
+  "settings": {
+    "outputStyleConflicts": ["Explanatory", "Learning"]
+  }
+}

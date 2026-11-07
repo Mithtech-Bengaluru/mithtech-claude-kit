@@ -1,0 +1,19 @@
+{
+  "name": "medusync",
+  "stack": "frappe",
+  "repo": "suparikoli/medusync",
+  "purpose": "Retired: two-way Frappe/ERPNext and Medusa v2 sync, replaced by the @mithtech-medusa/plugin-erpnext plugin",
+  "main": [
+    "Medusync Exclusion",
+    "Medusync Inclusion",
+    "Medusync Link",
+    "Medusync Log",
+    "Medusync Mapping",
+    "Medusync Reset Request",
+    "Medusync Settings",
+    "Medusync Site"
+  ],
+  "domain": "Medusync",
+  "status": "retired",
+  "updated": "2026-11-07"
+}

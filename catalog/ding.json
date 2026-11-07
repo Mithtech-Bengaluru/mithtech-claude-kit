@@ -1,0 +1,21 @@
+{
+  "name": "ding",
+  "stack": "frappe",
+  "repo": "suparikoli/ding",
+  "purpose": "App for telecalling directly from documents",
+  "main": [
+    "Ding Call Logs",
+    "Ding Settings",
+    "Contact Meet",
+    "Customer Meet",
+    "Day Plan",
+    "Field Rep Heartbeat",
+    "Field Sales Settings",
+    "Field Visit Route Planning",
+    "Lead Meet",
+    "Visit Plan Template"
+  ],
+  "domain": "ding, Field Sales",
+  "status": "active",
+  "updated": "2026-11-07"
+}

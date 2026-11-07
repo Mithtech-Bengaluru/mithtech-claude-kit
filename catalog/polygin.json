@@ -1,0 +1,16 @@
+{
+  "name": "polygin",
+  "stack": "frappe",
+  "repo": "suparikoli/polygin",
+  "purpose": "Send WhatsApp template messages from ERPNext through Polygin, with configurable buttons and field mapping",
+  "main": [
+    "Polygin Message Log",
+    "Polygin Quick Reply",
+    "Polygin Settings",
+    "Polygin Telegram Messages",
+    "Polygin Wa Messages"
+  ],
+  "domain": "Polygin",
+  "status": "active",
+  "updated": "2026-11-07"
+}

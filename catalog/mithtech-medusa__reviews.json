@@ -1,0 +1,12 @@
+{
+  "name": "@mithtech-medusa/reviews",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-reviews",
+  "purpose": "Medusa v2 product reviews: customer-submitted ratings and reviews with admin moderation, rendered on the product page an",
+  "main": [
+    "review"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

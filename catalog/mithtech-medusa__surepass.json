@@ -1,0 +1,10 @@
+{
+  "name": "@mithtech-medusa/surepass",
+  "stack": "medusa",
+  "repo": "",
+  "purpose": "Surepass KYC for Medusa v2: bank account verification, PAN, name match, Aadhaar OTP and DigiLocker as the @mithtech-medu",
+  "main": [],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

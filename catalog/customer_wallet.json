@@ -1,0 +1,15 @@
+{
+  "name": "customer_wallet",
+  "stack": "frappe",
+  "repo": "suparikoli/customer_wallet",
+  "purpose": "Customer wallet plus a line of credit on the Frappe lending app",
+  "main": [
+    "Wallet",
+    "Wallet Deposit",
+    "Wallet Transaction",
+    "Wallet Withdrawal"
+  ],
+  "domain": "Customer Wallet",
+  "status": "active",
+  "updated": "2026-11-07"
+}

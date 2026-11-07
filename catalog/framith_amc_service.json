@@ -1,0 +1,18 @@
+{
+  "name": "framith_amc_service",
+  "stack": "frappe",
+  "repo": "suparikoli/framith_amc_service",
+  "purpose": "Service contracts and service management on ERPNext and Frappe Helpdesk",
+  "main": [
+    "AMC Settings",
+    "AMC Contract",
+    "AMC Entitlement Ledger",
+    "AMC Plan",
+    "Job Template",
+    "Service",
+    "Service Order"
+  ],
+  "domain": "AMC, Service",
+  "status": "active",
+  "updated": "2026-11-07"
+}

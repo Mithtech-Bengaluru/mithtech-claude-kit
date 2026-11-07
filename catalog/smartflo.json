@@ -1,0 +1,15 @@
+{
+  "name": "smartflo",
+  "stack": "frappe",
+  "repo": "suparikoli/smartflo",
+  "purpose": "Integration of tatatelebiz with smartflo for mithtech",
+  "main": [
+    "Agent Mapping",
+    "Smartflo Dialer Queue",
+    "Smartflo Logs",
+    "Smartflo Settings"
+  ],
+  "domain": "Tatatelebiz Smartflo integration",
+  "status": "active",
+  "updated": "2026-11-07"
+}

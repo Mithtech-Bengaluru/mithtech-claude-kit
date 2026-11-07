@@ -1,0 +1,20 @@
+{
+  "name": "flowmentor",
+  "stack": "frappe",
+  "repo": "suparikoli/FlowMentor",
+  "purpose": "Interactive in-product training for ERPNext: guided walkthroughs with per-user progress and recommended settings.",
+  "main": [
+    "Demo Visit",
+    "WT",
+    "WT Applied Change",
+    "WT Event",
+    "WT Generation Run",
+    "WT Learn Flow",
+    "WT Learn Path",
+    "WT Recommendation",
+    "WT Settings"
+  ],
+  "domain": "FlowMentor",
+  "status": "active",
+  "updated": "2026-11-07"
+}

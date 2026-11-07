@@ -1,0 +1,12 @@
+{
+  "name": "@mithtech-medusa/social-auth",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-social-auth",
+  "purpose": "Medusa v2 social sign-in (Google, Apple, Facebook, Microsoft, GitHub) with admin-managed credentials and a configurable ",
+  "main": [
+    "social_auth_setting"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

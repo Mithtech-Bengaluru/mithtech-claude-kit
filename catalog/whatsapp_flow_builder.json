@@ -1,0 +1,14 @@
+{
+  "name": "whatsapp_flow_builder",
+  "stack": "frappe",
+  "repo": "suparikoli/whatsapp_flow_builder",
+  "purpose": "Visual conversation flow builder and graph runtime for the Frappe WhatsApp chatbot",
+  "main": [
+    "WhatsApp Flow Builder Settings",
+    "WhatsApp Flow Graph",
+    "WhatsApp Flow Graph Session"
+  ],
+  "domain": "WhatsApp Flow Builder",
+  "status": "active",
+  "updated": "2026-11-07"
+}

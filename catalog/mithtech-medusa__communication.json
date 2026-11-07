@@ -1,0 +1,23 @@
+{
+  "name": "@mithtech-medusa/communication",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-communication",
+  "purpose": "Outbound customer communication for Medusa v2: SMTP email templates, SMS (MSG91), WhatsApp (Polygin), phone OTP, ntfy op",
+  "main": [
+    "communication_brand_config",
+    "communication_email_log",
+    "communication_email_template",
+    "communication_event_template_map",
+    "communication_ntfy_event_map",
+    "communication_ntfy_log",
+    "communication_otp_request",
+    "communication_polygin_config",
+    "communication_push_device",
+    "communication_sms_log",
+    "communication_sms_template",
+    "communication_smtp_config"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

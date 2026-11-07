@@ -1,0 +1,10 @@
+{
+  "name": "@mithtech-bengaluru/medusa-factory",
+  "stack": "web",
+  "repo": "suparikoli/medusa-factory",
+  "purpose": "MithTech Medusa Factory: assemble production Medusa v2 commerce projects from a declarative manifest",
+  "main": [],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

@@ -1,0 +1,392 @@
+{
+  "_doc": "Single source of the kit rules. RULES.md and the rule blocks in the stack skills are generated from this file by `node kit/scripts/rules.mjs`. Edit here, never in the generated blocks. Style: one line, imperative, specific, reason in a few words if not obvious.",
+  "groups": [
+    {
+      "id": "everyone",
+      "title": "Everyone",
+      "skill": null,
+      "rules": [
+        {
+          "id": "E01",
+          "text": "Check what already exists before building: our apps and plugins, installed apps, and the platform's built-in features."
+        },
+        {
+          "id": "E02",
+          "text": "Give every record and setting one owner. Link to it; never copy it or create a second version."
+        },
+        {
+          "id": "E03",
+          "text": "Put code in the app or module that owns the feature. A new app, plugin or service needs approval."
+        },
+        {
+          "id": "E04",
+          "text": "Size the task first. Small: build. Medium: one plan approval. Large: approve architecture, wireframes and build plan before building."
+        },
+        {
+          "id": "E05",
+          "text": "Build everything that was approved, and nothing that was not."
+        },
+        {
+          "id": "E06",
+          "text": "Call a task done only when the project's checks pass, every approved requirement is built and tested, and nothing is stubbed."
+        },
+        {
+          "id": "E07",
+          "text": "Never push to main, master or production, and never force-push, without approval."
+        },
+        {
+          "id": "E08",
+          "text": "Get explicit approval for production deploys and production data changes. Back up before any migration."
+        },
+        {
+          "id": "E09",
+          "text": "Never edit third-party or upstream code (frappe, erpnext, hrms, india_compliance, @medusajs core, node_modules, generated code)."
+        },
+        {
+          "id": "E10",
+          "text": "Keep secrets out of git, images, logs and shared files. Use environment variables."
+        },
+        {
+          "id": "E11",
+          "text": "Never copy a database between machines without asking."
+        }
+      ]
+    },
+    {
+      "id": "communication",
+      "title": "Communication",
+      "skill": null,
+      "rules": [
+        {
+          "id": "C01",
+          "text": "Before a medium or large task, restate it in at most 7 bullets (goal, scope, placement, assumptions, done when) and get a yes."
+        },
+        {
+          "id": "C02",
+          "text": "Give the answer first. Keep messages to 10 lines unless detail is asked for."
+        },
+        {
+          "id": "C03",
+          "text": "Ask one question at a time, with 2 to 4 options and the recommended one first."
+        },
+        {
+          "id": "C04",
+          "text": "Write one idea per sentence. Keep instructions under 20 words and descriptions under 25."
+        },
+        {
+          "id": "C05",
+          "text": "Use active voice. Start instructions with a verb."
+        },
+        {
+          "id": "C06",
+          "text": "Use one term for one meaning, every time. Avoid noun clusters of more than 3 words."
+        }
+      ]
+    },
+    {
+      "id": "frappe",
+      "title": "Frappe / ERPNext",
+      "skill": "frappe-dev",
+      "rules": [
+        {
+          "id": "F01",
+          "text": "Name every Mithtech app `framith_<name>` (snake_case)."
+        },
+        {
+          "id": "F02",
+          "text": "Build the generic product app first (`framith_<product>`), complete and configurable through its Single Settings DocType."
+        },
+        {
+          "id": "F03",
+          "text": "Put each customer's changes in their own app (`framith_<customer>`), which lists the generic apps in required_apps. No customer logic in generic apps; never fork a generic app per customer.",
+          "claude": "Customer app `framith_<customer>` holds only that customer's Custom Fields, Property Setters, print formats, workspaces, fixtures and small overrides; it lists the generic apps in required_apps. Never put a customer check in generic code; never fork a generic app per customer."
+        },
+        {
+          "id": "F04",
+          "text": "If other customers could use a change, build it in the generic app behind a setting. Otherwise put it in the customer app. Say which and why."
+        },
+        {
+          "id": "F05",
+          "text": "Use the standard masters (Company, Customer, Supplier, Item, UOM, Price List, Employee, Address, Contact, Account, Cost Center, Warehouse, tax templates). Never duplicate a DocType or field; check India Compliance, HRMS and our framith_ apps too.",
+          "claude": "ERPNext/Frappe masters own their data: Company, Customer, Supplier, Item, Item Group, UOM, Price List, Employee, Address, Contact, Account, Cost Center, Warehouse, tax templates, and the masters of HRMS, India Compliance and our framith_ apps. Never create a DocType or field that duplicates one (for example a custom GSTIN field: India Compliance has `gstin`; a second wallet app: customer_wallet exists). Use Link fields, not copied values; fetch_from for read-only display."
+        },
+        {
+          "id": "F06",
+          "text": "Do not store computed values unless performance needs it, and then say why."
+        },
+        {
+          "id": "F07",
+          "text": "Extend before creating: Custom Fields, Property Setters, doc_events, override_doctype_class, hooks, standard reports, Print Designer, Workflows. Create a DocType only when nothing can be extended."
+        },
+        {
+          "id": "F08",
+          "text": "Keep one owning app per domain across all our framith_ apps."
+        },
+        {
+          "id": "F09",
+          "text": "Classify every app as OWN or VENDORED. Never edit vendored apps (including our forks of frappe and erpnext) unless asked."
+        },
+        {
+          "id": "F10",
+          "text": "Site-only changes (Custom Fields, Property Setters, Server/Client Scripts, Customize Form) are fine while working. Package them in the owning app before production.",
+          "claude": "Package for production: fixtures of the owning app (module set to that app's module, filtered fixtures) or install/patch code for fields and property setters; controllers, hooks and API files for server logic; doctype_js for client logic. Test packaged changes on a fresh site before release."
+        },
+        {
+          "id": "F11",
+          "text": "When site-only changes exist, suggest which app each belongs in, with the reason. Move nothing without approval, and never in bulk. Remove the database-only copy only after a tested move and a yes."
+        },
+        {
+          "id": "F12",
+          "text": "Treat older apps without the `framith_` prefix with care: report first; change them only with an approved plan, a backup and a trial on a copy of the site."
+        },
+        {
+          "id": "F13",
+          "text": "Export Custom Fields and Property Setters as fixtures filtered by module; blanket fixtures overwrite other apps."
+        },
+        {
+          "id": "F14",
+          "text": "Put data changes in idempotent patches listed in patches.txt."
+        },
+        {
+          "id": "F15",
+          "text": "Query with frappe.qb or get_all with explicit fields. No SQL string concatenation and no get_doc inside loops.",
+          "claude": "Use frappe.qb or get_all with explicit fields; db.get_value, bulk operations, frappe.enqueue (idempotent jobs), frappe.cache, search_index on filtered fields. No SQL concatenation; no get_doc in loops."
+        },
+        {
+          "id": "F16",
+          "text": "Check permissions in every whitelisted method. Use roles and User Permissions, never hardcoded users. Respect company filters.",
+          "claude": "Whitelisted functions check permissions; ignore_permissions only with a comment saying why; roles and User Permissions, never hardcoded users; respect company filters."
+        },
+        {
+          "id": "F17",
+          "text": "Never write GL or stock ledger entries by hand; use ERPNext controllers. Respect submit, cancel and amend, accounting dimensions and fiscal years."
+        },
+        {
+          "id": "F18",
+          "text": "Send Indian tax through India Compliance."
+        },
+        {
+          "id": "F19",
+          "text": "Keep settings in one Single Settings DocType per app; hardcode nothing. Wrap strings in _(). Use naming series."
+        },
+        {
+          "id": "F20",
+          "text": "Make apps distributable: required_apps, version branch, README, CHANGELOG, semver, clean after_install and before_uninstall."
+        },
+        {
+          "id": "F21",
+          "text": "Write FrappeTestCase tests for every DocType you touch. Run module tests while working and app tests before push."
+        },
+        {
+          "id": "F22",
+          "text": "Run `bench --site <site> backup` before migrate. Migrate automatically only on dev and test sites."
+        },
+        {
+          "id": "F23",
+          "text": "Run `bench build --app <app>` only for the app you changed."
+        },
+        {
+          "id": "F24",
+          "text": "Run the drift check before every production release and weekly on live customer sites."
+        },
+        {
+          "id": "F25",
+          "text": "Ship a generic app only when every requirement ID in its approved spec is built and tested. Keep partial apps on a feature branch."
+        },
+        {
+          "id": "FG01",
+          "kind": "gotcha",
+          "text": "Run deletes in bench console with frappe.db.commit(); bench execute did not commit a frappe.client.delete.",
+          "source": "kit pilot",
+          "added": "2026-11-08"
+        },
+        {
+          "id": "FG02",
+          "kind": "gotcha",
+          "text": "Drop the column yourself after deleting a test Custom Field on a dev site; Frappe keeps the database column.",
+          "source": "kit pilot",
+          "added": "2026-11-08"
+        }
+      ]
+    },
+    {
+      "id": "medusa",
+      "title": "Medusa",
+      "skill": "medusa-dev",
+      "rules": [
+        {
+          "id": "M01",
+          "text": "Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`)."
+        },
+        {
+          "id": "M02",
+          "text": "Build generic `mithusa-` plugins first. Put customer-only code in the customer's Medusa project, or in `mithusa-<customer>` if several of their stores share it."
+        },
+        {
+          "id": "M03",
+          "text": "Detect the Medusa version. These rules are for v2; say so when a project is v1."
+        },
+        {
+          "id": "M04",
+          "text": "Check built-in commerce modules, installed plugins, our mithusa- plugins, src/modules, workflows and routes before building. For a new project, check medusa-factory first."
+        },
+        {
+          "id": "M05",
+          "text": "Place code in this order and say which and why: the module or plugin that owns the domain, a generic mithusa- plugin, then the customer project's src/. A new module or plugin needs approval."
+        },
+        {
+          "id": "M06",
+          "text": "Extend, never fork core: module links, workflow hooks and steps, subscribers, src/api routes, admin widgets, Query for cross-module reads."
+        },
+        {
+          "id": "M07",
+          "text": "Treat ERPNext as the book of record for invoices and tax when connected. Medusa never recalculates statutory tax."
+        },
+        {
+          "id": "M08",
+          "text": "Put business logic in workflows with compensation. Keep routes thin and zod-validated."
+        },
+        {
+          "id": "M09",
+          "text": "Define models with model.define and generate migrations with the CLI. No cross-module database access."
+        },
+        {
+          "id": "M10",
+          "text": "Use strict TypeScript with no `any`. Verify webhooks and make them idempotent."
+        },
+        {
+          "id": "M11",
+          "text": "Publish plugins with semver, @medusajs/* as peerDependencies, README and CHANGELOG, to the private registry with your own npm config; never put a token in a file."
+        }
+      ]
+    },
+    {
+      "id": "nextjs",
+      "title": "Next.js and JS sites",
+      "skill": "nextjs-js",
+      "rules": [
+        {
+          "id": "N01",
+          "text": "Reuse existing components. Add no new framework or dependency without approval."
+        },
+        {
+          "id": "N02",
+          "text": "Read configuration from the environment."
+        },
+        {
+          "id": "N03",
+          "text": "Keep accessibility and performance budgets."
+        },
+        {
+          "id": "N04",
+          "text": "On CMS and marketing sites, change no URL; SEO checks must pass."
+        },
+        {
+          "id": "N05",
+          "text": "Run lint, typecheck and format before every commit."
+        }
+      ]
+    },
+    {
+      "id": "rust",
+      "title": "Rust",
+      "skill": "rust-dev",
+      "rules": [
+        {
+          "id": "R01",
+          "text": "Keep core crates free of network and connector dependencies."
+        },
+        {
+          "id": "R02",
+          "text": "Use no unwrap or todo!() on feature paths."
+        },
+        {
+          "id": "R03",
+          "text": "Keep clippy clean with the repo's config."
+        },
+        {
+          "id": "R04",
+          "text": "Run `cargo test -p <crate>` while working and the full gate before push. Limit build parallelism."
+        },
+        {
+          "id": "R05",
+          "text": "Keep Tauri commands as thin wrappers over core. Commit generated TypeScript types."
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "title": "Other stacks (Go, Flutter, Python, Tally TDL, Docker/k3s)",
+      "skill": "other-stack",
+      "rules": [
+        {
+          "id": "O01",
+          "text": "Read the project's CLAUDE.md for its gate command."
+        },
+        {
+          "id": "O02",
+          "text": "Follow the stack's official style guide and linters."
+        },
+        {
+          "id": "O03",
+          "text": "Look up the official docs before using an unfamiliar API."
+        },
+        {
+          "id": "O04",
+          "text": "Apply the same reuse, single-owner, placement and safety rules as every other stack."
+        }
+      ]
+    },
+    {
+      "id": "enterprise",
+      "title": "Business software (all stacks)",
+      "skill": "enterprise-core",
+      "rules": [
+        {
+          "id": "B01",
+          "text": "Take the tenant from the logged-in session, never from the request."
+        },
+        {
+          "id": "B02",
+          "text": "Check permissions and record scope on the server, not only in the UI."
+        },
+        {
+          "id": "B03",
+          "text": "Never use floats for money or quantities. Do no money math in the UI."
+        },
+        {
+          "id": "B04",
+          "text": "Never edit posted documents. Corrections are new documents."
+        },
+        {
+          "id": "B05",
+          "text": "Write the document and its outbox row in one transaction."
+        },
+        {
+          "id": "B06",
+          "text": "Put idempotency keys on commands and webhooks. Retry with backoff and a dead-letter queue."
+        },
+        {
+          "id": "B07",
+          "text": "Version offline sync and test its conflict rules."
+        },
+        {
+          "id": "B08",
+          "text": "Keep migrations compatible with the previous release."
+        },
+        {
+          "id": "B09",
+          "text": "Mask personal data in logs."
+        },
+        {
+          "id": "B10",
+          "text": "Avoid N+1 queries. Paginate every list."
+        },
+        {
+          "id": "B11",
+          "text": "Add a regression test for every bug you fix."
+        }
+      ]
+    }
+  ]
+}
