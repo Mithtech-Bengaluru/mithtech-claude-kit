@@ -22,13 +22,12 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 - SELF-UPDATE (all scripts, zero Claude tokens):
   - PULL: a SessionStart hook checks GitHub at most once a day and updates only to the newest release tag (never to whatever is on main) that passes the integrity check below; it fast-forwards the local clone, re-runs the installer quietly and prints one line. Never pulls over local uncommitted kit edits; reports them instead.
   - CONTRIBUTE: lessons and catalogue entries (section 3.11) are written as one small JSON file each under `inbox/` (unique name per machine and time, so no conflicts) and pushed by a script to the branch `inbox/<machine>` with the user's own GitHub login. Nobody pushes to main directly.
-  - MERGE: one maintainer job validates inbox files (JSON schema, length caps, duplicates, secret scan), merges catalogue entries into `catalog/` automatically, bundles lessons into one weekly pull request for my approval, bumps the kit version and deletes processed inbox files. Changes to rules, skills or hooks never merge without my approval.
-  - Where the maintainer job runs (first that is available): GitHub Actions on the kit repo (free tier minutes are enough), else a cron job on our own server using plain git, else `node kit/maintain.mjs` run by me on my Mac.
+  - COLLECT (manual, only me): `node kit/maintain.mjs` on my computer fetches every `inbox/*` branch from all devices, validates each entry (JSON schema, length caps, duplicates, secret scan), and shows me a summary of 10 lines or fewer. Nothing is accepted automatically. On my yes it writes the accepted entries (section 3.11), bumps the version, tags a release, pushes to main and deletes the processed inbox branches. No scheduled job, no GitHub Actions.
   - SAFETY: inbox entries are data from many people and end up in everyone's context. Only schema fields are kept, plain text, capped lengths, no URLs or commands in lessons, no instructions; anything else is rejected.
 - SECURITY (the repo is public and its code runs on every developer's machine, so it is a supply-chain target):
   - main is protected: changes only by pull request with my review; no force-push; only org members can push inbox branches.
   - Release tags are created only by me (signed tags if set up); the updater refuses anything else, and refuses a tag whose commit isn't on protected main.
-  - GitHub Actions run only on pushes by members; never `pull_request_target`, no secrets exposed to fork pull requests, actions pinned to commit SHAs, minimal workflow permissions.
+  - If GitHub Actions are added later: run only on pushes by members; never `pull_request_target`, no secrets exposed to fork pull requests, actions pinned to commit SHAs, minimal workflow permissions.
   - The public repo holds no internal hostnames, IPs, server names, customer names or registry URLs. Those go in each machine's local config or in a private repo the kit reads if present.
   - Commits use the GitHub noreply email.
 
@@ -171,7 +170,8 @@ light, worker, architect, checker (read, test, lint only; checks against approve
 
 ## 3.11 Learning loop and Mithtech catalogue (stored in this kit repo)
 - LESSONS: at the end of a program or a fixed bug, the checker records each real mistake with a cause tag: `kit-gap` (a rule or pattern was missing or wrong), `stack-gotcha` (a trap in Frappe, Medusa, Rust…), or `prompt-issue` (the request was unclear or wrong). Only kit-gap and stack-gotcha are submitted; prompt-issue lessons are dropped, so one person's bad prompting never becomes a rule for everyone. Format: stack, cause, one-line lesson, one-line fix, source project. Project-only gotchas go to that project's CLAUDE.md Gotchas section (max 15 lines) instead.
-- Lessons reach the kit only through the weekly pull request I approve; approved ones become rules, patterns or gotchas in the right skill.
+- Lessons reach the kit only when I accept them in `maintain.mjs`. Each accepted lesson becomes a rule, pattern or gotcha in the right skill, written in the kit's rule style: one line, imperative, specific, with the reason in a few words if it isn't obvious (for example "Frappe: export Custom Fields with a module filter; blanket fixtures overwrite other apps."). Merge it with an existing rule instead of adding a near-duplicate; delete rules that turn out wrong.
+- HUMAN-READABLE RULES: `RULES.md` at the repo root is the same rule set for people: grouped by stack, one line per rule, plain English, no Claude-specific wording, under 150 lines. `maintain.mjs` regenerates it whenever rules change, so the two never disagree.
 - CATALOGUE (`catalog/`, built as we go): whenever the indexer reads a project, it adds or updates one entry per Mithtech-owned app, plugin or service: name, stack, repo, one-line purpose (max 120 characters), main DocTypes/models, owner domain, status. G0 searches it, so a feature that exists in any Mithtech project is found before anyone rebuilds it. Catalogue entries merge automatically after validation.
 
 ## 3.12 Templates

@@ -18,6 +18,10 @@ node mithtech-claude-kit/kit/install.mjs
 Then restart Claude Code. Check the install with `node mithtech-claude-kit/kit/install.mjs --doctor`.
 
 ## Improving the kit
-Lessons and catalogue entries are submitted automatically to `inbox/` branches. Rule changes reach `main` only through reviewed pull requests.
+Every device pushes its lessons and catalogue entries to its own `inbox/<machine>` branch. Nothing is accepted automatically. To collect them from all devices, review and publish (maintainer only):
+```
+cd mithtech-claude-kit && git pull && node kit/maintain.mjs
+```
+`RULES.md` is the human-readable version of the rules.
 
 `archive/ClaudeSetup.v1.md` is the first version of the prompt.
