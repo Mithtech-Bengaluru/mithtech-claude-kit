@@ -11,7 +11,7 @@
     "Bash(go build *)", "Bash(go test *)", "Bash(go vet *)",
     "Bash(flutter analyze *)", "Bash(flutter analyze)", "Bash(flutter test *)", "Bash(flutter test)",
     "Bash(pytest *)", "Bash(pytest)", "Bash(ruff *)",
-    "Bash(bench build *)", "Bash(bench --site * run-tests *)", "Bash(bench --site * migrate)", "Bash(bench --site * backup *)", "Bash(bench --site * backup)",
+    "Bash(bench build *)",
     "Bash(npx medusa db:generate *)", "Bash(npx medusa db:migrate)", "Bash(npx medusa db:sync-links)",
     "Bash(offload ls *)", "Bash(offload ls)", "Bash(offload logs *)", "Bash(offload status *)", "Bash(offload status)", "Bash(offload doctor *)", "Bash(offload doctor)", "Bash(offload decide *)", "Bash(offload decide)",
     "Bash(docker ps *)", "Bash(docker ps)", "Bash(docker logs *)", "Bash(docker images *)", "Bash(docker inspect *)",

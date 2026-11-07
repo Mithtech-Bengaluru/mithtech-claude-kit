@@ -1,24 +1,69 @@
 {
-  "_doc": "Regex rules for guard.mjs (case-insensitive). block = always refused; ask = forces a confirmation prompt. Machine-specific production names go in ~/.claude/mithtech-kit.local.json (prodPatterns), never here.",
+  "_doc": "Regex rules for guard.mjs (case-insensitive). block = always refused; ask = forces a confirmation prompt. Machine-specific production names go in ~/.claude/mithtech-kit.local.json (prodPatterns), never here. gitPushRaw is used only for commands that run text again (sh -c, eval, ssh); otherwise guard.mjs parses git push and bench commands word by word, ignoring quoted text.",
   "bashBlock": [
-    { "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*(--force\\b|--force-with-lease|--force-if-includes|\\s-[a-zA-Z]*f\\b|\\s\\+[\\w/.:-]+)", "why": "force-push is blocked" },
-    { "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*(\\s|:|/)(main|master|production|prod)(\\s|$|;|&|\\|)", "why": "push to main/master/production is blocked; push a feature branch and open a PR" },
-    { "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*\\s--(all|mirror)\\b", "why": "push --all/--mirror is blocked" },
-    { "re": "(^|[\\s;&|(<'\"=])(cat|less|more|head|tail|bat|nl|strings|xxd|od|grep|rg|ag|awk|sed|cp|scp|rsync|source|\\.|base64|open|code)\\s[^;&|\\n]*(\\.env(?!\\.example|\\.sample|\\.template)[\\w.-]*|/\\.ssh/|~/\\.ssh|\\.pem\\b|[\\w.~-]*/credentials(/|\\b)|\\bcredentials\\.(json|ya?ml|txt|csv)\\b|\\.aws/|\\.npmrc|000-credentials|_pw\\.txt)", "why": "reading secrets (.env*, ~/.ssh, *.pem, credentials, .npmrc) is blocked" },
-    { "re": "\\bprintenv\\b|\\benv\\s*$|\\bset\\s*$", "why": "dumping the environment is blocked (may contain secrets)" }
+    {
+      "re": "(^|[\\s;&|(<'\"=])(cat|less|more|head|tail|bat|nl|strings|xxd|od|grep|rg|ag|awk|sed|cp|scp|rsync|source|\\.|base64|open|code)\\s[^;&|\\n]*(\\.env(?!\\.example|\\.sample|\\.template)[\\w.-]*|/\\.ssh/|~/\\.ssh|\\.pem\\b|[\\w.~-]*/credentials(/|\\b)|\\bcredentials\\.(json|ya?ml|txt|csv)\\b|\\.aws/|\\.npmrc|000-credentials|_pw\\.txt)",
+      "why": "reading secrets (.env*, ~/.ssh, *.pem, credentials, .npmrc) is blocked"
+    },
+    {
+      "re": "\\bprintenv\\b|\\benv\\s*$|\\bset\\s*$",
+      "why": "dumping the environment is blocked (may contain secrets)"
+    }
+  ],
+  "gitPushRaw": [
+    {
+      "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*(--force\\b|--force-with-lease|--force-if-includes|\\s-[a-zA-Z]*f\\b|\\s\\+[\\w/.:-]+)",
+      "why": "force-push is blocked"
+    },
+    {
+      "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*(\\s|:|/)(main|master|production|prod)(\\s|$|;|&|\\||['\"])",
+      "why": "push to main/master/production is blocked; push a feature branch and open a PR"
+    },
+    {
+      "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*\\s--(all|mirror)\\b",
+      "why": "push --all/--mirror is blocked"
+    }
   ],
   "bashAsk": [
-    { "re": "\\b(npm|pnpm|yarn)\\s+publish\\b|\\bcargo\\s+publish\\b", "why": "package publish needs your yes" },
-    { "re": "\\b(dropdb|mysqladmin\\s+drop|drop\\s+database)\\b|\\bbench\\b.*\\b(drop-site|restore|reinstall)\\b|\\bpg_restore\\b|\\bmysql\\b[^|]*<", "why": "database drop/restore needs your yes" },
-    { "re": "\\bkubectl\\s+(apply|delete|create|patch|replace|scale|rollout|edit|drain|cordon|label|annotate|set)\\b|\\bhelm\\s+(install|upgrade|uninstall|rollback)\\b", "why": "kubectl/helm write needs your yes" },
-    { "re": "\\bdocker(-buildx)?\\s+(push|rm|rmi|system\\s+prune|volume\\s+rm|stop|kill)\\b|\\bdocker\\s+compose\\b[^;&|\\n]*\\b(up|down|rm|restart|pull)\\b", "why": "docker write needs your yes" },
-    { "re": "\\boffload\\s+down\\b", "why": "offload down needs your yes" },
-    { "re": "\\b(vercel\\s+(--prod|deploy)|fly\\s+deploy|netlify\\s+deploy|wrangler\\s+(deploy|publish)|gh\\s+release\\s+create|terraform\\s+apply|ansible-playbook)\\b|\\bssh\\b[^;&|\\n]*\\b(deploy|docker|systemctl|bench|psql|mysql)\\b", "why": "deploys and remote server commands need your yes" }
+    {
+      "re": "\\b(npm|pnpm|yarn)\\s+publish\\b|\\bcargo\\s+publish\\b",
+      "why": "package publish needs your yes"
+    },
+    {
+      "re": "\\b(dropdb|mysqladmin\\s+drop|drop\\s+database)\\b|\\bbench\\b.*\\b(drop-site|restore|reinstall)\\b|\\bpg_restore\\b|\\bmysql\\b[^|]*<",
+      "why": "database drop/restore needs your yes"
+    },
+    {
+      "re": "\\bkubectl\\s+(apply|delete|create|patch|replace|scale|rollout|edit|drain|cordon|label|annotate|set)\\b|\\bhelm\\s+(install|upgrade|uninstall|rollback)\\b",
+      "why": "kubectl/helm write needs your yes"
+    },
+    {
+      "re": "\\bdocker(-buildx)?\\s+(push|rm|rmi|system\\s+prune|volume\\s+rm|stop|kill)\\b|\\bdocker\\s+compose\\b[^;&|\\n]*\\b(up|down|rm|restart|pull)\\b",
+      "why": "docker write needs your yes"
+    },
+    {
+      "re": "\\boffload\\s+down\\b",
+      "why": "offload down needs your yes"
+    },
+    {
+      "re": "\\b(vercel\\s+(--prod|deploy)|fly\\s+deploy|netlify\\s+deploy|wrangler\\s+(deploy|publish)|gh\\s+release\\s+create|terraform\\s+apply|ansible-playbook)\\b|\\bssh\\b[^;&|\\n]*\\b(deploy|docker|systemctl|bench|psql|mysql)\\b",
+      "why": "deploys and remote server commands need your yes"
+    }
   ],
   "pathBlock": [
-    { "re": "(^|/)\\.env(?!\\.example$|\\.sample$|\\.template$)[^/]*$", "why": ".env files are never read" },
-    { "re": "(^|/)\\.ssh(/|$)|\\.pem$|\\.key$|(^|/)\\.aws/|(^|/)\\.npmrc$|(^|/)credentials(/|\\.|$)|(^|/)000-credentials(/|$)|_pw\\.txt$|(^|/)id_(rsa|ed25519|ecdsa)", "why": "credential files are never read" }
+    {
+      "re": "(^|/)\\.env(?!\\.example$|\\.sample$|\\.template$)[^/]*$",
+      "why": ".env files are never read"
+    },
+    {
+      "re": "(^|/)\\.ssh(/|$)|\\.pem$|\\.key$|(^|/)\\.aws/|(^|/)\\.npmrc$|(^|/)credentials(/|\\.|$)|(^|/)000-credentials(/|$)|_pw\\.txt$|(^|/)id_(rsa|ed25519|ecdsa)",
+      "why": "credential files are never read"
+    }
   ],
-  "alwaysVendored": ["**/node_modules/**", "**/.venv/**", "**/site-packages/**"],
+  "alwaysVendored": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    "**/site-packages/**"
+  ],
   "devSitePattern": "(\\.localhost|\\.local|\\.test)$|(^|[.-])(dev|test|staging|qa|sandbox)([.-]|$)"
 }

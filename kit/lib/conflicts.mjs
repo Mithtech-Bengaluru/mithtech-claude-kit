@@ -92,7 +92,26 @@ export function scanConflicts(cfg, { dry = false } = {}) {
     changes.push({ file: sf, scope: 'settings', rule: 'output-style', old: `outputStyle: ${s.outputStyle}`, new: 'outputStyle removed (kit communication rules apply)' });
     if (!dry) { const old = s.outputStyle; const b = backup(sf); delete s.outputStyle; writeJSON(sf, s); logLine({ file: sf, old: `outputStyle ${old}`, new: '(removed)', backup: b, rule: 'output-style' }); }
   }
+  // settings: allow rules that skip a kit "ask" or "deny" (for example `cd * && git push:*`, `npm publish:*`)
+  const PC = (C.settings.permissionConflicts || []).map((p) => new RegExp(p, 'i'));
+  const kitAllow = new Set(readJSON(path.join(KIT, 'settings.kit.json'), { allow: [] }).allow);
+  const bad = (s.permissions?.allow || []).filter((r) => !kitAllow.has(r) && PC.some((p) => p.test(normRule(r))));
+  if (bad.length) {
+    for (const r of bad) changes.push({ file: sf, scope: 'settings', rule: 'permission-skips-kit', old: r, new: '(allow rule removed; the kit asks first)' });
+    if (!dry) {
+      const b = backup(sf);
+      s.permissions.allow = s.permissions.allow.filter((r) => !bad.includes(r));
+      writeJSON(sf, s);
+      for (const r of bad) logLine({ file: sf, old: r, new: '(removed)', backup: b, rule: 'permission-skips-kit' });
+    }
+  }
   return changes;
+}
+// `Bash(cd * && git -C * push:*)` -> `git push`
+function normRule(r) {
+  const m = String(r).match(/^Bash\((.*)\)$/);
+  if (!m) return '';
+  return m[1].replace(/(:\*|\s\*)$/, '').replace(/^(cd \S+ && )+/, '').replace(/\bgit -C \S+ /, 'git ').replace(/^(sudo|env) /, '').trim();
 }
 function clean(t) {
   return t.replace(/^---\n[\s\S]*?\n---\n/, '').replace(/\[\[[^\]]*\]\]/g, '').replace(/`[^`\n]*`/g, '').replace(/\b[\w.-]+-[\w.-]+\.md\b/g, '');
