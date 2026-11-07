@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "mithtech-kit",
+  "description": "Mithtech's Claude Code kit: orchestrator with approval gates, reuse-first stack skills, guardrail hooks.",
+  "owner": { "name": "Mithtech" },
+  "plugins": [
+    {
+      "name": "mithtech",
+      "description": "Orchestrate skill, Frappe/Medusa/Next.js/Rust/enterprise skills, agents, guardrail and self-update hooks.",
+      "source": "./kit",
+      "strict": true
+    }
+  ]
+}

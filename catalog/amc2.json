@@ -1,0 +1,17 @@
+{
+  "name": "amc2",
+  "stack": "frappe",
+  "repo": "mithtech-is/generic-amc-module",
+  "purpose": "Generic annual maintenance contracts on native ERPNext doctypes",
+  "main": [
+    "AMC Condition Grade",
+    "AMC Contract Type",
+    "AMC Item Profile",
+    "AMC Job Type",
+    "AMC Meter Type",
+    "AMC Meter Reading"
+  ],
+  "domain": "AMC Configuration, AMC Operations",
+  "status": "active",
+  "updated": "2026-11-07"
+}

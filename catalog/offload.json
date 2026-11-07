@@ -1,0 +1,10 @@
+{
+  "name": "offload",
+  "stack": "rust",
+  "repo": "suparikoli/offload",
+  "purpose": "Run your dev servers on your team's Kubernetes (k3s) cluster instead of your laptop, with the same localhost URLs, hot r",
+  "main": [],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

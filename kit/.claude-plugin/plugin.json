@@ -1,0 +1,9 @@
+{
+  "name": "mithtech",
+  "version": "1.0.0",
+  "description": "Mithtech kit: orchestrate with approval gates, reuse-first stack skills, guardrail hooks, self-update.",
+  "author": { "name": "Mithtech" },
+  "repository": "https://github.com/Mithtech-Bengaluru/mithtech-claude-kit",
+  "license": "MIT",
+  "keywords": ["frappe", "erpnext", "medusa", "nextjs", "rust", "orchestration"]
+}

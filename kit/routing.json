@@ -1,0 +1,33 @@
+{
+  "_doc": "Model and effort routing. Skills and worker.mjs read this file; change models here, not in skills. Aliases resolve through ~/.claude/mithtech-kit.local.json modelRemap (written by install --doctor). Verified 2026-11-08 against code.claude.com/docs/en/model-config.",
+  "models": {
+    "haiku": { "alias": "haiku", "id": "claude-haiku-5-5" },
+    "sonnet": { "alias": "sonnet", "id": "claude-sonnet-5-5" },
+    "opus": { "alias": "opus", "id": "claude-opus-5-5" },
+    "fable": { "alias": "fable", "id": "claude-fable-5-1", "note": "Most capable; for work larger than one sitting. Not a default; may bill to usage credits. Used only as the last escalation step or when the local config sets allowFable." }
+  },
+  "effortLevels": ["low", "medium", "high", "xhigh", "max"],
+  "routes": [
+    { "id": "light", "work": "File search, cleanup, status lines, index refresh", "model": "haiku", "effort": "low" },
+    { "id": "intake", "work": "Spec intake, G0 reuse check, docs, boilerplate", "model": "haiku", "effort": "medium" },
+    { "id": "orchestrator", "work": "Orchestrator, wireframes, simple fixes, Next.js/JS sites", "model": "sonnet", "effort": "medium", "lowFor": ["simple fixes", "status"] },
+    { "id": "feature", "work": "Frappe features (Custom Fields, hooks, controllers, reports), Medusa features, tests, checker", "model": "sonnet", "effort": "medium" },
+    { "id": "feature-hard", "work": "Rust features, Medusa workflows with compensation, integrations, risky small changes", "model": "sonnet", "effort": "high" },
+    { "id": "unfamiliar", "work": "Unfamiliar stacks (Go, Flutter, TDL, others): docs lookup first", "model": "sonnet", "effort": "high" },
+    { "id": "architecture", "work": "G1 architecture, contracts, data model, migrations", "model": "opus", "effort": "high" },
+    { "id": "critical", "work": "Accounting/ledgers, multi-company, payments, tenancy/security, offline sync, merge conflicts", "model": "opus", "effort": "xhigh" },
+    { "id": "hardest", "work": "Hard bugs after escalation fails; final review of a large program", "model": "opus", "effort": "max" }
+  ],
+  "floors": [
+    { "when": "money, permissions, production data or shared contracts", "min": { "model": "sonnet", "effort": "high" } }
+  ],
+  "escalation": [
+    ["haiku", "low"], ["haiku", "medium"], ["sonnet", "low"], ["sonnet", "medium"], ["sonnet", "high"],
+    ["opus", "high"], ["opus", "xhigh"], ["opus", "max"], ["fable", "high"]
+  ],
+  "policy": [
+    "Pick the cheapest setting likely to succeed the first time; a retry costs more than one step up.",
+    "The orchestrator may move one step up or down for a task, with a one-line reason in the routing log.",
+    "Stop rule: retry once at the same setting, then escalate one step (effort first, then model), then park as a question."
+  ]
+}

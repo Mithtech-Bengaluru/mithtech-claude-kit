@@ -1,0 +1,23 @@
+{
+  "name": "mith_service",
+  "stack": "frappe",
+  "repo": "mithtech-is/mith_service",
+  "purpose": "Service contracts and service management on ERPNext and Frappe Helpdesk",
+  "main": [
+    "Service Demo Record",
+    "Service Settings",
+    "Service Setup Run",
+    "Field Service Connection",
+    "Field Service Log",
+    "Service Equipment",
+    "Service Equipment Transfer",
+    "Service Equipment Type",
+    "Service Expense",
+    "Service Expense Kind",
+    "Service Job",
+    "Service Reminder Log"
+  ],
+  "domain": "Service Contracts, Service Operations",
+  "status": "active",
+  "updated": "2026-11-07"
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@mithtech-medusa/gst-india",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-gst-india",
+  "purpose": "Indian GST at checkout for a Medusa v2 store whose tax invoices come from ERPNext (India Compliance): a tax provider tha",
+  "main": [],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

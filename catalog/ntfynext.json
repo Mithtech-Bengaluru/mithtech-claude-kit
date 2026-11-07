@@ -1,0 +1,13 @@
+{
+  "name": "ntfynext",
+  "stack": "frappe",
+  "repo": "suparikoli/ntfynext",
+  "purpose": "ntfy push notifications as an additional channel for Frappe (deliver notification emails via ntfy)",
+  "main": [
+    "NTFY Notification Log",
+    "NTFY Settings"
+  ],
+  "domain": "NTFYnext",
+  "status": "active",
+  "updated": "2026-11-07"
+}

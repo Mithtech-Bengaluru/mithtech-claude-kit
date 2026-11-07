@@ -1,0 +1,21 @@
+{
+  "name": "pricenexus",
+  "stack": "frappe",
+  "repo": "suparikoli/pricenexus",
+  "purpose": "PriceNexus is a price-intelligence and deal-matching platform built on Frappe, designed to connect buyer requirements wi",
+  "main": [
+    "Dealer",
+    "Dealer Parsing Template",
+    "Dealer Pricelist Snapshot",
+    "Dealer Quote",
+    "Holding",
+    "Item Alias",
+    "LLM Usage Log",
+    "Match Opportunity",
+    "PriceNexus Settings",
+    "Requirement"
+  ],
+  "domain": "PriceNexus",
+  "status": "active",
+  "updated": "2026-11-07"
+}

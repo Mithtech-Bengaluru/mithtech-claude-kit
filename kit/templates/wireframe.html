@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{module}} wireframes</title>
+<style>
+  /* Low-fidelity, greyscale only. One <section class="page"> per page. */
+  body { font: 14px/1.4 system-ui, sans-serif; color: #222; background: #f4f4f4; margin: 0; padding: 16px; }
+  .page { background: #fff; border: 1px solid #999; margin: 0 auto 24px; max-width: 1000px; padding: 16px; }
+  .page h2 { margin: 0 0 8px; font-size: 16px; }
+  .frame { border: 2px dashed #888; padding: 12px; display: grid; gap: 8px; }
+  .bar, .field, .btn, .table, .box { border: 1px solid #777; background: #e6e6e6; padding: 6px 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { background: #ccc; display: inline-block; }
+  table.spec { border-collapse: collapse; width: 100%; margin-top: 12px; }
+  table.spec th, table.spec td { border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }
+  table.spec th { background: #ddd; }
+</style>
+</head>
+<body>
+<section class="page" id="{{page-id}}">
+  <h2>{{Page name}} <small>({{route or DocType}})</small></h2>
+  <div class="frame">
+    <div class="bar">{{Header / breadcrumbs}}</div>
+    <div class="row"><div class="field">{{Field label}}</div><div class="field">{{Field label}}</div></div>
+    <div class="table">{{List / grid: columns}}</div>
+    <div class="row"><span class="btn">{{Primary action}}</span><span class="btn">{{Secondary}}</span></div>
+  </div>
+  <table class="spec">
+    <tr><th>Functions</th><td>{{list}}</td></tr>
+    <tr><th>Fields (reused / new)</th><td>{{fieldname: owner}}</td></tr>
+    <tr><th>Roles</th><td>{{roles}}</td></tr>
+    <tr><th>Permissions</th><td>{{read/write/submit per role}}</td></tr>
+  </table>
+</section>
+</body>
+</html>

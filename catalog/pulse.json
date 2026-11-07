@@ -1,0 +1,23 @@
+{
+  "name": "pulse",
+  "stack": "frappe",
+  "repo": "mithtech-is/Pulse",
+  "purpose": "Enterprise Project Management Platform",
+  "main": [
+    "Pulse Activity Log",
+    "Pulse Allocation",
+    "Pulse Change Request",
+    "Pulse Checklist",
+    "Pulse Comment",
+    "Pulse CR Approval",
+    "Pulse Dashboard",
+    "Pulse Decision",
+    "Pulse Dependency",
+    "Pulse Document",
+    "Pulse Goal",
+    "Pulse Key Result"
+  ],
+  "domain": "Pulse",
+  "status": "active",
+  "updated": "2026-11-07"
+}

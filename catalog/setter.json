@@ -1,0 +1,16 @@
+{
+  "name": "setter",
+  "stack": "frappe",
+  "repo": "suparikoli/setter",
+  "purpose": "Country-based default settings, cost-plus selling prices and GST print formats for Frappe and ERPNext",
+  "main": [
+    "Setter Change Log",
+    "Setter Drift Log",
+    "Setter Price Log",
+    "Setter Pricing Settings",
+    "Setter Settings"
+  ],
+  "domain": "Setter",
+  "status": "active",
+  "updated": "2026-11-07"
+}

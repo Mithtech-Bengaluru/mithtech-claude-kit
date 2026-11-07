@@ -1,0 +1,12 @@
+{
+  "name": "mith_store",
+  "stack": "frappe",
+  "repo": "suparikoli/mith_store",
+  "purpose": "Tailwind build for the Mith Enterprise Commera theme",
+  "main": [
+    "Mith Enterprise Theme Settings"
+  ],
+  "domain": "Mith Store",
+  "status": "active",
+  "updated": "2026-11-07"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@mithtech-medusa/wallet-loc",
+  "stack": "medusa",
+  "repo": "suparikoli/Medusa_WalletLOC",
+  "purpose": "Medusa v2 customer wallet: ledgered balances, pluggable deposit-account issuers, top-ups through any Medusa payment prov",
+  "main": [
+    "wallet_audit_log",
+    "wallet_bank_account",
+    "wallet_deposit_account",
+    "wallet_deposit_proof",
+    "wallet_payment_attempt",
+    "wallet_topup",
+    "wallet_setting",
+    "wallet_transaction",
+    "wallet",
+    "wallet_webhook_event",
+    "wallet_withdrawal_batch"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

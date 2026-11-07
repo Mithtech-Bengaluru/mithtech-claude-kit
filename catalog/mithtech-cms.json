@@ -1,0 +1,10 @@
+{
+  "name": "mithtech-cms",
+  "stack": "web",
+  "repo": "mithtech-is/mithtech-payload",
+  "purpose": "The live Mithtech website: Next.js 16, React 19 and Payload CMS",
+  "main": [],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

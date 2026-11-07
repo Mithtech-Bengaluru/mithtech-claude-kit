@@ -1,0 +1,13 @@
+{
+  "name": "@mithtech-medusa/pages",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-pages",
+  "purpose": "Medusa v2 content pages and blog posts with SEO metadata, managed in the admin and rendered by the storefront.",
+  "main": [
+    "content_page",
+    "content_post"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

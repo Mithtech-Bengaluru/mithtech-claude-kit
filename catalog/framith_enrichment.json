@@ -1,0 +1,23 @@
+{
+  "name": "framith_enrichment",
+  "stack": "frappe",
+  "repo": "mithtech-is/framith_enrichment",
+  "purpose": "Lead enrichment and lead generation on Frappe, through swappable data providers",
+  "main": [
+    "Business Profile",
+    "Change Signal",
+    "Change Signal Field",
+    "Change Signal Product",
+    "Contact Check",
+    "Contact Check Field",
+    "Contact Check Product",
+    "Enrichment Cache",
+    "Enrichment Product",
+    "Enrichment Run",
+    "Enrichment Settings",
+    "Enrichment Target"
+  ],
+  "domain": "Framith Enrichment",
+  "status": "active",
+  "updated": "2026-11-07"
+}

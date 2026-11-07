@@ -1,0 +1,15 @@
+{
+  "name": "@mithtech-medusa/plugin-erpnext",
+  "stack": "medusa",
+  "repo": "mithtech-is/medusa-erpnextsync",
+  "purpose": "ERPNext to Medusa v2 sync plugin: catalogue over Frappe webhooks and a scheduled pull, orders and payments back",
+  "main": [
+    "erpnext_link",
+    "erpnext_mapping",
+    "erpnext_setting",
+    "erpnext_sync_event"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

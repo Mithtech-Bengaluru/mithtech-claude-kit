@@ -1,0 +1,10 @@
+{
+  "name": "@mithtech-medusa/cashfree",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-cashfree",
+  "purpose": "Cashfree for Medusa v2: Payment Gateway provider (orders, refunds, webhooks, wallet top-ups), Auto Collect virtual accou",
+  "main": [],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}

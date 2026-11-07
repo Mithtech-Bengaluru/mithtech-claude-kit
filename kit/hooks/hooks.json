@@ -1,0 +1,20 @@
+{
+  "description": "Mithtech kit guardrails and session start. Coexists with other hooks (for example Offload); does not duplicate them.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Read|Grep|Glob|Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/guard.mjs\"", "timeout": 10 }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start.mjs\"", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@mithtech-medusa/marketing",
+  "stack": "medusa",
+  "repo": "suparikoli/medusa-marketing",
+  "purpose": "Medusa v2 marketing toolkit: gift cards redeemed through core promotions, customer referrals with automatic rewards, con",
+  "main": [
+    "mkt_abandoned_cart_settings",
+    "mkt_abandoned_cart",
+    "mkt_gift_card_transaction",
+    "mkt_gift_card",
+    "mkt_lead",
+    "mkt_popup",
+    "mkt_referral_code",
+    "mkt_referral_program",
+    "mkt_referral"
+  ],
+  "domain": "",
+  "status": "active",
+  "updated": "2026-11-07"
+}
