@@ -6,7 +6,7 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 
 # 0. RULES FOR THIS SETUP
 - Detect OS, home folder, Claude config folder (~/.claude or %USERPROFILE%\.claude) and the coding root. Must work on macOS, Linux, Windows (Frappe on Windows = WSL). Scripts and hooks in Node, never bash.
-- Check what exists before writing: ~/.claude (settings.json, skills, agents, plugins, hooks), the coding root CLAUDE.md, every project CLAUDE.md and HANDOFF.md, PROJECTS.md. Never overwrite: back up to <name>.bak-<date>, then merge. Keep existing hooks (for example the Offload hook), third-party skills/agents and project rules. A project rule beats a kit rule; report conflicts.
+- Check what exists before writing: ~/.claude (settings.json, skills, agents, plugins, hooks), the coding root CLAUDE.md, every project CLAUDE.md and HANDOFF.md, PROJECTS.md. Never overwrite: back up to <name>.bak-<date>, then merge. Keep existing hooks (for example the Offload hook), third-party skills/agents and project facts (commands, paths, stack details). When an existing rule, preference or memory contradicts the kit, the kit wins (section 1, CONFLICTS).
 - Verify in the current Claude Code docs before writing: plugin and marketplace format (local folder and GitHub sources), SKILL.md frontmatter, agent files (model, effort, tools), settings permission syntax, hook events and whether hooks and deny rules still apply in bypassPermissions mode, how one session can start other sessions with their own model, effort and permission mode, what usage data a session exposes (statusline input, cost, OpenTelemetry), the current model list and effort levels. Verify Frappe, Medusa, Cargo and other CLI commands in their docs. Never guess syntax.
 - No secrets in any file; name env variables only. Never read credentials folders or .env files.
 - PHASE A (read-only): discover, then show me one short plan: files to create or change, and backups. Wait for my yes. PHASE B: write.
@@ -17,6 +17,13 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 - The folder holding this prompt is the git repo Mithtech-Bengaluru/mithtech-claude-kit (public, the only copy). Build the kit into `kit/` inside it. People install from a shared copy of the folder or a clone.
 - Package skills, agents, hooks, templates and patterns as a Claude Code plugin in `kit/`, with a marketplace file so it installs from the local folder or from GitHub, IF the docs confirm plugins carry all of these. Whatever a plugin can't carry (permission rules, global CLAUDE.md, statusline) is merged by `node kit/install.mjs`: adds the plugin, backs up, merges, safe to re-run, `--update`, `--uninstall`, `--doctor`, no tokens, about a minute.
 - `--doctor` checks: kit version vs GitHub, hooks fire on sample input, plugin loaded, which models and effort levels this account can use (writes the remap into the local config), gh login, git identity.
+- CONFLICTS (the installer handles these automatically, on every install and `--update`):
+  - Scan the global CLAUDE.md, memory files (`~/.claude/projects/*/memory/` and their MEMORY.md indexes), output style, settings.json, other plugins' skills and agents, and each onboarded project's CLAUDE.md.
+  - Replace every rule, preference or memory that contradicts the kit with the kit's version. Back up each changed file first. Delete a contradicting memory file and remove its MEMORY.md line; keep memories that don't conflict.
+  - Keep project facts (commands, paths, versions); only contradicting rules are replaced.
+  - Write each change to `~/.claude/mithtech-kit-conflicts.log` (file, old line, new line, backup path) and show a summary of at most 5 lines. `--uninstall` restores the backups.
+  - Account-level instructions in Claude settings can't be read by the kit: remind the user to replace them with the 2-line kit pointer.
+  - `--doctor` repeats the scan and fixes new conflicts the same way.
 - Nothing account-specific in the kit: no emails, account IDs, memory files or absolute paths. Each computer gets a gitignored `~/.claude/mithtech-kit.local.json`: coding root, machine name, max parallel sessions (default 3), model remap.
 - FIRST COMPUTER (this one): build the kit, run the pilot (section 5), push after my yes. OTHER COMPUTERS: `node kit/install.mjs`. Project CLAUDE.md files and approved plans live in each project's repo, so they are written once and never regenerated per computer.
 - SELF-UPDATE (all scripts, zero Claude tokens):
@@ -218,6 +225,6 @@ Fix the kit if any fails. Report token use per dry run.
 # 6. VERIFY AND REPORT
 - Validate all frontmatter, JSON, hook scripts; run `node kit/install.mjs --doctor`.
 - List every file created or changed (one line each) and the backups.
-- Report conflicts with existing project rules, and the naming audit (section 3.0).
+- Report the conflicts replaced (from the conflicts log), and the naming audit (section 3.0).
 - Recommend, don't create: shared enterprise-core library, a routine to refresh PROJECTS.md.
 - Give me: the 2-line text for Claude Settings → Instructions (it only points to the kit), the one-command install for other computers, and what I must do now (restart, or start a new session).
