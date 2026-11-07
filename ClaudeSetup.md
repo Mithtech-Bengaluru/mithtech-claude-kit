@@ -11,7 +11,7 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 - No secrets in any file; name env variables only. Never read credentials folders or .env files.
 - PHASE A (read-only): discover, then show me one short plan: files to create or change, and backups. Wait for my yes. PHASE B: write.
 - During setup do not build, install project deps, migrate, start servers or run project tests.
-- Talk to me in the kit's style (section 3.1, COMMUNICATION). One question at a time.
+- Talk to me in the kit's style (section 3.1, COMMUNICATION). One question at a time, as clickable options.
 
 # 1. DISTRIBUTION AND SELF-UPDATE
 - The folder holding this prompt is the git repo Mithtech-Bengaluru/mithtech-claude-kit (public, the only copy). Build the kit into `kit/` inside it. People install from a shared copy of the folder or a clone.
@@ -66,18 +66,36 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 - SAFETY: never force-push or push to main/master/production unless I ask; production deploys and production data changes need my explicit yes; backup before migrate; never edit vendored/upstream code (frappe, erpnext, hrms, india_compliance and other third-party apps, @medusajs core, node_modules, generated code); never copy databases between machines without asking.
 - DONE = the project's gate passes, every approved requirement built and tested, no stub/mock on a feature claimed done, status updated.
 - RUNNING APPS: follow the coding root CLAUDE.md (Offload) when present.
-- COMMUNICATION: answer first. Label blocks **Telling** (facts, results, recommendations) and **Asking** (one question, with choices). At most 10 lines unless I ask for detail. No narration, no recap of what I said, no repeated questions.
+- COMMUNICATION: answer first. Label blocks **Telling** (facts, results, recommendations) and **Asking** (one question). At most 10 lines unless I ask for detail. No narration, no recap of what I said, no repeated questions.
+- QUESTIONS AS OPTIONS: ask with the clickable question tool (AskUserQuestion) whenever it is available: 2–4 options, the recommended one first and marked (Recommended), short labels. Use plain text only when the tool is unavailable (for example in headless runs).
+- CONFIRM FIRST (M and L tasks): before any work, restate the request in at most 7 bullets: Goal, In scope, Out of scope, Placement, Assumptions (only ones you can't check), Done when. Ask me to confirm with options (Correct / Change something). Skip for S tasks.
+- WRITING STYLE (ASD-STE100 writing rules, without the restricted dictionary): one idea per sentence; instructions max 20 words, descriptions max 25; active voice; instructions start with a verb; one term per meaning, used the same way every time; no noun clusters of more than 3 words. Applies to messages, RULES.md, briefs, packs and reports; not to code or logs.
 - FINAL REPORT (max 8 lines): branch, commits, gate result, deploy status, pending items, risks, tokens used vs budget.
 
 ## 3.2 Task sizes and approval gates (the orchestrate skill owns these)
 - S (bug fix, one field, one small change, or a pattern match): G0 reuse check in one line, then build.
-- M (one feature): G0, then ONE mini pack for approval: placement (generic or customer app), data changes (existing vs new), wireframe if it adds or changes a page, test plan, token estimate. Then build.
-- L (module, app or program): full gates:
+- M (one feature): CONFIRM FIRST bullets, G0, then ONE mini pack for approval: placement (generic or customer app), data changes (existing vs new), wireframe if it adds or changes a page, test plan, token estimate. Then build.
+- L (module, app or program): CONFIRM FIRST bullets, then the full gates, organised by TOGAF ADM (table below):
   - G0 REUSE: Haiku reads the reuse index and catalogue and lists, per requirement, exists / extend / new, with the owner.
   - G1 ARCHITECTURE (TOGAF-lite, one pack per module): business capabilities, application placement (generic framith_/mithusa- app vs customer app), data model marking reused vs extended vs new entities, integration flows, key decisions as ADRs. Diagrams in Mermaid.
   - G2 WIREFRAMES: one low-fidelity wireframe per page (a single static HTML file per module, greyscale), each with a table of its functions, fields, roles and permissions.
   - G3 BUILD PLAN: waves in dependency order (data model and contracts first), one brief per unit with a token estimate, a tracker mapping every requirement ID to a brief, an owner (session or person) and a test.
   - I approve G1, G2 and G3 in that order, per module, on ONE REVIEW PAGE: `node kit/review.mjs <slug>` serves a local page (localhost only) showing packs, rendered diagrams and wireframes, with Approve / Comment per item. It writes my decisions to `docs/programs/<slug>/approvals.md` (gate, module, date, git hash) and comments to questions.md. No tokens are spent on reviewing. The plan is then frozen; a change request re-opens only the affected pack and brief.
+- TOGAF ADM MAPPING (lives in the orchestrate skill, so only large tasks load it; every output max one page, diagrams in Mermaid):
+  | ADM phase | Our output | Sizes |
+  |---|---|---|
+  | A Architecture Vision | the confirmed CONFIRM FIRST bullets, stakeholders, constraints | M, L |
+  | B Business | capabilities, processes, roles | L |
+  | C Data | entities marked reused, extended or new; single owner per entity | M, L |
+  | C Application | placement: framith_/mithusa-, generic or customer app | M, L |
+  | D Technology | stack, hosting, integrations | L |
+  | E Opportunities and Solutions | G0 reuse or build per requirement | M, L |
+  | F Migration Planning | G3 waves, data migration, cut-over plan | L |
+  | G Implementation Governance | checker compares the build with the approved pack | M, L |
+  | H Change Management | change requests and lessons (section 3.11) | L |
+  | Requirements Management | requirement IDs tracked from G0 to tests | all |
+  - G1 covers phases B, C and D; G2 wireframes follow phase C; G3 covers phases E and F.
+  - The catalogue is the architecture repository: the generic framith_ and mithusa- apps are the reusable building blocks.
 - LARGE SPECS (hundreds of pages): the orchestrator never reads the raw spec. An intake unit (Haiku) splits it into modules and gives every requirement an ID with a one-line index. Module planners (one session per module) read only their slice and write their pack. One architect pass (Opus) reads only the packs and merges the shared data model and placement, so modules never invent their own copies of shared masters.
 - The checker fails any build that adds something not in an approved pack, or leaves a requirement ID without code and a test.
 
@@ -189,11 +207,12 @@ On each pilot project run read-only dry runs and show me the result in 5 lines e
 2. Frappe: "build a customer wallet DocType" must find the existing wallet app and stop.
 3. Frappe: "add a field only customer X needs" must place it in framith_<customer>, not the generic app.
 4. Medusa: "add product reviews" must find the existing reviews plugin.
-5. Any: a size-L request must produce G0 and a G1 pack, open the review page, and wait without building.
-6. Orchestrator: a 3-unit plan must show units, owned files, model/effort with reasons and token estimates, and start no session before my yes.
-7. Hooks: a worker editing a file outside its brief, a force-push and an .env read must all be blocked.
-8. Dupcheck: a new field `gst_no` on Customer must be flagged.
-9. Driftcheck: on a dev site, a Custom Field and a Server Script made in the UI must be listed with a suggested app, and nothing is moved without approval.
+5. Any: a size-M request must first show the CONFIRM FIRST bullets as clickable options and wait.
+6. Any: a size-L request must produce G0 and a G1 pack mapped to TOGAF phases, open the review page, and wait without building.
+7. Orchestrator: a 3-unit plan must show units, owned files, model/effort with reasons and token estimates, and start no session before my yes.
+8. Hooks: a worker editing a file outside its brief, a force-push and an .env read must all be blocked.
+9. Dupcheck: a new field `gst_no` on Customer must be flagged.
+10. Driftcheck: on a dev site, a Custom Field and a Server Script made in the UI must be listed with a suggested app, and nothing is moved without approval.
 Fix the kit if any fails. Report token use per dry run.
 
 # 6. VERIFY AND REPORT

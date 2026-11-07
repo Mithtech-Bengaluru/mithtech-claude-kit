@@ -15,6 +15,12 @@ The rules every Mithtech developer follows, with or without Claude. One line eac
 - No secrets in git, images, logs or shared files. Use environment variables.
 - Never copy a database between machines without asking.
 
+## Communication
+- Before a medium or large task, restate it in at most 7 bullets (goal, scope, placement, assumptions, done when) and get a yes.
+- Write one idea per sentence. Keep instructions under 20 words, descriptions under 25.
+- Use active voice. Start instructions with a verb.
+- Use one term for one meaning, every time.
+
 ## Frappe / ERPNext
 - Name every Mithtech app `framith_<name>`.
 - Build the generic product app first (`framith_<product>`), complete and configurable through its Settings DocType.
