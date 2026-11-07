@@ -65,7 +65,7 @@ const prompt = `You are the worker for unit "${u.unit}" of program "${slug}". Yo
   + (val('--answer') ? `\nAnswer from the user to your earlier question: ${val('--answer')}\nContinue the unit.` : '');
 const cmd = ['-p', prompt, '--model', model, '--effort', u.effort, '--permission-mode', 'bypassPermissions', '--output-format', 'stream-json', '--verbose',
   '--append-system-prompt', readText(promptFile).replace(/^---[\s\S]*?---\n/, '')];
-if (flag('--dry-run')) { console.log(`worktree ${wt} (branch ${branch})\nclaude ${cmd.slice(0, 1).join(' ')} "<prompt>" ${cmd.slice(2, 12).join(' ')} --append-system-prompt <worker agent>`); process.exit(0); }
+if (flag('--dry-run')) { console.log(`worktree ${wt} (branch ${branch})\nclaude ${cmd.slice(0, 1).join(' ')} "<prompt>" ${cmd.slice(2, 11).join(' ')} --append-system-prompt <worker agent>`); process.exit(0); }
 
 if (!exists(wt)) {
   if (git(root, 'rev-parse', '--verify', `feat/${slug}`).code !== 0) git(root, 'branch', `feat/${slug}`);
