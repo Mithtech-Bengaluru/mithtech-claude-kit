@@ -73,18 +73,21 @@ function mergeSettings() {
   const m = readJSON(MANIFEST, { backups: [], created: [] });
   m.added = m.added || { allow: [], deny: [], ask: [] };
   s.permissions = s.permissions || {};
-  let added = 0;
+  let added = 0, removed = 0;
   for (const k of ['allow', 'deny', 'ask']) {
     const cur = new Set(s.permissions[k] || []);
+    // rules an older kit version added and this version dropped
+    for (const r of [...m.added[k]]) if (!kitS[k].includes(r)) { if (cur.delete(r)) removed++; m.added[k] = m.added[k].filter((x) => x !== r); }
     for (const r of kitS[k]) if (!cur.has(r)) { cur.add(r); added++; if (!m.added[k].includes(r)) m.added[k].push(r); }
     s.permissions[k] = [...cur];
   }
+  added += removed;
   let statusNote = 'statusline kept';
   if (!s.statusLine) { s.statusLine = { type: 'command', command: `node "${kitPathFwd}/kit/scripts/statusline.mjs"`, padding: 0 }; m.statusLine = true; statusNote = 'statusline added'; }
   if (added || m.statusLine) {
     if (!dry) { backup(SETTINGS); writeJSON(SETTINGS, s); writeJSON(MANIFEST, m); }
   }
-  return `${added} permission rule(s) added; ${statusNote}`;
+  return `${added - removed} permission rule(s) added, ${removed} outdated kit rule(s) removed; ${statusNote}`;
 }
 
 // ---------- global CLAUDE.md ----------

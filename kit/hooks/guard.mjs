@@ -20,11 +20,11 @@ if (d.decision === 'deny') {
   process.stderr.write(d.reason + '\n');
   process.exit(2);
 }
-// ask: force a confirmation even when allow rules match
+// ask: force a confirmation even when allow rules match; allow: pre-approve a narrow safe case (dev-site bench)
 process.stdout.write(JSON.stringify({
   hookSpecificOutput: {
     hookEventName: 'PreToolUse',
-    permissionDecision: 'ask',
+    permissionDecision: d.decision === 'allow' ? 'allow' : 'ask',
     permissionDecisionReason: d.reason,
   },
 }));

@@ -50,6 +50,21 @@ t('edit vendored blocked', tool('Edit', path.join(repo, 'apps', 'erpnext', 'erpn
 t('edit node_modules blocked', tool('Edit', path.join(tmp, 'p', 'node_modules', 'a', 'i.js')).code === 2);
 t('migrate prod site blocked', bash('bench --site erp.example.com migrate').code === 2);
 t('migrate dev site allowed', bash('bench --site test.localhost migrate').code === 0);
+// v1.0.1: quoted text is data; the real command structure decides
+t('grep for "git push" allowed on main', bash('grep -c "git push" notes.md', repo).code === 0);
+t('commit message mentioning push to main allowed', bash('git commit -m "fix: push to main is blocked"', repo).code === 0);
+t('echo of a prod migrate allowed', bash('echo "bench --site erp.example.com migrate"').code === 0);
+t('push to quoted "main" blocked', bash('git push origin "main"').code === 2);
+t('git -C repo push on main blocked', bash(`git -C ${repo} push`).code === 2);
+t('cd repo && git push on main blocked', bash(`cd ${repo} && git push`).code === 2);
+t('bash -c push to main blocked', bash('bash -c "git push origin main"').code === 2);
+t('push -uf blocked', bash('git push -uf origin feat/x').code === 2);
+t('push +refspec blocked', bash('git push origin +feat/x').code === 2);
+t('push refs/heads/main blocked', bash('git push origin HEAD:refs/heads/main').code === 2);
+t('tag push from main allowed', bash('git push origin v1.2.3', repo).code === 0);
+const devB = bash('bench --site dev.localhost backup');
+t('dev-site backup pre-approved', devB.code === 0 && /"permissionDecision":"allow"/.test(devB.out));
+t('chained dev-site migrate not pre-approved', !/"allow"/.test(bash('bench --site dev.localhost migrate && rm -rf x').out));
 const pub = bash('npm publish');
 t('npm publish asks', pub.code === 0 && /"permissionDecision":"ask"/.test(pub.out));
 t('offload down asks', /"ask"/.test(bash('offload down myapp').out));
@@ -91,6 +106,12 @@ const hitFiles = (() => { try { return JSON.parse(scanOut.stdout); } catch { ret
 t('conflict scan finds the contradicting memory', hitFiles.some((f) => f.endsWith('bad.md')));
 t('conflict scan ignores memory links', !hitFiles.some((f) => f.endsWith('good.md')), scanOut.stderr.trim());
 void scanConflicts; void savedDir;
+// permission rules that skip a kit ask/deny are found; harmless ones are kept
+fs.writeFileSync(path.join(env.CLAUDE_CONFIG_DIR, 'settings.json'), JSON.stringify({ permissions: { allow: ['Bash(cd * && git push:*)', 'Bash(git -C * push:*)', 'Bash(cd * && npm publish:*)', 'Bash(git -C * worktree remove:*)', 'Bash(ls *)'] } }));
+const permOut = spawnSync(process.execPath, ['-e', `import(${JSON.stringify(path.join(KIT, 'lib', 'conflicts.mjs'))}).then(m=>console.log(JSON.stringify(m.scanConflicts({},{dry:true}).filter(c=>c.rule==='permission-skips-kit').map(c=>c.old))))`], { env, encoding: 'utf8' });
+const permHits = (() => { try { return JSON.parse(permOut.stdout); } catch { return []; } })();
+t('conflict scan finds allow rules that skip asks', permHits.length === 3 && permHits.includes('Bash(cd * && npm publish:*)'), permOut.stderr.trim() || JSON.stringify(permHits));
+t('conflict scan keeps harmless allow rules', !permHits.includes('Bash(ls *)') && !permHits.includes('Bash(git -C * worktree remove:*)'));
 
 // generated files in sync
 const rc = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'rules.mjs'), '--check'], { encoding: 'utf8' });
