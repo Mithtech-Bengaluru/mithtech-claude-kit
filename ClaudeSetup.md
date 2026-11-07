@@ -39,6 +39,9 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
   - GENERIC FIRST: product features are built as generic, configurable apps, `framith_<product>` (for example framith_fieldops, framith_kyc). Behaviour that differs between customers is a setting in the app's Single Settings DocType, never a customer check in code.
   - CUSTOMER LAYER: each customer gets one app `framith_<customer>` that lists the generic apps in required_apps and holds only that customer's Custom Fields, Property Setters, print formats, workspaces, fixtures and small overrides. No generic logic in a customer app; no customer logic in a generic app; never fork a generic app per customer.
   - When a customer asks for something: if other customers could use it, build it in the generic app behind a setting; otherwise put it in the customer app. State which and why.
+  - EVERYTHING LIVES IN AN APP: every Frappe change ends up as code in an app repo, never only in a site's database. Custom Fields and Property Setters are exported as fixtures of the owning app (module set to that app's module, filtered fixtures) or created in its install/patch code; server logic goes in controllers, hooks and API files; client logic in the app's JS (doctype_js hooks). No Server Scripts, Client Scripts or Customize Form changes left on a site once the work works. Quick UI changes while exploring are fine, but before "done" they are moved into the app, tested from a fresh install, and the database-only originals are removed so the app stays the single source of truth.
+  - WHICH APP: generic behaviour goes into the generic framith_<product> app; customer-specific changes into framith_<customer>. On a live customer site, every customisation, including ones people make by hand in the UI, is saved into that customer's app.
+  - DRIFT CHECK (`node kit/driftcheck.mjs <site>`, read-only, no tokens): lists Custom Fields, Property Setters, Server Scripts, Client Scripts, Print Formats, Reports and Workspaces that exist on the site but in no app, with the app each one should move to. Run it before every release and on live customer sites weekly; the "capture live customisations" pattern moves them into the app.
   - COMPLETE FEATURES: a generic app ships only when every requirement ID in its approved spec is built and tested. The checker blocks "done" while any ID is missing. Partial apps stay on a feature branch.
 - MEDUSA: every Medusa plugin, module or extension Mithtech builds is named `mithusa-<name>` (npm package; keep the registry scope we already use, verify it). Same layering: generic `mithusa-<feature>` plugins first; customer-only code lives in that customer's Medusa project (or `mithusa-<customer>` if several of their stores share it).
 - OTHER STACKS: no prefix rule yet; keep repo names. New rules are added here through the kit repo.
@@ -121,7 +124,7 @@ Verify the current models (Haiku 5.5, Sonnet 5.5, Opus 5.5, Fable 5.1 at the tim
 - Generic framith_<product> app first, customer framith_<customer> app for customisations (section 3.0).
 - Extend first: Custom Fields, Property Setters, doc_events, override_doctype_class, hooks, standard reports, Print Designer, Workflows. New DocType only after G0 shows nothing to extend.
 - Check across our framith_ apps too: one domain, one owning app.
-- Logic in app code, not database Server/Client Scripts, unless I ask. frappe.qb or get_all with explicit fields; no SQL concatenation; no get_doc in loops; db.get_value, bulk ops, frappe.enqueue (idempotent), frappe.cache, search_index on filtered fields.
+- Logic in app code, never left in database Server/Client Scripts or Customize Form; everything is saved into the right app before "done" (section 3.0, EVERYTHING LIVES IN AN APP). frappe.qb or get_all with explicit fields; no SQL concatenation; no get_doc in loops; db.get_value, bulk ops, frappe.enqueue (idempotent), frappe.cache, search_index on filtered fields.
 - Permissions: whitelisted functions check permissions; ignore_permissions only with a comment; roles and User Permissions, never hardcoded users; respect company filters.
 - Accounting: never write GL/Stock ledger rows by hand (use ERPNext controllers); respect submit/cancel/amend, accounting dimensions, fiscal years. Indian tax through india_compliance.
 - Settings in one Single "Settings" DocType per app; nothing hardcoded. Strings in _(). Naming series.
@@ -144,7 +147,7 @@ For Go, Flutter, Python, TDL and anything else: read the project's CLAUDE.md for
 Tenant from the session, never the request; server-side permission plus record scope; money and quantities never floats, no money math in the UI; posted documents immutable, corrections are new documents; document and outbox row in one transaction; idempotency keys on commands and webhooks; retries with backoff and dead-letter; offline sync versioned with tested conflict rules; migrations backward-compatible; PII masked in logs; no N+1, paginate everything; a regression test for every bug fixed.
 
 ## 3.7 Patterns (kit `patterns/`, one short recipe each)
-Ready answers for common tasks so they skip planning: field on a standard master (Custom Field + fixture in the right framith_ app), customer-specific print format, new setting (Single Settings DocType field), report on existing data (Query/Script Report, no new table), webhook in/out (signature check, idempotency key, background job, integration log), Medusa link to a core model, Medusa admin widget, scheduled job. Recipes grow through the learning loop.
+Ready answers for common tasks so they skip planning: capture live customisations (driftcheck, then export into the customer or generic app, test on a fresh site, remove the database-only copies), field on a standard master (Custom Field + fixture in the right framith_ app), customer-specific print format, new setting (Single Settings DocType field), report on existing data (Query/Script Report, no new table), webhook in/out (signature check, idempotency key, background job, integration log), Medusa link to a core model, Medusa admin widget, scheduled job. Recipes grow through the learning loop.
 
 ## 3.8 Agents (minimal tools, one-line descriptions; model/effort from routing.json)
 light, worker, architect, checker (read, test, lint only; checks against approved packs, naming and layering, SSOT, placement, stack rules, enterprise-core and requirement coverage), cleanup (git and file tools only), indexer (builds .claude/index and catalogue entries).
@@ -183,6 +186,7 @@ On each pilot project run read-only dry runs and show me the result in 5 lines e
 6. Orchestrator: a 3-unit plan must show units, owned files, model/effort with reasons and token estimates, and start no session before my yes.
 7. Hooks: a worker editing a file outside its brief, a force-push and an .env read must all be blocked.
 8. Dupcheck: a new field `gst_no` on Customer must be flagged.
+9. Driftcheck: on a dev site, a Custom Field and a Server Script made in the UI must be listed with the app they belong in.
 Fix the kit if any fails. Report token use per dry run.
 
 # 6. VERIFY AND REPORT
