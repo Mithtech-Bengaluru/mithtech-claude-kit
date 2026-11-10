@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "Parallel audit sessions sharing one Chrome profile share stored theme settings and cannot resize the window below about 600 px",
+  "fix": "Measure viewports in fixed-size same-origin frames or a separate headless browser, and set the theme explicitly for each check",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-10T21:37:58.004Z"
+}
