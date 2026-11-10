@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Frappe reads a per-site apps file, so a renamed app can be rehearsed on a throwaway site without changing the bench app list.",
+  "fix": "List the new app in the site's own apps file and load the code with a worktree overlay.",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-10T04:10:44.401Z"
+}

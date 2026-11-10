@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Worker budget counted each stream content block, so one message counted 2-3 times and units paused early.",
+  "fix": "Usage is now counted once per message id, with the latest figures.",
+  "project": "framith_tradedeal",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-09T07:13:52.329Z"
+}
