@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "Meta Embedded Signup sends the phone and account IDs only in the popup message event. Coexistence history sync expires 24 hours after onboarding.",
+  "fix": "Listen for the popup message event and request the contacts and history sync right after onboarding.",
+  "project": "whatomate",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-10T08:32:34.653Z"
+}
