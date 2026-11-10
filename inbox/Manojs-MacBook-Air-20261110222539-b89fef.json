@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "A local dev server that loads the whole local env file can reach real ERP, push and mail services on a test submit.",
+  "fix": "For local checks pass only the database URL and the Payload secret, as an allow-list.",
+  "project": "mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-10T22:25:39.970Z"
+}
