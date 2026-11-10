@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "When other apps import a renamed app at module level, install the new package beside the old one before switching anything.",
+  "fix": "Order: add new beside old, switch dependents, rename each site, migrate, then remove the old package.",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-10T04:10:52.323Z"
+}
