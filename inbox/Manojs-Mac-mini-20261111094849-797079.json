@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Frappe 16 list view sets its own Add button after listview onload, so a primary action set in onload never shows.",
+  "fix": "Define the custom new-record dialog in the listview primary_action setting, which the Add button calls.",
+  "project": "framith_amc_service",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-11T09:48:49.113Z"
+}
