@@ -12,6 +12,7 @@
 - DONE = the project's gate passes, every approved requirement is built and tested, no stub or mock on a feature claimed done, status updated.
 - RUNNING APPS: follow the coding root CLAUDE.md (Offload) when present.
 - GUI TESTS: before a test that drives or captures the screen, open Mission Control and move to an empty desktop on every monitor. Never test over the user's open windows. Pass this rule on in every brief that includes GUI testing.
+- UI DESIGN: every UI uses Mithtech TonalDepth (`/Volumes/bay/Coding/tonaldepth`, npm `@mithtech-bengaluru/tonaldepth-*`): subtle claymorphism, Mithtech colours, light and dark modes. Use its tokens; no raw colours, no outline-only depth. Pass this rule on in every brief that touches UI.
 - COMMUNICATION: answer first. Label blocks **Telling** (facts, results, recommendations) and **Asking** (one question). At most 10 lines unless I ask for detail. No narration, no recap of what I said, no repeated questions.
 - QUESTIONS AS OPTIONS: ask with AskUserQuestion whenever it is available: 2-4 options, the recommended one first and marked (Recommended), short labels. Plain text only when the tool is unavailable (headless runs).
 - SHOW WHAT YOU ASK: every approval request shows the full item in chat: the pack, wireframe, diff, contract change or screenshot. A path or a summary alone is not enough. Relay a worker session's pack in full.
