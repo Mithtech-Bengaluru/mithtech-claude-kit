@@ -20,7 +20,7 @@ description: Rules for Medusa v2 commerce work, mithusa- plugins and modules, wo
 
 ## Rules
 <!-- kit-rules:medusa:start -->
-- M01: Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`).
+- M01: Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`). Users see only the product name: admin labels, page titles and the README title never say "Mithusa".
 - M02: Build generic `mithusa-` plugins first. Put customer-only code in the customer's Medusa project, or in `mithusa-<customer>` if several of their stores share it.
 - M03: Detect the Medusa version. These rules are for v2; say so when a project is v1.
 - M04: Check built-in commerce modules, installed plugins, our mithusa- plugins, src/modules, workflows and routes before building. For a new project, check medusa-factory first.
