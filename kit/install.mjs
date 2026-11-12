@@ -13,6 +13,7 @@ import {
   backup, recordCreated, run, git, localConfig, saveLocalConfig, kitVersion, semverCmp, today,
 } from './lib/common.mjs';
 import { scanConflicts, restoreConflicts } from './lib/conflicts.mjs';
+import { checkRouting } from './lib/route.mjs';
 
 const args = process.argv.slice(2);
 const has = (k) => args.includes(k);
@@ -153,6 +154,8 @@ function doctor() {
   }
   const avail = Object.entries(cfg.models || {}).filter(([, e]) => e.length).map(([m]) => m);
   ok(avail.length > 0, `models: ${avail.join(', ') || 'none probed'}; effort low..max; remap ${JSON.stringify(cfg.modelRemap || {})}`);
+  const routeBad = checkRouting(readJSON(path.join(KIT, 'routing.json'), {}), cfg);
+  ok(routeBad.length === 0, routeBad.length ? `routing.json: ${routeBad.join('; ')}` : 'routing.json: every route, floor, ladder step and agent has a known model and effort');
   // gh login and git identity
   const gh = run('gh', ['auth', 'status']);
   const ghUser = (gh.out + gh.err).match(/account (\S+)[^\n]*\n[^\n]*\n\s*- Active account: true/)?.[1] || (gh.out + gh.err).match(/account (\S+)/)?.[1];
