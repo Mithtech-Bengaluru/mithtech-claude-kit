@@ -51,7 +51,9 @@ function commands(cmd, cwd) {
   }
   return out;
 }
-function gitPush({ w, dir }) {
+// cfg.mainPushRepos: absolute repo roots where the owner allows a plain `git push` from main
+// (single-branch repos shared across devices). Force-push, --all/--mirror and explicit `push … main` stay blocked.
+function gitPush({ w, dir }, cfg = {}) {
   if (!/(^|\/)git$/.test(w[0])) return null;
   let i = 1, d = dir;
   while (i < w.length && w[i].startsWith('-')) {
@@ -69,7 +71,9 @@ function gitPush({ w, dir }) {
   if (pos.slice(1).some((r) => r.split(':').some((x) => PROTECTED.test(x.replace(/^refs\/heads\//, ''))))) return deny('push to main/master/production is blocked; push a feature branch and open a PR');
   if (pos.length < 2) {
     const b = git(d, 'symbolic-ref', '--short', 'HEAD').out;
-    if (PROTECTED.test(b)) return deny(`you are on ${b}; pushing it is blocked`);
+    const top = norm(git(d, 'rev-parse', '--show-toplevel').out || '');
+    const allowed = (cfg.mainPushRepos || []).map((r) => norm(String(r).replace(/^~(?=\/|$)/, HOME)));
+    if (PROTECTED.test(b) && !(top && allowed.includes(top))) return deny(`you are on ${b}; pushing it is blocked`);
   }
   return null;
 }
@@ -95,7 +99,7 @@ function bash(cmd, cwd, cfg) {
   if (raw) for (const r of R.gitPushRaw || []) if (rx(r.re).test(cmd)) return deny(r.why);
   let allow = null;
   for (const c of commands(cmd, cwd)) {
-    const d = gitPush(c) || benchSite(c, cfg);
+    const d = gitPush(c, cfg) || benchSite(c, cfg);
     if (d && d.decision !== 'allow') return d;
     if (d) allow = allow || d;
   }
