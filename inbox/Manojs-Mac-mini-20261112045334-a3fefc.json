@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "frappe.db.get_value on a child DocType from the browser returns only name, so the field values come back undefined",
+  "fix": "Call frappe.client.get_value with parent set to the parent DocType for child-table reads",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-12T04:53:34.300Z"
+}
