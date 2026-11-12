@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "Playwright cannot attach to Android WebView over plain CDP, and attached pages emulate a light colour scheme by default.",
+  "fix": "Attach with the Playwright Android device API and clear the colour scheme emulation before theme checks.",
+  "project": "FieldOps",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-12T12:34:41.061Z"
+}
