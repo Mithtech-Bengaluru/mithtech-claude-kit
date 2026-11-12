@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Translating labels at module import freezes the first request language in each worker, so one Chinese browser turned all visitor labels Chinese",
+  "fix": "Translate at request time only. Keep English-only copy as source text. Test by reloading the module under another language.",
+  "project": "flowmentor",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-12T09:47:29.201Z"
+}
