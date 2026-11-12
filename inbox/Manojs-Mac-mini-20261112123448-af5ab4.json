@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "stack-gotcha",
+  "lesson": "Tauri 2 mobile plugin events never reach the UI unless the plugin allows the register and remove listener commands.",
+  "fix": "Add both listener commands to the plugin command list and default permissions, then test on an emulator.",
+  "project": "FieldOps",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-12T12:34:48.292Z"
+}
