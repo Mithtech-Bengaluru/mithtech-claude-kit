@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "Android 17 apps targeting API 37 cannot reach private network addresses without the local network permission.",
+  "fix": "Request that permission in debug builds, and in release builds only for servers on a private LAN.",
+  "project": "FieldOps",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-12T12:34:55.413Z"
+}
