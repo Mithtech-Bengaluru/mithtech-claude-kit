@@ -32,11 +32,17 @@ Never read the raw spec yourself. Run an intake unit (route `intake`): it splits
 - A unit can belong to a person (`owner: person:<name>`). The brief, tracker, owned files and checker apply the same way; worker.mjs refuses to start person-owned units.
 
 ## 5. Run workers
-- DESKTOP APP FIRST: when `mcp__ccd_session__start_session` exists (load it with ToolSearch `select:mcp__ccd_session__start_session`), start each unit of the approved wave as its own visible session. The user's yes to "Start wave N?" is the request for sessions, so use `initiation: "user_asked"`. Send all units of the wave in one message, up to `maxParallel`. Use `context: "fresh"`, a worktree, and a short brief that names `docs/programs/<slug>/briefs/<unit>.md`, the owned files and the gate command. Call `mark_chapter` first with the wave name. Do not use subagents for units. When no session tool exists (headless, CLI), use the worker.mjs path below.
+- MIXED MODE: run every unit of a wave at once; there is no cap on visible sessions. Choose per unit:
+  - Visible session: units with `opus/xhigh` route (money, permissions, security, sync), units that hold user decisions, long units (token estimate of 250k or more), and UI units the user wants to watch.
+  - Headless worker (worker.mjs): all other units.
+- DESKTOP APP: when `mcp__ccd_session__start_session` exists (load it with ToolSearch `select:mcp__ccd_session__start_session`), start each visible unit as its own session. The user's yes to "Start wave N?" is the request for sessions, so use `initiation: "user_asked"`. Send all visible units of the wave in one message. Use `context: "fresh"`, a worktree, and a short brief that names `docs/programs/<slug>/briefs/<unit>.md`, the owned files and the gate command. Call `mark_chapter` first with the wave name. ROUTING IS MANDATORY: pass `model` (routing.json id, e.g. `claude-sonnet-5-5`) and `effort` from the unit's route on every `start_session` call, including ad-hoc sessions outside the plan; pick the route from routing.json `routes` and `floors`, and log `<session> | <model>/<effort> | <reason>` in `routing.log`. A session may only go at or below the orchestrator's own model and effort; if a route needs more, start it and then raise it with `set_session_model`/`set_session_effort` (the app asks the user). Do not use subagents for units. When no session tool exists (headless, CLI), use the worker.mjs path below.
 - Headless fallback: start each unit with `node <kit>/scripts/worker.mjs <slug> <unit>` from the project root (in the background). It creates the worktree `<repo>-worktrees/<unit>` (or the repo's convention) on `unit/<slug>/<unit>` from `feat/<slug>`, writes `.claude/owns.txt` from the brief, and starts `claude -p` with the routed model and effort in bypassPermissions mode. The guard hook and deny rules still apply there.
-- Max parallel units = `maxParallel` in `~/.claude/mithtech-kit.local.json` (default 3). worker.mjs enforces it.
+- SESSION BASE: a session started from an automated turn becomes a proposal card, and cards drop `source_branch`. So every unit prompt must say: first create a worktree with `git worktree add ../<repo>-worktrees/<unit> -b unit/<slug>/<unit> feat/<slug>` and work only there.
+- INTEGRATE UNIT: plan one `wN-integrate` unit after each wave. It owns the seam files (app wiring, start-up, lock file, additive contract changes) and applies the orchestrator's answers to that wave's questions. Feature units never edit seams.
+- UI GATE: a UI unit merges only after the user approves screenshots of its built pages shown next to the approved G2 wireframe.
+- Max parallel headless workers = `maxParallel` in `~/.claude/mithtech-kit.local.json` (default 3; 0 = no cap). worker.mjs enforces it. Visible sessions are never capped.
 - A worker never talks to the user. It writes questions to `.claude/tasks/<slug>/questions.md` and returns one line: `<unit> | done|blocked | summary | tokens | questions or "none"`.
-- TOKEN BUDGET: worker.mjs logs usage to `tokens.log` and pauses a unit at 150% of its estimate. Then ask the user: Continue / Simplify / Stop.
+- TOKEN BUDGET: worker.mjs logs usage to `tokens.log` and pauses a unit at 150% of its estimate, unless `.claude/tasks/<slug>/nocap` exists or the repo is listed in `noTokenCap` in the local config. Then ask the user: Continue / Simplify / Stop.
 - QUESTIONS: ask held questions one at a time (AskUserQuestion) and route each answer back with `node <kit>/scripts/worker.mjs <slug> <unit> --answer "<text>"`.
 - STOP RULE: retry a failed unit once at the same setting, then escalate one step (`routing.json` escalation: effort first, then model), then park it as a question.
 
@@ -45,7 +51,7 @@ Never read the raw spec yourself. Run an intake unit (route `intake`): it splits
 - Update `tracker.md` (requirement ID -> brief -> owner -> test -> status) after each merge.
 - SHIP: push `feat/<slug>` (never main). Deploy to staging if the project's CLAUDE.md defines it. Production only after the user's explicit yes.
 - LEARN: at program end the checker records lessons (section "Lessons" in the checker agent) with `node <kit>/scripts/contribute.mjs lesson ...`.
-- CLEANUP (route `light`, cleanup agent): remove worktrees and branches only for units that are done, merged and checked.
+- CLEANUP (automatic, no question; route `light`, cleanup agent): right after each unit merges and passes the gate, remove its worktree (`target/` first), its `unit/<slug>/<unit>` branch, and any Claude session that worked only on that unit. Keep a unit that is blocked, running or unmerged. At wave end, merge every remaining done unit into `feat/<slug>` so one branch holds all the work. Never delete `feat/<slug>`, main or the orchestrator session.
 
 ## 7. Final report (max 8 lines)
 Branch, commits, gate result, deploy status, pending items, risks, tokens used vs budget (sum of `tokens.log`).

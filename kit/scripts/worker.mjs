@@ -52,7 +52,7 @@ if (!routing.effortLevels.includes(u.effort) || !routing.models[u.model]) { cons
 const running = path.join(tasks, 'running');
 fs.mkdirSync(running, { recursive: true });
 const live = fs.readdirSync(running).filter((f) => { try { process.kill(Number(readText(path.join(running, f))), 0); return true; } catch { fs.rmSync(path.join(running, f), { force: true }); return false; } });
-if (live.length >= (cfg.maxParallel || 3) && !live.includes(u.unit)) { console.log(`${u.unit} | blocked | ${live.length} units running (max ${cfg.maxParallel || 3}); start it after one finishes | 0 | none`); process.exit(0); }
+if ((cfg.maxParallel ?? 3) > 0 && live.length >= (cfg.maxParallel ?? 3) && !live.includes(u.unit)) { console.log(`${u.unit} | blocked | ${live.length} units running (max ${cfg.maxParallel || 3}); start it after one finishes | 0 | none`); process.exit(0); }
 
 // worktree on unit/<slug>/<unit> from feat/<slug>
 const wtRoot = cfg.worktreeRoot ? path.join(cfg.worktreeRoot, path.basename(root)) : `${root}-worktrees`;
@@ -82,14 +82,17 @@ fs.copyFileSync(path.join(briefsDir, `${u.unit}.md`), path.join(wt, '.claude', '
 const child = spawn('claude', cmd, { cwd: wt, shell: IS_WIN, stdio: ['ignore', 'pipe', 'pipe'] });
 fs.writeFileSync(path.join(running, u.unit), String(child.pid));
 let used = 0, cost = 0, result = '', paused = false, buf = '';
-const limit = u.tokens ? u.tokens * 1.5 : Infinity;
+const perMsg = new Map(); // message id -> tokens (last usage seen wins)
+const noCap = exists(path.join(tasks, 'nocap')) || (cfg.noTokenCap || []).includes(path.basename(root));
+const limit = u.tokens && !noCap ? u.tokens * 1.5 : Infinity;
 child.stdout.on('data', (d) => {
   buf += d; let i;
   while ((i = buf.indexOf('\n')) >= 0) {
     const line = buf.slice(0, i); buf = buf.slice(i + 1);
     let ev; try { ev = JSON.parse(line); } catch { continue; }
     const us = ev.message?.usage;
-    if (ev.type === 'assistant' && us) used += (us.input_tokens || 0) + (us.output_tokens || 0) + (us.cache_creation_input_tokens || 0) + Math.round((us.cache_read_input_tokens || 0) * 0.1);
+    // stream-json sends one assistant event per content block, each repeating the message's usage: count each message id once (latest usage).
+    if (ev.type === 'assistant' && us) { perMsg.set(ev.message.id || perMsg.size, (us.input_tokens || 0) + (us.output_tokens || 0) + (us.cache_creation_input_tokens || 0) + Math.round((us.cache_read_input_tokens || 0) * 0.1)); used = [...perMsg.values()].reduce((a, b) => a + b, 0); }
     if (ev.type === 'result') { result = String(ev.result || '').trim().split('\n').pop(); cost = ev.total_cost_usd || 0; }
     if (used > limit && !paused) { paused = true; child.kill('SIGTERM'); }
   }

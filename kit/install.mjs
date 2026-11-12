@@ -139,7 +139,7 @@ function doctor() {
     const routing = readJSON(path.join(KIT, 'routing.json'));
     const models = {};
     for (const m of Object.keys(routing.models)) {
-      const r = run('claude', ['-p', 'Reply with OK only.', '--model', m, '--max-turns', '1', '--output-format', 'json', '--bare'], { timeout: 90000 });
+      const r = run('claude', ['-p', 'Reply with OK only.', '--model', m, '--max-turns', '1', '--output-format', 'json'], { timeout: 90000 }); // no --bare: it skips the claude.ai (OAuth) login
       let j = {}; try { j = JSON.parse(r.out); } catch {}
       models[m] = r.code === 0 && !j.is_error;
     }
