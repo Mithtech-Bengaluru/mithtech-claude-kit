@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Routing existed only as text, so desktop sessions, subagents and forks copied the parent model and effort.",
+  "fix": "A shared resolver plus a pre-call hook on session and subagent starts now enforces model and effort.",
+  "project": "setupClaude",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-12T06:58:17.370Z"
+}
