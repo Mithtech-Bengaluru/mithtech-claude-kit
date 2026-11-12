@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "India Compliance Bill of Entry rejects an Actual IGST tax row whose item-wise tax rates are empty",
+  "fix": "When a script switches the BoE IGST row to Actual, also fill its item-wise rates JSON per item row",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-12T04:53:49.607Z"
+}
