@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Parallel worker sessions on one bench share one test site and one app checkout, so their test runs collide.",
+  "fix": "Give each worker its own git worktree, put that worktree first on the Python path for its test runs, and run tests one at a time under a shared lock.",
+  "project": "framith_amc_service",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-13T17:23:29.222Z"
+}
