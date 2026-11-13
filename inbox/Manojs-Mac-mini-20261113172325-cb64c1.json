@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Frappe does not enforce read-only fields on the server, so any user with write access can change them through the REST API.",
+  "fix": "Protect fields that only engine code sets with a higher permission level or a validate guard that keeps the stored values for normal users.",
+  "project": "framith_amc_service",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-13T17:23:25.483Z"
+}
