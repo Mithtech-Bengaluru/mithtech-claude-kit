@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "Scaling a 3D world's radius with angles kept breaks fixed world-unit limits tuned for the old radius, such as guide reach and slot lengths",
+  "fix": "Search for fixed world-unit limits beside the radius and scale them by the radius ratio",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-14T08:08:07.552Z"
+}
