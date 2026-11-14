@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Frappe caches the module map in Redis per site. A bench call that loads another checkout of the app caches its old module list and breaks install.",
+  "fix": "Load the same app checkout for every bench call on a site, and clear the site cache after a call that did not.",
+  "project": "framith_supplychain",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-14T04:14:32.730Z"
+}
