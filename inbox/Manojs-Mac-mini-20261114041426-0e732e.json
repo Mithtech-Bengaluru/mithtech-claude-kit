@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Frappe expects the controller class name to be the DocType name without spaces. A title-cased class makes migrate delete the DocType as an orphan.",
+  "fix": "Keep acronyms as written in class names, for example SCException for SC Exception.",
+  "project": "framith_supplychain",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-14T04:14:26.092Z"
+}
