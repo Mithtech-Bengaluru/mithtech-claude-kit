@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "Payload migrate:create diffs against the last snapshot, so it also emits others' unmigrated changes and snapshot gaps that can fail in prod.",
+  "fix": "Read every generated statement, strip what is outside your collections, keep that drift visible in the snapshot, and list it in the PR.",
+  "project": "mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-14T08:33:41.478Z"
+}
