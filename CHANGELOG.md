@@ -5,6 +5,7 @@
 - Routing: new `marketing` (sonnet/medium) and `marketing-money` (sonnet/high) routes for channel plans, copy, budgets, paid ads and partner terms.
 - Routing: Fable model ID updated to `claude-fable-5-2`.
 - Global template: matching ROUTING line.
+- Model probe no longer passes `--bare`, which ignores `claude auth login` sessions. Before, the probe failed on every OAuth login and remapped all models to sonnet.
 
 ## 1.0.1
 - Guard hook reads the command structure: quoted text and here-docs are data, so searches and commit messages that mention "git push" or "migrate" are no longer blocked. `git -C`, `cd … &&`, quoted branch names, `-uf` and `+refspec` pushes are now caught.
