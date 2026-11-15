@@ -20,7 +20,7 @@
         },
         {
           "id": "E04",
-          "text": "Size the task first. Small: build. Medium: one plan approval. Large: approve architecture, wireframes and build plan before building."
+          "text": "Size the task first. Small: build. Medium: one plan approval. Large: approve architecture, wireframes, software flow, UI/UX and build plan before building. Any screen change: approve wireframe, then flow, then UI/UX, and show screenshots against them while building."
         },
         {
           "id": "E05",

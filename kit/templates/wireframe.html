@@ -34,5 +34,18 @@
     <tr><th>Permissions</th><td>{{read/write/submit per role}}</td></tr>
   </table>
 </section>
+<section class="page" id="flow">
+  <h2>Software flow <small>(approve after the wireframes)</small></h2>
+  <pre class="mermaid">flowchart LR
+  A[{{Screen}}] -->|{{action}}| B[{{Screen or state}}]
+  B -->|error| C[{{Error state}}]
+  A -.->|empty| D[{{Empty state}}]</pre>
+  <table class="spec">
+    <tr><th>States</th><td>{{loading, empty, error, success}}</td></tr>
+    <tr><th>Roles per step</th><td>{{role: allowed actions}}</td></tr>
+    <tr><th>Data read / written</th><td>{{entity: owner}}</td></tr>
+    <tr><th>UI/UX checks</th><td>{{TonalDepth tokens, contrast, keyboard, light and dark, mobile}}</td></tr>
+  </table>
+</section>
 </body>
 </html>

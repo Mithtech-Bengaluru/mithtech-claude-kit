@@ -1,6 +1,6 @@
 {
   "name": "mithtech",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Mithtech kit: orchestrate with approval gates, reuse-first stack skills, guardrail hooks, self-update.",
   "author": { "name": "Mithtech" },
   "repository": "https://github.com/Mithtech-Bengaluru/mithtech-claude-kit",
