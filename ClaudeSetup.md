@@ -138,6 +138,7 @@ Verify the current models (Haiku 5.5, Sonnet 5.5, Opus 5.5, Fable 5.1 at the tim
 | Hard bugs after escalation fails; final review of a large program | Opus / max |
 - The orchestrator may move one step up or down for a specific task, with a one-line reason in the routing log. Anything touching money, permissions, production data or shared contracts is at least Sonnet / high.
 - Pick the cheapest setting likely to succeed the first time; a retry costs more than one step up.
+- Enforcement: `kit/scripts/route.mjs` is the one resolver (route id or description, floors, machine remap, escalation ladder). `worker.mjs`, the `route-guard` hook (start_session, Agent), the kit agents' frontmatter and `install.mjs --doctor` all use it.
 - The machine's local config may remap models the account doesn't have.
 
 ## 3.5 Reuse index and duplicate checker (the biggest token savers)

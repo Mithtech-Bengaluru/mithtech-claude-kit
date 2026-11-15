@@ -12,7 +12,7 @@ import { KIT, readText, exists, git } from './lib/common.mjs';
 
 const args = process.argv.slice(2);
 const slug = args.find((a) => !a.startsWith('--'));
-const port = Number((args[args.indexOf('--port') + 1]) || 4377);
+const port = Number(args.includes('--port') ? args[args.indexOf('--port') + 1] : 4377);
 const root = git(process.cwd(), 'rev-parse', '--show-toplevel').out || process.cwd();
 const prog = path.join(root, 'docs', 'programs', slug || '');
 if (!slug || !exists(prog)) { console.error(`usage: node kit/review.mjs <slug>  (no docs/programs/${slug || '<slug>'} here)`); process.exit(2); }

@@ -7,7 +7,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Check what already exists before building: our apps and plugins, installed apps, and the platform's built-in features.
 - Give every record and setting one owner. Link to it; never copy it or create a second version.
 - Put code in the app or module that owns the feature. A new app, plugin or service needs approval.
-- Size the task first. Small: build. Medium: one plan approval. Large: approve architecture, wireframes and build plan before building.
+- Size the task first. Small: build. Medium: one plan approval. Large: approve architecture, wireframes, software flow, UI/UX and build plan before building. Any screen change: approve wireframe, then flow, then UI/UX, and show screenshots against them while building.
 - Build everything that was approved, and nothing that was not.
 - Call a task done only when the project's checks pass, every approved requirement is built and tested, and nothing is stubbed.
 - Never push to main, master or production, and never force-push, without approval.

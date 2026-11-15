@@ -1,12 +1,8 @@
 # Changelog
 
-## 1.0.2
-- Routing: every session or subagent gets an explicit model and effort from `routing.json`; it never inherits the parent setting.
-- Routing: new `marketing` (sonnet/medium) and `marketing-money` (sonnet/high) routes for channel plans, copy, budgets, paid ads and partner terms.
-- Routing: Fable model ID updated to `claude-fable-5-2`.
-- Global template: matching ROUTING line.
-- Model probe no longer passes `--bare`, which ignores `claude auth login` sessions. Before, the probe failed on every OAuth login and remapped all models to sonnet.
-- `--doctor --probe-models` no longer marks every model unavailable on claude.ai logins: the probe ran with `--bare`, which skips the OAuth login.
+## Unreleased
+- UI FLOW rule: any screen change needs approved wireframe, then software flow, then UI/UX review (TonalDepth, accessibility, light and dark, mobile), with screenshots against them while building. G2 now covers all three.
+- New pattern `marketing-content-tracking` (UTM, content register, scheduler rules for tracked marketing content).
 
 ## 1.0.1
 - Guard hook reads the command structure: quoted text and here-docs are data, so searches and commit messages that mention "git push" or "migrate" are no longer blocked. `git -C`, `cd … &&`, quoted branch names, `-uf` and `+refspec` pushes are now caught.
