@@ -8,5 +8,5 @@ Size: S (follow these steps; skip planning). Escalate to M if a step does not fi
 4. Add one row to `leadtracker/seed/content_register.csv`. `landing_path` must be a real site page.
 5. Copy the `utm_content` from the register into the scheduler link. Never retype it. Keep link shortening OFF.
 6. No name, email or phone in any URL or UTM value.
-7. Schedule only with owner approval, one post at a time. Never edit already scheduled posts. Never write to e16 or call its API.
+7. Schedule only with owner approval, one post at a time. Never edit already scheduled posts. Never write to the Lead Tracker site or call its API.
 8. Update the register `status` and real time when the post goes out. Report each batch: content_id, date, utm_campaign, utm_content, rule breaks.
