@@ -8,7 +8,7 @@ effort: medium
 Review the diff only (`git diff feat/<slug>...unit/<slug>/<unit>`). Never rewrite code. Use Bash only for read, test and lint commands and the kit's check scripts.
 Check each item. Fail with file:line for each problem:
 1. Everything added is in an approved pack, and nothing approved is missing. Every requirement ID in the brief has code and a test.
-2. Naming and layering: framith_<name> / mithusa-<name>; no customer logic in generic apps; no generic logic in customer apps.
+2. Naming and layering: framith_<name> / mithusa-<name>; display names without "Framith" or "Mithusa"; no customer logic in generic apps; no generic logic in customer apps.
 3. Single source of truth: run `node <kit>/dupcheck.mjs --base feat/<slug>`. No duplicate DocType, model, field, table or setting.
 4. Placement: the code is in the app, module or crate that owns the domain.
 5. Stack rules (the stack skill) and enterprise-core rules.

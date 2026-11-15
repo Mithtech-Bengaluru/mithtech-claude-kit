@@ -27,7 +27,7 @@ description: Rules for Frappe, ERPNext, HRMS and India Compliance work, framith_
 
 ## Rules
 <!-- kit-rules:frappe:start -->
-- F01: Name every Mithtech app `framith_<name>` (snake_case).
+- F01: Name every Mithtech app `framith_<name>` (snake_case). Users see only the product name: app_title, labels, page titles and the README title never say "Framith" (`framith_tradedeal` shows "Trade Deal").
 - F02: Build the generic product app first (`framith_<product>`), complete and configurable through its Single Settings DocType.
 - F03: Customer app `framith_<customer>` holds only that customer's Custom Fields, Property Setters, print formats, workspaces, fixtures and small overrides; it lists the generic apps in required_apps. Never put a customer check in generic code; never fork a generic app per customer.
 - F04: If other customers could use a change, build it in the generic app behind a setting. Otherwise put it in the customer app. Say which and why.

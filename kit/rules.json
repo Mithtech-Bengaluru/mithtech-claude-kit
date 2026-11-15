@@ -90,7 +90,7 @@
       "rules": [
         {
           "id": "F01",
-          "text": "Name every Mithtech app `framith_<name>` (snake_case)."
+          "text": "Name every Mithtech app `framith_<name>` (snake_case). Users see only the product name: app_title, labels, page titles and the README title never say \"Framith\" (`framith_tradedeal` shows \"Trade Deal\")."
         },
         {
           "id": "F02",
@@ -216,7 +216,7 @@
       "rules": [
         {
           "id": "M01",
-          "text": "Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`)."
+          "text": "Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`). Users see only the product name: admin labels, page titles and the README title never say \"Mithusa\"."
         },
         {
           "id": "M02",
