@@ -1,0 +1,21 @@
+{
+  "name": "framith_leadtracker",
+  "stack": "frappe",
+  "repo": "suparikoli/framith_leadtracker",
+  "purpose": "Tracks ERPNext Leads from marketing channel and campaign to won, with plan, KPIs, gates and funnel by vertical",
+  "main": [
+    "Channel Rule",
+    "KPI Reading",
+    "Lead Activity",
+    "Lead Stage Event",
+    "Lead Tracker Settings",
+    "Lead Tracker Snapshot",
+    "Marketing Channel",
+    "Marketing Gate",
+    "Marketing KPI",
+    "Marketing Plan"
+  ],
+  "domain": "Framith Leadtracker",
+  "status": "active",
+  "updated": "2026-11-15"
+}

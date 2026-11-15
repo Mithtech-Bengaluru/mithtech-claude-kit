@@ -16,7 +16,7 @@ You are the orchestrator: the only session the user talks to. Default: Sonnet, m
 
 ## 2. Size and gates
 - S: G0 reuse check in one line, then build.
-- M: CONFIRM FIRST bullets, G0, then ONE mini pack for approval: placement (generic or customer app), data changes (existing vs new), wireframe if a page is added or changed, test plan, token estimate. Then build.
+- M: CONFIRM FIRST bullets, G0, then ONE mini pack for approval: placement (generic or customer app), data changes (existing vs new), wireframe and software flow if a page is added or changed (then UI/UX review), test plan, token estimate. Then build.
 - L: CONFIRM FIRST bullets, then G0, G1, G2, G3 per module. Read `gates.md` in this skill folder for the pack contents and the TOGAF ADM mapping.
 - CONFIRM FIRST (M and L): restate in at most 7 bullets: Goal, In scope, Out of scope, Placement, Assumptions (only ones you cannot check), Done when. Ask with AskUserQuestion: "Correct (Recommended)" / "Change something". Headless: print the bullets and the question as plain text and stop.
 - Approval: the user approves G1, G2, G3 in that order, per module, on one page: `node <kit>/review.mjs <slug>` (run it in the background from the project root; it prints a localhost URL). Decisions land in `docs/programs/<slug>/approvals.md`. Never treat chat as approval for L gates. After G3 the plan is frozen; a change request re-opens only the affected pack and brief.
@@ -39,7 +39,7 @@ Never read the raw spec yourself. Run an intake unit (route `intake`): it splits
 - Headless fallback: start each unit with `node <kit>/scripts/worker.mjs <slug> <unit>` from the project root (in the background). It creates the worktree `<repo>-worktrees/<unit>` (or the repo's convention) on `unit/<slug>/<unit>` from `feat/<slug>`, writes `.claude/owns.txt` from the brief, and starts `claude -p` with the routed model and effort in bypassPermissions mode. The guard hook and deny rules still apply there.
 - SESSION BASE: a session started from an automated turn becomes a proposal card, and cards drop `source_branch`. So every unit prompt must say: first create a worktree with `git worktree add ../<repo>-worktrees/<unit> -b unit/<slug>/<unit> feat/<slug>` and work only there.
 - INTEGRATE UNIT: plan one `wN-integrate` unit after each wave. It owns the seam files (app wiring, start-up, lock file, additive contract changes) and applies the orchestrator's answers to that wave's questions. Feature units never edit seams.
-- UI GATE: a UI unit merges only after the user approves screenshots of its built pages shown next to the approved G2 wireframe.
+- UI GATE: a UI unit merges only after the user approves screenshots of its built pages shown next to the approved G2 wireframe and software flow, with the UI/UX checks passed. Show interim screenshots at each UI milestone.
 - Max parallel headless workers = `maxParallel` in `~/.claude/mithtech-kit.local.json` (default 3; 0 = no cap). worker.mjs enforces it. Visible sessions are never capped.
 - A worker never talks to the user. It writes questions to `.claude/tasks/<slug>/questions.md` and returns one line: `<unit> | done|blocked | summary | tokens | questions or "none"`.
 - TOKEN BUDGET: worker.mjs logs usage to `tokens.log` and pauses a unit at 150% of its estimate, unless `.claude/tasks/<slug>/nocap` exists or the repo is listed in `noTokenCap` in the local config. Then ask the user: Continue / Simplify / Stop.
