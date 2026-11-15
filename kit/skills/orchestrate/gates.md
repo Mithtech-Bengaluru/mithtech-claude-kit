@@ -10,12 +10,15 @@ TOGAF-lite: business capabilities, application placement (generic framith_/mithu
 
 ## G2 WIREFRAMES (route `orchestrator`, sonnet/medium; `modules/<m>/G2.html`)
 One low-fidelity greyscale wireframe per page, all pages of a module in one static HTML file. Each page has a table: functions, fields, roles, permissions.
+Then the software flow, in the same file: a Mermaid flow of screens, actions, states, roles, errors, empty and loading states, and the data each step reads or writes (owner per entity from G1).
+Then the UI/UX review: TonalDepth tokens, layout, accessibility (contrast, keyboard, labels), light and dark, mobile. The user approves wireframes, then flow, then UI/UX. Show each in chat.
+While building: at each UI milestone, show screenshots beside the approved wireframe and flow. Any deviation needs a new approval.
 
 ## G3 BUILD PLAN (`modules/<m>/G3.md` + `plan.md` + `tracker.md` + `briefs/`)
 Waves in dependency order (data model and contracts first), one brief per unit with a token estimate, a tracker mapping every requirement ID to a brief, an owner (session or person) and a test.
 
 ## Approval
-The user approves G1, then G2, then G3, per module, in `node <kit>/review.mjs <slug>`. review.mjs refuses out-of-order approvals. Do not build until G3 of the module is approved.
+The user approves G1, then G2 (wireframes, flow, UI/UX), then G3, per module, in `node <kit>/review.mjs <slug>`. review.mjs refuses out-of-order approvals. Do not build until G3 of the module is approved.
 
 ## TOGAF ADM mapping
 | ADM phase | Our output | Sizes |

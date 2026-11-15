@@ -5,7 +5,7 @@ description: Rules for business logic in any stack - multi-tenant SaaS, permissi
 
 # enterprise-core
 
-Route money, permissions, tenancy, production data and shared contracts at least sonnet/high; ledgers, payments, tenancy/security and offline sync at opus/xhigh (`routing.json`).
+Set `Floor: money|permissions|production|contracts` on these tasks, and route ledgers, payments, tenancy/security and offline sync as `critical` (`node <kit>/scripts/route.mjs critical`).
 
 ## Rules
 <!-- kit-rules:enterprise:start -->

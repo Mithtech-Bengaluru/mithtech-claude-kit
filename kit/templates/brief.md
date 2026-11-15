@@ -1,6 +1,7 @@
 # Brief: {{unit}}
 - Program: {{slug}} | Wave: {{wave}} | Owner: session (or `person:<name>`)
-- Route: {{model}}/{{effort}} | Reason: {{one line}}
+- Route: {{route-id}} | Reason: {{one line}}
+- Floor: {{money, permissions, production, contracts, or none}}
 - Token estimate: {{tokens}}
 
 ## Goal

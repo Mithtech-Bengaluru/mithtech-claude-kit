@@ -7,7 +7,7 @@ description: Rules for Go, Flutter, Python, Tally TDL, Docker/k3s and any stack 
 
 ## Before building
 1. Read the project's CLAUDE.md for its gate command. None? Propose one and ask.
-2. Look up the official docs before writing an unfamiliar API (route `unfamiliar`: sonnet/high).
+2. Look up the official docs before writing an unfamiliar API (route `unfamiliar`; see `route.mjs unfamiliar`).
 3. Grep the index (`.claude/index/other.txt`) and the catalogue first.
 
 ## Common gates (verify in the project)
