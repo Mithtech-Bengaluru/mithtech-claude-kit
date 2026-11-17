@@ -9,3 +9,4 @@ node_modules/
 inbox/pending/
 catalog/private/
 docs/*.private.md
+.impeccable/
