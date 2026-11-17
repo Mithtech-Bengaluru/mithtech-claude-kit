@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "In Frappe HR version sixteen, interview rounds are gone. Each interview links to an interview type with expected skills.",
+  "fix": "Create interview types with their skills first, then link each interview to a type.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-17T10:13:25.338Z"
+}
