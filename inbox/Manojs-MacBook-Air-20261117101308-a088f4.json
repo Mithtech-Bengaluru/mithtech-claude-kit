@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Piping a multi-line script into the bench console breaks function bodies at blank lines.",
+  "fix": "Pipe a one-line runner that calls exec on the script file with a fresh globals dict.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-17T10:13:08.070Z"
+}
