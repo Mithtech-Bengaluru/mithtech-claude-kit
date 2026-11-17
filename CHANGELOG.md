@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1
+- Installer updates a stale plugin cache even on a plain run; `--doctor` fails when the cached plugin version differs from the kit.
+
 ## 1.1.0
 - GitHub Free: new rule E12 and a GITHUB FREE line in the global CLAUDE.md. No GitHub Actions or other paid features; gates run locally or on the home cluster (Offload). A conflict rule replaces memories that rely on CI.
 - Display names: users see only the product name, never "Framith" or "Mithusa" (F01, M01, checker).
