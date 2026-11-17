@@ -11,7 +11,10 @@ import { generate, findRepos, unignored, currentBlock, blockLines } from '../lib
 const args = process.argv.slice(2);
 const has = (k) => args.includes(k);
 const val = (k) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : null; };
-const root = path.resolve(val('--root') || localConfig().codingRoot || process.cwd());
+const rootArg = val('--root') || localConfig().codingRoot;
+// never guess the root from the current folder: a wrong root would write an ignore file into a repo
+if (!rootArg) { if (!has('--quiet')) console.log('stignore: no coding root; pass --root <dir> or set codingRoot (node kit/install.mjs --coding-root <dir>)'); process.exit(has('--check') ? 1 : 0); }
+const root = path.resolve(rootArg);
 const quiet = has('--quiet');
 const say = (m) => { if (!quiet) console.log(m); };
 

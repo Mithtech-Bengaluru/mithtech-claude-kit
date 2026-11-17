@@ -312,6 +312,8 @@ t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
   t('stignore --check fails on a stale block and names the repo', chk.status === 1 && /newrepo/.test(chk.stdout), chk.stdout);
   ST.generate(root);
   const t2 = fs.readFileSync(path.join(root, '.stglobalignore'), 'utf8');
+  const nr = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'stignore.mjs')], { env, cwd: root, encoding: 'utf8' });
+  t('stignore without a coding root writes nothing', nr.status === 0 && /no coding root/.test(nr.stdout));
   t('stignore replaces the block in place', t2.split(ST.BEGIN).length === 2 && t2.includes('/newrepo') && t2.startsWith('// mine'));
   t('device prefix from host name', devicePrefix('Manojs-MacBook-Air.local') === 'air' && devicePrefix("Manoj's Mac mini") === 'mini' && devicePrefix('Studio.lan') === 'studio');
   const gr = path.join(tmp, 'gaterepo');
