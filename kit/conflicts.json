@@ -78,6 +78,18 @@
         "memory",
         "output_style"
       ]
+    },
+    {
+      "id": "ci-runs-tests",
+      "re": "\\b(rely on|wait for|let|leave (it )?to)\\b (the )?(ci|github actions|gh actions|actions workflow|status checks?)\\b[^.\\n]{0,30}\\b(tests?|checks?|gate)",
+      "kit": "We use GitHub Free: run the gate locally (or on the home cluster with Offload) before every PR; never rely on GitHub Actions or other paid GitHub features.",
+      "scopes": [
+        "claude_md",
+        "memory",
+        "output_style",
+        "skill",
+        "agent"
+      ]
     }
   ],
   "settings": {

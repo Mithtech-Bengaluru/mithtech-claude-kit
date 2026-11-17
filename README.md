@@ -35,5 +35,8 @@ If they are missing, ask me to run: node <kit clone>/kit/install.mjs
 - `RULES.md`: the same rules for people, generated from `kit/rules.json`.
 - `ClaudeSetup.md`: the prompt that built this kit. `archive/`: older versions.
 
+## GitHub plan
+Mithtech uses GitHub Free. No GitHub Actions CI, required status checks, Codespaces, Copilot or other paid features. Every test and gate runs locally (or on the home cluster with Offload) before a pull request; the PR body records the gate result. Kit tests: `node kit/tests/run.mjs`.
+
 ## Security
 The repo is public and its code runs on every developer's machine. main is protected (pull requests with review, no force-push); only maintainers create release tags; the updater refuses tags whose commit is not on main. No hostnames, IPs, customer names, registry URLs or secrets in this repo: those go in each machine's local config.

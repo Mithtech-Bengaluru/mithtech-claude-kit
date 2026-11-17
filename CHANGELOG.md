@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+- GitHub Free: new rule E12 and a GITHUB FREE line in the global CLAUDE.md. No GitHub Actions or other paid features; gates run locally or on the home cluster (Offload). A conflict rule replaces memories that rely on CI.
+- Display names: users see only the product name, never "Framith" or "Mithusa" (F01, M01, checker).
+- 34 curated lessons from the Mac mini and MacBook Air inboxes: gotchas for Frappe, business logic, Next.js, Rust and other stacks; orchestrate rules for shared-site tests, briefs, checker sessions, landing and G0/G2 audits.
+- maintain.mjs pushes main and the tag atomically.
+
 ## 1.0.2
 - Routing: every session or subagent gets an explicit model and effort from `routing.json` through `scripts/route.mjs`; a `route-guard` hook blocks calls without them. It never inherits the parent setting.
 - Routing: new `marketing` and `marketing-money` routes; Fable model ID is `claude-fable-5-2`.

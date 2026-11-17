@@ -41,6 +41,8 @@ Never read the raw spec yourself. Run an intake unit (route `intake`): it splits
 - INTEGRATE UNIT: plan one `wN-integrate` unit after each wave. It owns the seam files (app wiring, start-up, lock file, additive contract changes) and applies the orchestrator's answers to that wave's questions. Feature units never edit seams.
 - UI GATE: a UI unit merges only after the user approves screenshots of its built pages shown next to the approved G2 wireframe and software flow, with the UI/UX checks passed. Show interim screenshots at each UI milestone.
 - Max parallel headless workers = `maxParallel` in `~/.claude/mithtech-kit.local.json` (default 3; 0 = no cap). worker.mjs enforces it. Visible sessions are never capped.
+- BRIEFS: give each unit its own worktree (first on the Python path for its tests), a temp folder named after the unit and free ports per run. Timing gates wait for a calm machine.
+- CHECKERS: for high-effort floors, run the checker as a visible session, not with the Agent tool.
 - A worker never talks to the user. It writes questions to `.claude/tasks/<slug>/questions.md` and returns one line: `<unit> | done|blocked | summary | tokens | questions or "none"`.
 - TOKEN BUDGET: worker.mjs logs usage to `tokens.log` and pauses a unit at 150% of its estimate, unless `.claude/tasks/<slug>/nocap` exists or the repo is listed in `noTokenCap` in the local config. Then ask the user: Continue / Simplify / Stop.
 - QUESTIONS: ask held questions one at a time (AskUserQuestion) and route each answer back with `node <kit>/scripts/worker.mjs <slug> <unit> --answer "<text>"`.
@@ -49,7 +51,8 @@ Never read the raw spec yourself. Run an intake unit (route `intake`): it splits
 ## 6. Integrate, check, ship
 - Merge one unit at a time into `feat/<slug>`. Run the checker agent on the unit diff (it reads diffs, not whole files). The checker fails anything not in an approved pack, and any requirement ID without code and a test.
 - Update `tracker.md` (requirement ID -> brief -> owner -> test -> status) after each merge.
-- SHIP: push `feat/<slug>` (never main). Deploy to staging if the project's CLAUDE.md defines it. Production only after the user's explicit yes.
+- TESTS: only the orchestrator runs tests on a shared bench site or test database. Units commit and stop. Merge and gate one branch at a time, then re-run the full gate and give drift fixes to the unit that changed the behaviour. No GitHub Actions: the gate runs locally or on the cluster (Offload).
+- SHIP: merge the remote main into `feat/<slug>` first (keep the approved version), then push `feat/<slug>` (never main) and open a PR with the gate result. The guard blocks pushes to main even after a chat yes: give the owner the exact command. Deploy to staging if the project's CLAUDE.md defines it. Production only after the user's explicit yes.
 - LEARN: at program end the checker records lessons (section "Lessons" in the checker agent) with `node <kit>/scripts/contribute.mjs lesson ...`.
 - CLEANUP (automatic, no question; route `light`, cleanup agent): right after each unit merges and passes the gate, remove its worktree (`target/` first), its `unit/<slug>/<unit>` branch, and any Claude session that worked only on that unit. Keep a unit that is blocked, running or unmerged. At wave end, merge every remaining done unit into `feat/<slug>` so one branch holds all the work. Never delete `feat/<slug>`, main or the orchestrator session.
 

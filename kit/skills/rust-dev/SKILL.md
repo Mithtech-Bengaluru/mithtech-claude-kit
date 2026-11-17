@@ -25,4 +25,5 @@ description: Rules for Rust work, including Tauri desktop and mobile apps, serve
 
 ## Gotchas (from lessons)
 <!-- kit-lessons:rust:start -->
+- RG01: Add the register and remove listener commands to a Tauri 2 mobile plugin command list and default permissions, then test on an emulator; otherwise events never reach the UI.
 <!-- kit-lessons:rust:end -->

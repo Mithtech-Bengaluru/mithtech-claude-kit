@@ -3,7 +3,7 @@
 Every output is one page at most. Diagrams are Mermaid. Templates: `<kit>/templates/pack.md`, `wireframe.html`, `tracker.md`, `brief.md`, `approvals.md`.
 
 ## G0 REUSE (route `intake`, haiku/medium)
-Read `.claude/index/` (run `node <kit>/index.mjs` first if it is missing or stale) and `<kit>/../catalog/`. Per requirement ID: `exists | extend | new`, with the owner (app/module/plugin/crate) and where. If it exists or is easy to extend, STOP and tell the user what and where, with extend-or-rebuild advice.
+Read `.claude/index/` (run `node <kit>/index.mjs` first if it is missing or stale) and `<kit>/../catalog/`. Per requirement ID: `exists | extend | new`, with the owner (app/module/plugin/crate) and where. Audit each reuse candidate's code read-only before marking it; document-only marks run too high. If it exists or is easy to extend, STOP and tell the user what and where, with extend-or-rebuild advice.
 
 ## G1 ARCHITECTURE (route `architecture`, opus/high; one pack per module, `modules/<m>/G1.md`)
 TOGAF-lite: business capabilities, application placement (generic framith_/mithusa- app vs customer app), data model marking each entity reused / extended / new with its single owner, integration flows, key decisions as ADRs (`adr/ADR-NNN-<title>.md`).
@@ -13,6 +13,7 @@ One low-fidelity greyscale wireframe per page, all pages of a module in one stat
 Then the software flow, in the same file: a Mermaid flow of screens, actions, states, roles, errors, empty and loading states, and the data each step reads or writes (owner per entity from G1).
 Then the UI/UX review: TonalDepth tokens, layout, accessibility (contrast, keyboard, labels), light and dark, mobile. The user approves wireframes, then flow, then UI/UX. Show each in chat.
 While building: at each UI milestone, show screenshots beside the approved wireframe and flow. Any deviation needs a new approval.
+Checks: the wireframe build fails on unbalanced tags, unknown requirement IDs, missing spec rows and banned terms; the layout check tests the minimum width of each main area and the grid, in both themes. After each fix pass, sessions that did not write the files run one independent audit. Before a parallel UI wave, review the base and one sample of each frame type in the browser.
 
 ## G3 BUILD PLAN (`modules/<m>/G3.md` + `plan.md` + `tracker.md` + `briefs/`)
 Waves in dependency order (data model and contracts first), one brief per unit with a token estimate, a tracker mapping every requirement ID to a brief, an owner (session or person) and a test.
