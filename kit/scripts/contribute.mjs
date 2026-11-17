@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// Submits a lesson or catalogue entry as one small JSON file to the branch inbox/<machine>,
-// pushed with your own GitHub login. Nobody pushes to main. Zero tokens.
+// Submits a lesson or catalogue entry as one small JSON file in inbox/ on main (the only branch),
+// pushed with your own GitHub login. The maintainer collects and clears inbox/ with maintain.mjs. Zero tokens.
 //   node kit/scripts/contribute.mjs lesson --stack frappe --cause kit-gap --lesson "..." --fix "..." --project <repo>
 //   node kit/scripts/contribute.mjs catalog --file catalog/<name>.json
 //   node kit/scripts/contribute.mjs flush        retry entries that could not be pushed
@@ -41,22 +41,21 @@ if (entry) {
   writeJSON(path.join(pending, name), v.entry);
 }
 
-// push every pending entry to inbox/<machine> through a temporary worktree
+// push every pending entry to main (the only branch) through a temporary worktree; retry if another computer pushed first
 const files = exists(pending) ? fs.readdirSync(pending).filter((f) => f.endsWith('.json')) : [];
 if (!files.length) process.exit(0);
-const branch = `inbox/${machine}`;
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mithtech-inbox-'));
-const fetched = git(kitRepo, 'fetch', '--quiet', 'origin', `+refs/heads/${branch}:refs/remotes/origin/${branch}`).code === 0;
-git(kitRepo, 'fetch', '--quiet', 'origin', '+refs/heads/main:refs/remotes/origin/main');
-const base = fetched ? `origin/${branch}` : 'origin/main';
-let ok = git(kitRepo, 'worktree', 'add', '--quiet', '--detach', tmp, base).code === 0;
-if (ok) {
-  fs.mkdirSync(path.join(tmp, 'inbox'), { recursive: true });
-  for (const f of files) fs.copyFileSync(path.join(pending, f), path.join(tmp, 'inbox', f));
-  git(tmp, 'add', 'inbox');
-  ok = git(tmp, 'commit', '--quiet', '-m', `inbox: ${files.length} entr${files.length === 1 ? 'y' : 'ies'} from ${machine}`).code === 0
-    && git(tmp, 'push', '--quiet', 'origin', `HEAD:refs/heads/${branch}`).code === 0;
+let ok = false;
+for (let attempt = 0; attempt < 4 && !ok; attempt++) {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mithtech-inbox-'));
+  git(kitRepo, 'fetch', '--quiet', 'origin', '+refs/heads/main:refs/remotes/origin/main');
+  if (git(kitRepo, 'worktree', 'add', '--quiet', '--detach', tmp, 'origin/main').code === 0) {
+    fs.mkdirSync(path.join(tmp, 'inbox'), { recursive: true });
+    for (const f of files) fs.copyFileSync(path.join(pending, f), path.join(tmp, 'inbox', f));
+    git(tmp, 'add', 'inbox');
+    ok = git(tmp, 'commit', '--quiet', '-m', `inbox: ${files.length} entr${files.length === 1 ? 'y' : 'ies'} from ${machine}`).code === 0
+      && git(tmp, 'push', '--quiet', 'origin', 'HEAD:refs/heads/main').code === 0;
+  }
+  git(kitRepo, 'worktree', 'remove', '--force', tmp);
 }
-git(kitRepo, 'worktree', 'remove', '--force', tmp);
-if (ok) { for (const f of files) fs.rmSync(path.join(pending, f)); console.log(`sent ${files.length} entr${files.length === 1 ? 'y' : 'ies'} to ${branch}`); }
+if (ok) { for (const f of files) fs.rmSync(path.join(pending, f)); console.log(`sent ${files.length} entr${files.length === 1 ? 'y' : 'ies'} to main (inbox/)`); }
 else console.log(`saved ${files.length} entr${files.length === 1 ? 'y' : 'ies'} in inbox/pending; push failed (check gh auth / org access). Retry: node kit/scripts/contribute.mjs flush`);

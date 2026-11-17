@@ -4,6 +4,7 @@
 //   node kit/install.mjs --update       after a pull (also run by the self-updater)
 //   node kit/install.mjs --doctor [--probe-models]   checks and fixes new conflicts
 //   node kit/install.mjs --uninstall    remove the kit and restore backups
+//   Every run also syncs skills with the master list (kit/registry/skills.json on main).
 // Options: --coding-root <dir>, --machine <name>, --quiet, --dry-run
 import fs from 'node:fs';
 import os from 'node:os';
@@ -117,6 +118,13 @@ function conflicts() {
   return out.slice(0, 5);
 }
 
+// ---------- skills (master list on main -> this computer) ----------
+function skillSync() {
+  if (dry) return 'skills: dry run, not synced';
+  const r = run(process.execPath, [path.join(KIT, 'scripts', 'skills.mjs'), 'sync'], { timeout: 300000 });
+  return r.code === 0 ? (r.out || 'skills: in sync') : `skills: sync problem: ${(r.err || r.out).split('\n')[0]}. Retry: node kit/scripts/skills.mjs sync`;
+}
+
 // ---------- doctor ----------
 function doctor() {
   const cfg = localConfig();
@@ -129,6 +137,9 @@ function doctor() {
   // hooks fire on sample input
   const tests = run(process.execPath, [path.join(KIT, 'tests', 'run.mjs'), '--quiet']);
   ok(tests.code === 0, `hook and script tests: ${tests.out.split('\n').pop() || tests.err.split('\n').pop()}`);
+  // skills match the master list
+  const sk = run(process.execPath, [path.join(KIT, 'scripts', 'skills.mjs'), 'sync', '--dry-run']);
+  ok(sk.code === 0 && /in sync/.test(sk.out), `skills ${sk.code === 0 && /in sync/.test(sk.out) ? 'match the master list' : `differ from master: ${sk.out || sk.err}; run node kit/scripts/skills.mjs sync`}`);
   // plugin loaded
   const list = claude('plugin', 'list');
   const loaded = list.out.includes(PLUGIN);
@@ -212,6 +223,7 @@ else {
   out.push(`kit v${kitVersion()} on ${cfg.machine} (${process.platform}); coding root ${cfg.codingRoot}`);
   out.push(`${installPlugin(has('--update'))}; ${mergeSettings()}; ${writeGlobalMd()}`);
   out.push(...conflicts());
+  out.push(skillSync());
 }
 if (!quiet || out.some((l) => l.startsWith('FAIL'))) console.log(out.join('\n'));
 if (!has('--doctor') && !has('--uninstall') && !quiet) {

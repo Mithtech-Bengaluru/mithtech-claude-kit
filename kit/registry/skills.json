@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "packs": [
+    {
+      "id": "founder-skill",
+      "repo": "Jakeschincariol/founder-skill",
+      "ref": "fd9385b0cfe1b96bebce3898fbd506d73eff5a9d",
+      "use": "Describe a business idea and say \"test my business idea\" to start with founder-board. Then run founder-competitors, founder-consumer (buyer panel), founder-pricing, founder-offer, founder-cfo, founder-marketing, founder-brand, founder-ops and founder-launch. End with founder-plan for the full plan and verdict.",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "founder-board",
+          "path": "skills/founder-board",
+          "desc": "Your board of directors. Puts a business idea in front of a three-member board, each a sub-agent reading the idea through one published framework: the Offers lens (from Alex Hormozi's $100M Offers), the Monopoly lens (from Peter Thiel's Zero to One) and the Product lens (from Walter Isaacson's..."
+        },
+        {
+          "name": "founder-brand",
+          "path": "skills/founder-brand",
+          "desc": "Your brand designer. Names the business (with the trademark, domain and handle checks to run before falling in love with a name), writes the voice, a one-line promise and a tagline, and briefs the look: colours, type, logo and the first things a customer sees, so they match the positioning the..."
+        },
+        {
+          "name": "founder-cfo",
+          "path": "skills/founder-cfo",
+          "desc": "Your CFO. Builds the unit economics of a business before money is spent: what one unit earns after its direct costs, the real profit margin at the planned volume, the break-even point in units a day, year 1 month by month, the cash needed before it pays for itself, how long the startup spend..."
+        },
+        {
+          "name": "founder-competitors",
+          "path": "skills/founder-competitors",
+          "desc": "Maps every competitor and the gap they leave. Finds the direct competitors, indirect ones and the substitutes a buyer would use instead, from public sources only, and records what each sells, at what price, how they position themselves and what their customers complain about in public reviews,..."
+        },
+        {
+          "name": "founder-consumer",
+          "path": "skills/founder-consumer",
+          "desc": "The consumer panel. Spins up a swarm of buyer sub-agents (default 100, --quick for 20) trained on the user's target customer, each with a different income, age, buying behaviour and objection, shows every one the same pitch, and runs the business through 100 buyer scenarios to see who buys, who..."
+        },
+        {
+          "name": "founder-launch",
+          "path": "skills/founder-launch",
+          "desc": "Your launch lead. Builds a dated, step-by-step launch plan: a cheap real-world test first (a waitlist, a pre-sale or a pop-up with a real price, so real buyers confirm what the simulated panel said), then the countdown to opening day with owners and deadlines, the launch-day run sheet, and the..."
+        },
+        {
+          "name": "founder-marketing",
+          "path": "skills/founder-marketing",
+          "desc": "Your marketing director. Turns the buyer panel and the competitor map into positioning, the channels the target customer actually uses, a 30-day launch campaign with dated posts and ads, the first ten hooks, a budget split and the numbers to watch. Every message answers an objection real or..."
+        },
+        {
+          "name": "founder-offer",
+          "path": "skills/founder-offer",
+          "desc": "Builds an offer too good to refuse. Lists every problem the buyer hits on the way to the result they want, turns each into a solution, trims to what is cheap to deliver and valuable to the buyer, and stacks it with honest bonuses, a guarantee the CFO can afford, real urgency and a clear name...."
+        },
+        {
+          "name": "founder-ops",
+          "path": "skills/founder-ops",
+          "desc": "Your operations manager. Works out how the business actually runs on day one: suppliers and what they cost, who works when, the step-by-step routines for opening, serving or shipping and closing, the tools to run it, the licences and permits to check, and a risk register with what to do when..."
+        },
+        {
+          "name": "founder-plan",
+          "path": "skills/founder-plan",
+          "desc": "Your business planner. Compiles everything the other founder skills wrote (the board's verdict, the competitors, the buyer panel, pricing, the offer, the CFO's numbers, marketing, brand, operations and the launch plan) into one business plan with a verdict at the top that is computed from the..."
+        },
+        {
+          "name": "founder-pricing",
+          "path": "skills/founder-pricing",
+          "desc": "Finds the price buyers will actually pay. Reads the consumer panel's four price answers per buyer into a Van Westendorp price-sensitivity range (too cheap, a bargain, getting expensive, too expensive), sets it against what competitors really charge and against the CFO's margin, and recommends a..."
+        }
+      ]
+    },
+    {
+      "id": "rea",
+      "repo": "morluto/rea",
+      "ref": "af062e7a2d290fec4307fb9444298a13c2fea630",
+      "use": "Ask Claude to reverse engineer an app, binary, Electron bundle, web page or firmware, or to compare two versions. It uses the rea MCP tools; set those up from the rea repo README (install.sh) if the tools are missing.",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "reverse-engineer-anything",
+          "path": ".agents/skills/reverse-engineer-anything",
+          "desc": "Reverse engineer native, managed, Electron/JavaScript, packaged, firmware, and browser targets with REA, and build agent environments (AgentEnv bundles) of web applications from a live instance or a capture, and of Linux desktop apps with a task from a request. Use shipped-artifact or requested..."
+        }
+      ]
+    },
+    {
+      "id": "impeccable",
+      "repo": "pbakaus/impeccable",
+      "ref": "d41d9860b0094dcb68030657da63461212835aaa",
+      "use": "Ask Claude to design, critique, audit, polish, simplify or animate a UI, or to write DESIGN.md. Example: \"critique this dashboard\" or \"make this landing page bolder\". Pair it with the TonalDepth rule for Mithtech UIs.",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "impeccable",
+          "path": ".claude/skills/impeccable",
+          "desc": "Use to design, redesign, critique, audit, polish or animate a frontend: websites, landing pages, dashboards, app UI, components, native iOS/Android screens, or a design system (DESIGN.md)."
+        }
+      ]
+    },
+    {
+      "id": "fundraising-skills",
+      "repo": "oncesylvia/fundraising-skills",
+      "ref": "084b22d3db00611ea231ec12813ccb071b84bc33",
+      "use": "Ask for investor research, targeting, a pitch narrative, cold email, warm intro, cold call, an outreach diagnosis or a pipeline tracker. Start with investor-research or investor-targeting, then use cold-email or warm-intro. Lists are researched live.",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "cold-call",
+          "path": "skills/cold-call",
+          "desc": "Prepare a founder for a live cold or first call with an investor — a 30-second opener, the core narrative beats, objection handling, a voicemail script, and a clear close/ask. Use when a founder says \"I have a call with an investor\", \"help me prep a cold call\", \"what do I say on the phone\",..."
+        },
+        {
+          "name": "cold-email",
+          "path": "skills/cold-email",
+          "desc": "Write short, personalized cold fundraising emails to investors (VCs, angels) plus a polite follow-up sequence. Use when a founder says \"write a cold email to an investor\", \"draft an outreach email to <fund/partner>\", \"help me email a VC\", or wants to improve an existing cold email. Enforces real..."
+        },
+        {
+          "name": "fundraising-agents",
+          "path": "skills/fundraising-agents",
+          "desc": "Use fundraising agents, scouts, syndicates, and accelerators as warm-intro channels — and vet them so you don't get burned or hurt your raise. Use when a founder says \"should I use an FA / placement agent\", \"success-fee fundraising\", \"how do I find a scout / syndicate\", \"should I join an..."
+        },
+        {
+          "name": "investor-research",
+          "path": "skills/investor-research",
+          "desc": "Deep-dive due diligence on a single investor (VC fund, angel, or accelerator) before a founder reaches out or takes a meeting. Use when a founder says \"research <fund/partner>\", \"tell me about <investor>\", \"should I take money from <fund>\", \"what's <partner>'s thesis\", or is prepping for an..."
+        },
+        {
+          "name": "investor-targeting",
+          "path": "skills/investor-targeting",
+          "desc": "Build a tiered, stage- and sector-fit list of investors (VCs, angels, micro-funds, accelerators) for a founder's raise, using free public sources and live web search. Use when a founder asks \"who should I raise from\", \"find investors for my startup\", \"which funds invest in <sector> at <stage>\",..."
+        },
+        {
+          "name": "outreach-diagnosis",
+          "path": "skills/outreach-diagnosis",
+          "desc": "Diagnose why fundraising outreach isn't converting — you've sent lots of cold emails / DMs / intro requests and gotten few or zero replies or meetings, and need to know the real bottleneck. Use when a founder says \"I sent 100 emails and got nothing\", \"no replies from investors\", \"why isn't my..."
+        },
+        {
+          "name": "pipeline-tracker",
+          "path": "skills/pipeline-tracker",
+          "desc": "Run a fundraise like a sales pipeline — track every investor conversation, its stage, the next action, and follow-up timing in a simple file-based CRM. Use when a founder says \"track my fundraising\", \"set up an investor CRM\", \"who do I need to follow up with\", \"update my pipeline\", or wants to..."
+        },
+        {
+          "name": "pitch-narrative",
+          "path": "skills/pitch-narrative",
+          "desc": "Sharpen a founder's fundraising story before they reach out — the one-liner, the elevator pitch, and the round narrative (problem, why now, wedge, traction, why you, the raise). Use when a founder says \"help me with my pitch\", \"what's my one-liner\", \"tighten my elevator pitch\", \"what's my..."
+        },
+        {
+          "name": "warm-intro",
+          "path": "skills/warm-intro",
+          "desc": "Get warm introductions to investors. Writes the forwardable (double opt-in) intro the founder sends to a mutual connection, plus the ask that makes saying yes easy, and ways to find warm paths. Use when a founder says \"ask my contact to intro me to <investor>\", \"write a forwardable intro\", \"I..."
+        },
+        {
+          "name": "warm-path-finder",
+          "path": "skills/warm-path-finder",
+          "desc": "Find the right human at an investor (the partner / principal / senior investment manager who owns your deal) AND map the warm-connection paths to reach them. Use when a founder says \"who at <firm> should I talk to\", \"how do I get a warm intro to <investor>\", \"find a connection to <fund>\", \"who..."
+        }
+      ]
+    },
+    {
+      "id": "brag",
+      "repo": "latent-spaces/brag",
+      "ref": "06379432a9243c951dfcc051153be18d2d261044",
+      "use": "In a finished project, say \"let's /brag\" to make a short launch video of it. Use brag-slim for the lighter version. It renders with Hyperframes, so Node and ffmpeg must be installed.",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "brag",
+          "path": "skills/brag",
+          "desc": "Turn the current project website into a short, polished, shareable launch video using Hyperframes. Use when someone says \"/brag\", \"let's brag about this\", \"make a launch video\", \"turn this into a video\", or wants to share what they built. Reads the project code directly — no live URL or..."
+        },
+        {
+          "name": "brag-slim",
+          "path": "skills/brag-slim",
+          "desc": "Turn a project directory or a website URL into a short, shareable launch video with music, motion, and share copy. One file, no bundled assets — built entirely by the model with the tools already on the machine. Use when someone says \"/brag-slim\", \"let's /brag about this\", \"brag about a..."
+        }
+      ]
+    },
+    {
+      "id": "taste-skill",
+      "repo": "leonxlnx/taste-skill",
+      "ref": "f6b76575f949707b4e3c37cd86cb44b0b98643e8",
+      "use": "Ask Claude to build or redesign a company site or landing page. It picks a palette, fonts and layout for the trade and checks the page in a browser before it finishes. Run its checker script when it asks.",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "design-taste-frontend",
+          "path": "skills/taste-skill",
+          "desc": "tasteskill 2.5.1, the anti-slop frontend skill. Builds professional company websites at the level of figma.com and x.ai: plain copy in a voice of its own, one system, one section per screen, equal edges, real photographs and real product UI (licensed stand-in photographs when the client has..."
+        }
+      ]
+    },
+    {
+      "id": "rasterless",
+      "repo": "dheerajponnaganti/rasterless",
+      "ref": "fa16b9ac3efa1fe91df7282812703dba3ff499de",
+      "use": "Give Claude a PNG, JPG or WebP icon or logo and say \"make this an svg\". It traces the image into a small SVG with named layers and checks the result. Works for folders of icons. Needs Python 3.10+ (uv recommended).",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "rasterless",
+          "path": "skills/rasterless",
+          "desc": "Convert icons, logos, and other flat art (PNG, JPG, WebP) into clean, small SVG files with one named layer per object, by tracing them with Potrace. Use this instead of writing SVG by hand whenever the user has an image and wants it as SVG: a hand-drawn SVG does not match the image, this matches..."
+        }
+      ]
+    },
+    {
+      "id": "anatomy",
+      "repo": "wheresryan22/anatomy",
+      "ref": "1482e8469b0a9e0d8cc18ea2740a01423d29ae80",
+      "use": "Ask for an isometric SVG figure that explains a technical idea as a physical object, for docs or a blog post. Example: \"draw an isometric figure of how a hash table works\".",
+      "note": "",
+      "added": "2026-11-17",
+      "addedBy": "Manojs-Mac-mini",
+      "skills": [
+        {
+          "name": "anatomy",
+          "path": ".",
+          "desc": "Build crafted, highly detailed, interactive isometric SVG figures that explain a technical idea as a real physical object (a test rig, a dial gauge, a cabinet of drawers, a plotter, a lock), with many small precise solid parts, four-tone shading, correct painter's order, a framed card with..."
+        }
+      ]
+    }
+  ]
+}

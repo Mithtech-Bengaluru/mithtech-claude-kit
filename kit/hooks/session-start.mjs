@@ -13,10 +13,17 @@ const out = [];
 
 const st = readJSON(STATE, {});
 if (st.message && !st.shown) { out.push(`kit: ${st.message}`); st.shown = true; writeJSON(STATE, st); }
+if (st.skillsMessage && !st.skillsShown) { out.push(st.skillsMessage); st.skillsShown = true; writeJSON(STATE, st); }
 if (!st.lastCheck || Date.now() - Date.parse(st.lastCheck) > 24 * 3600e3) {
   st.lastCheck = new Date().toISOString(); writeJSON(STATE, st);
   const child = spawn(process.execPath, [path.join(KIT, 'scripts', 'update.mjs'), '--background'], { detached: true, stdio: 'ignore' });
   child.unref();
+}
+// skill sync (own daily timer; reads the master list from main, never needs a release tag)
+if (!st.lastSkillSync || Date.now() - Date.parse(st.lastSkillSync) > 24 * 3600e3) {
+  st.lastSkillSync = new Date().toISOString(); writeJSON(STATE, st);
+  const sk = spawn(process.execPath, [path.join(KIT, 'scripts', 'skills.mjs'), 'sync', '--background'], { detached: true, stdio: 'ignore' });
+  sk.unref();
 }
 
 const top = git(cwd, 'rev-parse', '--show-toplevel').out || cwd;

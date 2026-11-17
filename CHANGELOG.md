@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+- Skill registry: `kit/registry/skills.json` is the master list; `SKILLS.md` (generated) says where each skill comes from and how to use it. New `skills.mjs sync|list|add|remove|docs`. Each computer installs missing skills, updates pinned commits and uninstalls skills that master dropped (daily SessionStart sync, every installer run, `--doctor` check). Removed skills go to `~/.claude/skills/.trash`; skills the kit did not install are never touched.
+- First registry: founder-skill (11), rea, impeccable, fundraising-skills (10), brag (2), taste-skill, rasterless, anatomy.
+- One branch: lessons and catalogue entries go to `inbox/` on main (no `inbox/<machine>` branches); `maintain.mjs` reads and clears `inbox/` on main. The `protect-main` ruleset no longer requires pull requests (deletion and force-push stay blocked).
+
 ## 1.1.1
 - Installer updates a stale plugin cache even on a plain run; `--doctor` fails when the cached plugin version differs from the kit.
 
