@@ -25,7 +25,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Use one term for one meaning, every time. Avoid noun clusters of more than 3 words.
 
 ## Frappe / ERPNext
-- Name every Mithtech app `framith_<name>` (snake_case).
+- Name every Mithtech app `framith_<name>` (snake_case). Users see only the product name: app_title, labels, page titles and the README title never say "Framith" (`framith_tradedeal` shows "Trade Deal").
 - Build the generic product app first (`framith_<product>`), complete and configurable through its Single Settings DocType.
 - Put each customer's changes in their own app (`framith_<customer>`), which lists the generic apps in required_apps. No customer logic in generic apps; never fork a generic app per customer.
 - If other customers could use a change, build it in the generic app behind a setting. Otherwise put it in the customer app. Say which and why.
@@ -54,7 +54,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Drop the column yourself after deleting a test Custom Field on a dev site; Frappe keeps the database column.
 
 ## Medusa
-- Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`).
+- Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`). Users see only the product name: admin labels, page titles and the README title never say "Mithusa".
 - Build generic `mithusa-` plugins first. Put customer-only code in the customer's Medusa project, or in `mithusa-<customer>` if several of their stores share it.
 - Detect the Medusa version. These rules are for v2; say so when a project is v1.
 - Check built-in commerce modules, installed plugins, our mithusa- plugins, src/modules, workflows and routes before building. For a new project, check medusa-factory first.
