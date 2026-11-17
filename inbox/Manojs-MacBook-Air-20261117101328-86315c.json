@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "India Payroll computes provident fund and professional tax itself. Both stay zero until its statutory settings are on.",
+  "fix": "Turn on provident fund and professional tax for the company, and set the employment state on each salary assignment.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-17T10:13:28.311Z"
+}
