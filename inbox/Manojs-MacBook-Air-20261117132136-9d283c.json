@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "A stale TAG value in a server env file overrode the compose default and rolled Twenty back after a stepped upgrade.",
+  "fix": "Pin the image tag literally in compose after an upgrade, and check the resolved images before you recreate.",
+  "project": "000-docker",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-17T13:21:36.549Z"
+}
