@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "frappe.get_doc(dict).is_new() is False (no __islocal), so HRMS Appraisal put KRAs in the wrong table and scored 0.",
+  "fix": "Build documents that controllers treat as new with frappe.new_doc(doctype) then update(), not frappe.get_doc(dict).",
+  "project": "FlowMentor",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-17T12:02:25.357Z"
+}
