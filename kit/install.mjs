@@ -47,8 +47,11 @@ function ensureLocalConfig() {
 const pick = (o, ks) => Object.fromEntries(ks.filter((k) => o[k] !== undefined).map((k) => [k, o[k]]));
 
 // ---------- plugin ----------
+// Version Claude Code has cached for the kit plugin (null when not installed).
+const pluginVersion = () => readJSON(path.join(CLAUDE_DIR, 'plugins', 'installed_plugins.json'), {}).plugins?.[PLUGIN]?.[0]?.version || null;
 function installPlugin(update) {
   const known = readJSON(path.join(CLAUDE_DIR, 'plugins', 'known_marketplaces.json'), {});
+  update = update || (pluginVersion() && pluginVersion() !== kitVersion()); // a stale cache needs an update, even on a plain run
   let r;
   if (!known[MKT]) r = claude('plugin', 'marketplace', 'add', REPO, '--scope', 'user');
   else if (update) r = claude('plugin', 'marketplace', 'update', MKT);
@@ -130,6 +133,8 @@ function doctor() {
   const list = claude('plugin', 'list');
   const loaded = list.out.includes(PLUGIN);
   ok(loaded, `plugin ${PLUGIN} ${loaded ? 'installed' : 'not listed by `claude plugin list`'}`);
+  const pv = pluginVersion();
+  ok(!loaded || pv === kitVersion(), `plugin cache v${pv || '?'} matches kit v${kitVersion()}${pv === kitVersion() ? '' : ': run node kit/install.mjs --update'}`);
   // the CLI must be logged in for worker sessions (claude -p); the desktop app's login does not carry over
   const auth = run('claude', ['auth', 'status']);
   let authJ = {}; try { authJ = JSON.parse(auth.out); } catch {}
