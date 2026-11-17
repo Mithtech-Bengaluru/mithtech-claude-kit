@@ -34,7 +34,7 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 - SECURITY (the repo is public and its code runs on every developer's machine, so it is a supply-chain target):
   - main is protected: changes only by pull request with my review; no force-push; only org members can push inbox branches.
   - Release tags are created only by me (signed tags if set up); the updater refuses anything else, and refuses a tag whose commit isn't on protected main.
-  - If GitHub Actions are added later: run only on pushes by members; never `pull_request_target`, no secrets exposed to fork pull requests, actions pinned to commit SHAs, minimal workflow permissions.
+  - GitHub Free only: no GitHub Actions, required status checks, Codespaces, Copilot or other paid features. Tests and gates run locally (or on the home cluster with Offload) and the PR records the result.
   - The public repo holds no internal hostnames, IPs, server names, customer names or registry URLs. Those go in each machine's local config or in a private repo the kit reads if present.
   - Commits use the GitHub noreply email.
 
@@ -147,7 +147,7 @@ Verify the current models (Haiku 5.5, Sonnet 5.5, Opus 5.5, Fable 5.1 at the tim
 - Medusa: modules, data models, links, workflows, steps, routes, subscribers, admin widgets, installed plugins and their options.
 - Others: packages/crates/modules, public types, routes, DB tables from migrations.
 - DUPLICATE CHECKER (`node kit/dupcheck.mjs`, no tokens): compares new or changed DocTypes, fields, models and settings against the index with name and label similarity (for example `gst_no` vs `gstin`, `cust_mobile` vs `mobile_no`) and type and options matches. Runs in the pre-commit hook and in each project's CI. A hit fails the commit unless the brief marks it as intended with a reason.
-- CI CHECK PER PROJECT: the same dupcheck plus naming and placement checks run on every pull request (GitHub Actions; pre-commit hook as fallback), so developers who don't use Claude follow the rules too.
+- CI CHECK PER PROJECT: the same dupcheck plus naming and placement checks run on every pull request (local pre-push hook; no GitHub Actions, we use GitHub Free), so developers who don't use Claude follow the rules too.
 
 ## 3.6 Stack skills (short rules; loaded only when the stack matches)
 ### frappe-dev

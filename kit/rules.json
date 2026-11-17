@@ -49,6 +49,10 @@
         {
           "id": "E11",
           "text": "Never copy a database between machines without asking."
+        },
+        {
+          "id": "E12",
+          "text": "We use GitHub Free. Do not add or rely on GitHub Actions, required status checks, Codespaces, Copilot or other paid GitHub features. Run the gate locally (or on the home cluster with Offload) before every pull request and put the result in the PR."
         }
       ]
     },
@@ -206,6 +210,104 @@
           "text": "Drop the column yourself after deleting a test Custom Field on a dev site; Frappe keeps the database column.",
           "source": "kit pilot",
           "added": "2026-11-08"
+        },
+        {
+          "id": "FG03",
+          "kind": "gotcha",
+          "text": "Name the controller class exactly as the DocType without spaces, acronyms as written (`SCException`); a title-cased class makes migrate delete the DocType as an orphan.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG04",
+          "kind": "gotcha",
+          "text": "Guard engine-only fields with a higher permlevel or a validate check; Frappe does not enforce read-only fields on the server, so the REST API can change them.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG05",
+          "kind": "gotcha",
+          "text": "Read child-table values from the browser with frappe.client.get_value and `parent` set; frappe.db.get_value on a child DocType returns only name.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG06",
+          "kind": "gotcha",
+          "text": "Set a custom new-record dialog in the listview `primary_action`; Frappe 16 resets the Add button after listview onload.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG07",
+          "kind": "gotcha",
+          "text": "Follow `amended_from` in submit hooks, or block amending system-made documents; Cancel-then-Amend gives a new name.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG08",
+          "kind": "gotcha",
+          "text": "Take the row lock first in the transaction, or read balances with locking reads; MariaDB keeps the old snapshot after plain reads.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG09",
+          "kind": "gotcha",
+          "text": "Load the same app checkout for every bench call on a site, and clear the site cache after one that did not; Redis caches the module map per site.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG10",
+          "kind": "gotcha",
+          "text": "Rename an app in this order: add the new package beside the old, switch dependents, rename each site, migrate, remove the old package. Rehearse on a throwaway site through its own apps file.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG11",
+          "kind": "gotcha",
+          "text": "Read dict hooks per app in install order (Frappe merges them into lists of values). In hook tests, assert on the doctype keys and add a positive control.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG12",
+          "kind": "gotcha",
+          "text": "Fill the item-wise rates JSON for every item when a script sets a Bill of Entry IGST row to Actual; India Compliance rejects it empty.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG13",
+          "kind": "gotcha",
+          "text": "Wrap the ERPNext test bootstrap to relax only the India Compliance checks it fails (zero-rate template, no HSN, non-GST state); load test data once on the baseline site.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG14",
+          "kind": "gotcha",
+          "text": "Translate at request time only; translating labels at module import freezes the first request language in each worker.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG15",
+          "kind": "gotcha",
+          "text": "Put the nvm Node 24 folder first on PATH before get-app or build on a server; a non-interactive ssh shell picks the system Node.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "FG16",
+          "kind": "gotcha",
+          "text": "Patch shared dicts once in the main thread around worker threads; mock.patch.dict inside threads leaks the patched value.",
+          "source": "inbox",
+          "added": "2026-11-17"
         }
       ]
     },
@@ -284,6 +386,48 @@
         {
           "id": "N05",
           "text": "Run lint, typecheck and format before every commit."
+        },
+        {
+          "id": "NG01",
+          "kind": "gotcha",
+          "text": "Read every statement Payload migrate:create generates; strip changes outside your collections and list that drift in the PR.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "NG02",
+          "kind": "gotcha",
+          "text": "Start Web Workers inline from a blob URL at module load, before long synchronous work, and allow blob: workers in the CSP; Chrome starts a URL worker only on a free main-thread task.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "NG03",
+          "kind": "gotcha",
+          "text": "Add a silence watchdog (about 12 s without host messages) to WebRTC guests; a crashed host leaves the data channel open and close never fires.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "NG04",
+          "kind": "gotcha",
+          "text": "Build production in a checkout with its own deps and env, or use the release image build as the check; worktree builds fail on symlinked node_modules and blocked env.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "NG05",
+          "kind": "gotcha",
+          "text": "Compose TonalDepth pages without a bare main element and write actions as buttons; compat styles hit bare main and link colour beats component classes.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "NG06",
+          "kind": "gotcha",
+          "text": "Check layouts at the real inner width (the browser pane can be narrower than requested), test a minimum width per main area, set the theme per check, and confirm the pane is visible (a hidden pane freezes animations).",
+          "source": "inbox",
+          "added": "2026-11-17"
         }
       ]
     },
@@ -311,6 +455,13 @@
         {
           "id": "R05",
           "text": "Keep Tauri commands as thin wrappers over core. Commit generated TypeScript types."
+        },
+        {
+          "id": "RG01",
+          "kind": "gotcha",
+          "text": "Add the register and remove listener commands to a Tauri 2 mobile plugin command list and default permissions, then test on an emulator; otherwise events never reach the UI.",
+          "source": "inbox",
+          "added": "2026-11-17"
         }
       ]
     },
@@ -334,6 +485,27 @@
         {
           "id": "O04",
           "text": "Apply the same reuse, single-owner, placement and safety rules as every other stack."
+        },
+        {
+          "id": "OG01",
+          "kind": "gotcha",
+          "text": "Read Meta Embedded Signup phone and account IDs from the popup message event, and request contacts and history sync right after onboarding; it expires in 24 hours.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "OG02",
+          "kind": "gotcha",
+          "text": "Attach Playwright to Android WebView with its Android device API (not plain CDP) and clear colour-scheme emulation before theme checks.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "OG03",
+          "kind": "gotcha",
+          "text": "Request the local network permission for Android 17 (API 37) apps that reach private addresses: debug builds always, release builds only for private LAN servers.",
+          "source": "inbox",
+          "added": "2026-11-17"
         }
       ]
     },
@@ -385,6 +557,34 @@
         {
           "id": "B11",
           "text": "Add a regression test for every bug you fix."
+        },
+        {
+          "id": "EG01",
+          "kind": "gotcha",
+          "text": "Read a payout balance as of the run date (or block overlapping runs) and test out-of-order periods; mixed dates paid one balance twice.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "EG02",
+          "kind": "gotcha",
+          "text": "Cap text length before PII regexes, keep dates out of the phone pattern and test date-plus-phone strings; long text made the email pattern quadratic.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "EG03",
+          "kind": "gotcha",
+          "text": "Make every database change safe to run twice and rehearse it on a copy of production data; a branch script can repeat changes production already has.",
+          "source": "inbox",
+          "added": "2026-11-17"
+        },
+        {
+          "id": "EG04",
+          "kind": "gotcha",
+          "text": "Start local test servers with an allow-list of env vars (database URL, app secret); a full env file can reach real ERP, push and mail services.",
+          "source": "inbox",
+          "added": "2026-11-17"
         }
       ]
     }

@@ -23,4 +23,7 @@ description: Rules for Go, Flutter, Python, Tally TDL, Docker/k3s and any stack 
 
 ## Gotchas (from lessons)
 <!-- kit-lessons:other:start -->
+- OG01: Read Meta Embedded Signup phone and account IDs from the popup message event, and request contacts and history sync right after onboarding; it expires in 24 hours.
+- OG02: Attach Playwright to Android WebView with its Android device API (not plain CDP) and clear colour-scheme emulation before theme checks.
+- OG03: Request the local network permission for Android 17 (API 37) apps that reach private addresses: debug builds always, release builds only for private LAN servers.
 <!-- kit-lessons:other:end -->

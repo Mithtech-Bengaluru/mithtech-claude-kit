@@ -24,4 +24,8 @@ Set `Floor: money|permissions|production|contracts` on these tasks, and route le
 
 ## Gotchas (from lessons)
 <!-- kit-lessons:enterprise:start -->
+- EG01: Read a payout balance as of the run date (or block overlapping runs) and test out-of-order periods; mixed dates paid one balance twice.
+- EG02: Cap text length before PII regexes, keep dates out of the phone pattern and test date-plus-phone strings; long text made the email pattern quadratic.
+- EG03: Make every database change safe to run twice and rehearse it on a copy of production data; a branch script can repeat changes production already has.
+- EG04: Start local test servers with an allow-list of env vars (database URL, app secret); a full env file can reach real ERP, push and mail services.
 <!-- kit-lessons:enterprise:end -->

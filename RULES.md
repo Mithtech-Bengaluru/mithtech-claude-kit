@@ -15,6 +15,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Never edit third-party or upstream code (frappe, erpnext, hrms, india_compliance, @medusajs core, node_modules, generated code).
 - Keep secrets out of git, images, logs and shared files. Use environment variables.
 - Never copy a database between machines without asking.
+- We use GitHub Free. Do not add or rely on GitHub Actions, required status checks, Codespaces, Copilot or other paid GitHub features. Run the gate locally (or on the home cluster with Offload) before every pull request and put the result in the PR.
 
 ## Communication
 - Before a medium or large task, restate it in at most 7 bullets (goal, scope, placement, assumptions, done when) and get a yes.
@@ -52,6 +53,20 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Ship a generic app only when every requirement ID in its approved spec is built and tested. Keep partial apps on a feature branch.
 - Run deletes in bench console with frappe.db.commit(); bench execute did not commit a frappe.client.delete.
 - Drop the column yourself after deleting a test Custom Field on a dev site; Frappe keeps the database column.
+- Name the controller class exactly as the DocType without spaces, acronyms as written (`SCException`); a title-cased class makes migrate delete the DocType as an orphan.
+- Guard engine-only fields with a higher permlevel or a validate check; Frappe does not enforce read-only fields on the server, so the REST API can change them.
+- Read child-table values from the browser with frappe.client.get_value and `parent` set; frappe.db.get_value on a child DocType returns only name.
+- Set a custom new-record dialog in the listview `primary_action`; Frappe 16 resets the Add button after listview onload.
+- Follow `amended_from` in submit hooks, or block amending system-made documents; Cancel-then-Amend gives a new name.
+- Take the row lock first in the transaction, or read balances with locking reads; MariaDB keeps the old snapshot after plain reads.
+- Load the same app checkout for every bench call on a site, and clear the site cache after one that did not; Redis caches the module map per site.
+- Rename an app in this order: add the new package beside the old, switch dependents, rename each site, migrate, remove the old package. Rehearse on a throwaway site through its own apps file.
+- Read dict hooks per app in install order (Frappe merges them into lists of values). In hook tests, assert on the doctype keys and add a positive control.
+- Fill the item-wise rates JSON for every item when a script sets a Bill of Entry IGST row to Actual; India Compliance rejects it empty.
+- Wrap the ERPNext test bootstrap to relax only the India Compliance checks it fails (zero-rate template, no HSN, non-GST state); load test data once on the baseline site.
+- Translate at request time only; translating labels at module import freezes the first request language in each worker.
+- Put the nvm Node 24 folder first on PATH before get-app or build on a server; a non-interactive ssh shell picks the system Node.
+- Patch shared dicts once in the main thread around worker threads; mock.patch.dict inside threads leaks the patched value.
 
 ## Medusa
 - Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`). Users see only the product name: admin labels, page titles and the README title never say "Mithusa".
@@ -72,6 +87,12 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Keep accessibility and performance budgets.
 - On CMS and marketing sites, change no URL; SEO checks must pass.
 - Run lint, typecheck and format before every commit.
+- Read every statement Payload migrate:create generates; strip changes outside your collections and list that drift in the PR.
+- Start Web Workers inline from a blob URL at module load, before long synchronous work, and allow blob: workers in the CSP; Chrome starts a URL worker only on a free main-thread task.
+- Add a silence watchdog (about 12 s without host messages) to WebRTC guests; a crashed host leaves the data channel open and close never fires.
+- Build production in a checkout with its own deps and env, or use the release image build as the check; worktree builds fail on symlinked node_modules and blocked env.
+- Compose TonalDepth pages without a bare main element and write actions as buttons; compat styles hit bare main and link colour beats component classes.
+- Check layouts at the real inner width (the browser pane can be narrower than requested), test a minimum width per main area, set the theme per check, and confirm the pane is visible (a hidden pane freezes animations).
 
 ## Rust
 - Keep core crates free of network and connector dependencies.
@@ -79,12 +100,16 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Keep clippy clean with the repo's config.
 - Run `cargo test -p <crate>` while working and the full gate before push. Limit build parallelism.
 - Keep Tauri commands as thin wrappers over core. Commit generated TypeScript types.
+- Add the register and remove listener commands to a Tauri 2 mobile plugin command list and default permissions, then test on an emulator; otherwise events never reach the UI.
 
 ## Other stacks (Go, Flutter, Python, Tally TDL, Docker/k3s)
 - Read the project's CLAUDE.md for its gate command.
 - Follow the stack's official style guide and linters.
 - Look up the official docs before using an unfamiliar API.
 - Apply the same reuse, single-owner, placement and safety rules as every other stack.
+- Read Meta Embedded Signup phone and account IDs from the popup message event, and request contacts and history sync right after onboarding; it expires in 24 hours.
+- Attach Playwright to Android WebView with its Android device API (not plain CDP) and clear colour-scheme emulation before theme checks.
+- Request the local network permission for Android 17 (API 37) apps that reach private addresses: debug builds always, release builds only for private LAN servers.
 
 ## Business software (all stacks)
 - Take the tenant from the logged-in session, never from the request.
@@ -98,3 +123,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Mask personal data in logs.
 - Avoid N+1 queries. Paginate every list.
 - Add a regression test for every bug you fix.
+- Read a payout balance as of the run date (or block overlapping runs) and test out-of-order periods; mixed dates paid one balance twice.
+- Cap text length before PII regexes, keep dates out of the phone pattern and test date-plus-phone strings; long text made the email pattern quadratic.
+- Make every database change safe to run twice and rehearse it on a copy of production data; a branch script can repeat changes production already has.
+- Start local test servers with an allow-list of env vars (database URL, app secret); a full env file can reach real ERP, push and mail services.

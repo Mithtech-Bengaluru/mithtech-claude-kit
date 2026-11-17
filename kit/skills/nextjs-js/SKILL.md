@@ -21,4 +21,10 @@ description: Rules for Next.js, Payload CMS and other JavaScript or TypeScript s
 
 ## Gotchas (from lessons)
 <!-- kit-lessons:nextjs:start -->
+- NG01: Read every statement Payload migrate:create generates; strip changes outside your collections and list that drift in the PR.
+- NG02: Start Web Workers inline from a blob URL at module load, before long synchronous work, and allow blob: workers in the CSP; Chrome starts a URL worker only on a free main-thread task.
+- NG03: Add a silence watchdog (about 12 s without host messages) to WebRTC guests; a crashed host leaves the data channel open and close never fires.
+- NG04: Build production in a checkout with its own deps and env, or use the release image build as the check; worktree builds fail on symlinked node_modules and blocked env.
+- NG05: Compose TonalDepth pages without a bare main element and write actions as buttons; compat styles hit bare main and link colour beats component classes.
+- NG06: Check layouts at the real inner width (the browser pane can be narrower than requested), test a minimum width per main area, set the theme per check, and confirm the pane is visible (a hidden pane freezes animations).
 <!-- kit-lessons:nextjs:end -->

@@ -58,4 +58,18 @@ description: Rules for Frappe, ERPNext, HRMS and India Compliance work, framith_
 <!-- kit-lessons:frappe:start -->
 - FG01: Run deletes in bench console with frappe.db.commit(); bench execute did not commit a frappe.client.delete.
 - FG02: Drop the column yourself after deleting a test Custom Field on a dev site; Frappe keeps the database column.
+- FG03: Name the controller class exactly as the DocType without spaces, acronyms as written (`SCException`); a title-cased class makes migrate delete the DocType as an orphan.
+- FG04: Guard engine-only fields with a higher permlevel or a validate check; Frappe does not enforce read-only fields on the server, so the REST API can change them.
+- FG05: Read child-table values from the browser with frappe.client.get_value and `parent` set; frappe.db.get_value on a child DocType returns only name.
+- FG06: Set a custom new-record dialog in the listview `primary_action`; Frappe 16 resets the Add button after listview onload.
+- FG07: Follow `amended_from` in submit hooks, or block amending system-made documents; Cancel-then-Amend gives a new name.
+- FG08: Take the row lock first in the transaction, or read balances with locking reads; MariaDB keeps the old snapshot after plain reads.
+- FG09: Load the same app checkout for every bench call on a site, and clear the site cache after one that did not; Redis caches the module map per site.
+- FG10: Rename an app in this order: add the new package beside the old, switch dependents, rename each site, migrate, remove the old package. Rehearse on a throwaway site through its own apps file.
+- FG11: Read dict hooks per app in install order (Frappe merges them into lists of values). In hook tests, assert on the doctype keys and add a positive control.
+- FG12: Fill the item-wise rates JSON for every item when a script sets a Bill of Entry IGST row to Actual; India Compliance rejects it empty.
+- FG13: Wrap the ERPNext test bootstrap to relax only the India Compliance checks it fails (zero-rate template, no HSN, non-GST state); load test data once on the baseline site.
+- FG14: Translate at request time only; translating labels at module import freezes the first request language in each worker.
+- FG15: Put the nvm Node 24 folder first on PATH before get-app or build on a server; a non-interactive ssh shell picks the system Node.
+- FG16: Patch shared dicts once in the main thread around worker threads; mock.patch.dict inside threads leaks the patched value.
 <!-- kit-lessons:frappe:end -->

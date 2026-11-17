@@ -83,7 +83,7 @@ const msg = `kit v${next}: ${accepted.lesson.length} lesson(s), ${accepted.catal
 if (git(REPO, 'commit', '--quiet', '-m', msg).code !== 0) die('commit failed');
 const signed = !!git(REPO, 'config', 'user.signingkey').out;
 git(REPO, 'tag', signed ? '-s' : '-a', `v${next}`, '-m', msg);
-const push = git(REPO, 'push', '--quiet', 'origin', 'main', `v${next}`);
+const push = git(REPO, 'push', '--quiet', '--atomic', 'origin', 'main', `v${next}`);
 if (push.code !== 0) {
   git(REPO, 'push', '--quiet', 'origin', `HEAD:refs/heads/release/v${next}`);
   console.log(`main is protected against direct push. Open the PR: gh pr create --head release/v${next} --title "${msg}"`);
