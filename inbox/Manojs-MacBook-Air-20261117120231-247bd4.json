@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Server-side journey smoke passed while the browser failed: client mandatory checks on child rows and website route fields only show in the Desk.",
+  "fix": "Play every new FlowMentor journey in a browser before calling it done, and pass start records as a doctype and name pair rather than a document.",
+  "project": "FlowMentor",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-17T12:02:31.648Z"
+}
