@@ -16,10 +16,6 @@
       "why": "force-push is blocked (rule E07)"
     },
     {
-      "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*(\\s|:|/)(main|master|production|prod)(\\s|$|;|&|\\||['\"])",
-      "why": "push to main/master/production is blocked; push a feature branch and open a PR, or use git ship (rule E07)"
-    },
-    {
       "re": "\\bgit\\b[^;&|\\n]*\\bpush\\b[^;&|\\n]*\\s--(all|mirror)\\b",
       "why": "push --all/--mirror is blocked (rule E07)"
     }

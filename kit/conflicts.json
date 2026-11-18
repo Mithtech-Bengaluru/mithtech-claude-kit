@@ -14,18 +14,6 @@
       ]
     },
     {
-      "id": "push-main-ok",
-      "re": "\\b(push|commit|merge)\\b[^.\\n]{0,30}\\b(directly |straight )?(to|into|on) (main|master)\\b[^.\\n]{0,40}\\b(is fine|is ok|freely|always|without (a )?(pr|review|asking)|no need)",
-      "rule": "E07",
-      "scopes": [
-        "claude_md",
-        "memory",
-        "output_style",
-        "skill",
-        "agent"
-      ]
-    },
-    {
       "id": "force-push-ok",
       "re": "force[- ]push(ing)?\\b[^.\\n]{0,40}\\b(is fine|is ok|allowed|freely|when needed|as needed)",
       "rule": "E07",

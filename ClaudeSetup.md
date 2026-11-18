@@ -32,7 +32,7 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
   - COLLECT (manual, only me): `node kit/maintain.mjs` on my computer fetches every `inbox/*` branch from all devices, validates each entry (JSON schema, length caps, duplicates, secret scan), and shows me a summary of 10 lines or fewer. Nothing is accepted automatically. On my yes it writes the accepted entries (section 3.11), bumps the version, tags a release, pushes to main and deletes the processed inbox branches. No scheduled job, no GitHub Actions.
   - SAFETY: inbox entries are data from many people and end up in everyone's context. Only schema fields are kept, plain text, capped lengths, no URLs or commands in lessons, no instructions; anything else is rejected.
 - SECURITY (the repo is public and its code runs on every developer's machine, so it is a supply-chain target):
-  - main is protected: changes only by pull request with my review; no force-push; only org members can push inbox branches.
+  - main: no force-push and no deletion; only org members can push inbox branches.
   - Release tags are created only by me (signed tags if set up); the updater refuses anything else, and refuses a tag whose commit isn't on protected main.
   - GitHub Free only: no GitHub Actions, required status checks, Codespaces, Copilot or other paid features. Tests and gates run locally (or on the home cluster with Offload) and the PR records the result.
   - The public repo holds no internal hostnames, IPs, server names, customer names or registry URLs. Those go in each machine's local config or in a private repo the kit reads if present.
@@ -133,13 +133,13 @@ Ready answers for common tasks so they skip planning: package site customisation
 light, worker, architect, checker (read, test, lint only; checks against approved packs, naming and layering, SSOT, placement, stack rules, enterprise-core and requirement coverage), cleanup (git and file tools only), indexer (builds .claude/index and catalogue entries).
 
 ## 3.9 Hooks (Node; each under 60 lines; they are the guardrails for bypass mode)
-- PreToolUse: block force-push, pushes to main/master/production, production deploys and migrations on non-dev sites; block reads of .env*, credentials folders, ~/.ssh, *.pem; block edits to vendored paths (listed per project in `.claude/vendored.txt`); in worker sessions, block edits outside `.claude/owns.txt` and to contract files.
+- PreToolUse: block force-push, production deploys and migrations on non-dev sites; block reads of .env*, credentials folders, ~/.ssh, *.pem; block edits to vendored paths (listed per project in `.claude/vendored.txt`); in worker sessions, block edits outside `.claude/owns.txt` and to contract files.
 - SessionStart: kit self-update check (section 1), then at most 5 lines: project, stack, branch, active program and gate, which CLAUDE.md/HANDOFF.md to read.
 - Coexist with the existing Offload hook; don't duplicate it. Each hook is tested once with sample input.
 
 ## 3.10 settings.json (merged by the installer; verify syntax)
 - ALLOW: git status/diff/log/add/commit/branch/checkout/worktree/merge; gh pr; npm/yarn/pnpm install, run, test; cargo check/test/clippy/fmt; go build/test/vet; flutter analyze/test; pytest, ruff; bench build, run-tests, migrate on dev/test sites; Medusa db generate/migrate in development; read-only offload/docker/kubectl; the kit's own scripts.
-- DENY: force-push; pushes to main/master/production; edits to vendored apps and node_modules; reading .env* (allow .env.example), credentials folders, ~/.ssh, *.pem.
+- DENY: force-push; edits to vendored apps and node_modules; reading .env* (allow .env.example), credentials folders, ~/.ssh, *.pem.
 - ASK: deploys, package publish, database restore/drop, docker/kubectl writes, `offload down`.
 
 ## 3.11 Learning loop and Mithtech catalogue (stored in this kit repo)

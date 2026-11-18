@@ -34,7 +34,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - E25: Build every UI with TonalDepth (`<coding root>/tonaldepth`, npm `@mithtech-bengaluru/tonaldepth-*`): its tokens, Mithtech colours, subtle claymorphism, light and dark modes. Use no raw colours and no outline-only depth. Copy this rule into every UI brief.
 
 ## Git and GitHub
-- E07: Never force-push. Never push to main, master or production. Put work on main only through a pull request, for example `git ship`.
+- E07: Never force-push or push with --all or --mirror. Run the project's gate before you push main; `git ship` runs it and opens the PR.
 - E12: Use only free GitHub features: no Actions, required status checks, Codespaces or Copilot. Before every pull request, run the gate locally or on the home cluster (Offload), and put the result in the PR body.
 - E13: With live git sync on (`<kit>/docs/two-macs.md`), work on `wip`. SessionStart pulls it, Stop pushes it after each turn, and a job syncs idle repos. When SessionStart says PAUSED, help clear it first. Never commit a `*.sync-conflict-*` file.
 

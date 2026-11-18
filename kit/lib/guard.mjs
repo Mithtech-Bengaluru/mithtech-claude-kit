@@ -27,7 +27,6 @@ export function decide(input) {
 
 // Commands that run text again (sh -c, eval, ssh …) are checked on the raw text, conservatively.
 const REEVAL = /\b(sh|bash|zsh|dash|fish)\s+(-\w+\s+)*-c\b|\beval\b|\bxargs\b|\bssh\b|\bsource\b|(^|[\s;&|])\.\s|\bwatch\b|\bparallel\b/;
-const PROTECTED = /^(main|master|production|prod)$/;
 const WRAPPERS = new Set(['sudo', 'env', 'command', 'time', 'nohup', 'exec', 'nice']);
 
 // Quoted text and here-doc bodies are data, not commands: drop multi-word strings, keep one-word ones as words.
@@ -51,9 +50,8 @@ function commands(cmd, cwd) {
   }
   return out;
 }
-// cfg.mainPushRepos: absolute repo roots where the owner allows a plain `git push` from main
-// (single-branch repos shared across devices). Force-push, --all/--mirror and explicit `push … main` stay blocked.
-function gitPush({ w, dir }, cfg = {}) {
+// Force-push and --all/--mirror are blocked (rule E07). Pushes to main are allowed (pending_work/push-main-block.md).
+function gitPush({ w, dir }) {
   if (!/(^|\/)git$/.test(w[0])) return null;
   let i = 1, d = dir;
   while (i < w.length && w[i].startsWith('-')) {
@@ -63,18 +61,8 @@ function gitPush({ w, dir }, cfg = {}) {
   }
   if (w[i] !== 'push') return null;
   const args = w.slice(i + 1);
-  if (args.some((a) => /^--force(-with-lease|-if-includes)?(=|$)/.test(a) || /^-[a-zA-Z]*f[a-zA-Z]*$/.test(a) || /^\+/.test(a))) return deny('force-push is blocked');
-  if (args.some((a) => a === '--all' || a === '--mirror')) return deny('push --all/--mirror is blocked');
-  const valueOpts = new Set(['-o', '--push-option', '--repo', '--receive-pack', '--exec']);
-  const pos = [];
-  for (let k = 0; k < args.length; k++) { if (valueOpts.has(args[k])) { k++; continue; } if (!args[k].startsWith('-')) pos.push(args[k]); }
-  if (pos.slice(1).some((r) => r.split(':').some((x) => PROTECTED.test(x.replace(/^refs\/heads\//, ''))))) return deny('push to main/master/production is blocked; push a feature branch and open a PR');
-  if (pos.length < 2) {
-    const b = git(d, 'symbolic-ref', '--short', 'HEAD').out;
-    const top = norm(git(d, 'rev-parse', '--show-toplevel').out || '');
-    const allowed = (cfg.mainPushRepos || []).map((r) => norm(String(r).replace(/^~(?=\/|$)/, HOME)));
-    if (PROTECTED.test(b) && !(top && allowed.includes(top))) return deny(`you are on ${b}; pushing it is blocked`);
-  }
+  if (args.some((a) => /^--force(-with-lease|-if-includes)?(=|$)/.test(a) || /^-[a-zA-Z]*f[a-zA-Z]*$/.test(a) || /^\+/.test(a))) return deny('force-push is blocked (rule E07)');
+  if (args.some((a) => a === '--all' || a === '--mirror')) return deny('push --all/--mirror is blocked (rule E07)');
   return null;
 }
 // Syncthing conflict copies (*.sync-conflict-*) never go into git: block git add/commit that would stage one.
@@ -119,7 +107,7 @@ function bash(cmd, cwd, cfg) {
   if (raw) for (const r of R.gitPushRaw || []) if (rx(r.re).test(cmd)) return deny(r.why);
   let allow = null;
   for (const c of commands(cmd, cwd)) {
-    const d = gitPush(c, cfg) || syncConflict(c) || benchSite(c, cfg);
+    const d = gitPush(c) || syncConflict(c) || benchSite(c, cfg);
     if (d && d.decision !== 'allow') return d;
     if (d) allow = allow || d;
   }

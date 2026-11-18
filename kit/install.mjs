@@ -49,7 +49,7 @@ function ensureLocalConfig() {
     liveSync: has('--live-sync') ? true : has('--no-live-sync') ? false : cfg.liveSync ?? false,
     // --shared-root auto (or no value ever set): use <Syncthing "default" folder>/0000.codesync
     sharedRoot: val('--shared-root') === 'auto' ? undefined : val('--shared-root') || cfg.sharedRoot || undefined,
-    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'mainPushRepos', 'liveSyncOptions']),
+    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'liveSyncOptions']),
   };
   if (!dry) { if (!exists(LOCAL_CFG)) recordCreated(LOCAL_CFG); saveLocalConfig(next); }
   return next;
