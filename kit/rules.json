@@ -56,7 +56,7 @@
         },
         {
           "id": "E13",
-          "text": "Every project in the coding folder uses Git Town (kit/docs/two-macs.md). Start every session with `git sync`; end it with `git ship` or a pushed device branch (`air/...`, `mini/...`). Code moves only through GitHub, never through Syncthing. Never commit a `*.sync-conflict-*` file."
+          "text": "Where live git sync is on (one person's own Macs; kit/docs/two-macs.md): work on the sync branch `wip`, which the job and the session hooks commit and push. Put finished work on main only with `git ship` (local gate, PR, squash-merge). Never push main directly, never force-push, never commit a secret or a `*.sync-conflict-*` file."
         }
       ]
     },

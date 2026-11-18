@@ -6,8 +6,7 @@
 //   node kit/install.mjs --uninstall    remove the kit and restore backups
 //   Every run also syncs skills with the master list (kit/registry/skills.json on main).
 // Options: --coding-root <dir>, --machine <name>, --device-prefix <air|mini|...>, --quiet, --dry-run
-//   Also sets up the two-Mac git flow: git-town, git aliases (start/sync/ship), device branch prefix,
-//   and an hourly launchd job that keeps Syncthing away from git repos (kit/docs/two-macs.md).
+//   --live-sync / --no-live-sync, --shared-root <dir>: live git sync between one person's Macs (kit/docs/two-macs.md)
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,8 +16,9 @@ import {
 } from './lib/common.mjs';
 import { scanConflicts, restoreConflicts } from './lib/conflicts.mjs';
 import { checkRouting } from './lib/route.mjs';
-import { devicePrefix } from './scripts/flow.mjs';
-import { findRepos, currentBlock, blockLines, unignored } from './lib/stignore.mjs';
+import * as LS from './lib/livesync.mjs';
+import { devicePrefix } from './lib/livesync.mjs';
+import { auditAll } from './scripts/livesync.mjs';
 
 const args = process.argv.slice(2);
 const has = (k) => args.includes(k);
@@ -46,7 +46,9 @@ function ensureLocalConfig() {
     ownGitOwners: cfg.ownGitOwners || [], privateNames: cfg.privateNames || [], projects: cfg.projects || [],
     benchPath: cfg.benchPath || null, allowFable: cfg.allowFable ?? false,
     devicePrefix: val('--device-prefix') || cfg.devicePrefix || devicePrefix(os.hostname()),
-    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'mainPushRepos']),
+    liveSync: has('--live-sync') ? true : has('--no-live-sync') ? false : cfg.liveSync ?? false,
+    sharedRoot: val('--shared-root') || cfg.sharedRoot || null,
+    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'mainPushRepos', 'liveSyncOptions']),
   };
   if (!dry) { if (!exists(LOCAL_CFG)) recordCreated(LOCAL_CFG); saveLocalConfig(next); }
   return next;
@@ -131,76 +133,101 @@ function skillSync() {
   return r.code === 0 ? (r.out || 'skills: in sync') : `skills: sync problem: ${(r.err || r.out).split('\n')[0]}. Retry: node kit/scripts/skills.mjs sync`;
 }
 
-// ---------- two-Mac git flow (kit/docs/two-macs.md) ----------
-const AGENT = 'in.mithtech.stignore';
-const AGENT_PLIST = path.join(HOME, 'Library', 'LaunchAgents', `${AGENT}.plist`);
-const FLOW = path.join(KIT, 'scripts', 'flow.mjs').replace(/\\/g, '/');
-const ALIASES = { start: 'start', sync: 'sync', ship: 'ship', 'flow-setup': 'setup' };
-const aliasCmd = (sub) => `!node "${FLOW}" ${sub}`;
-function plistXml(cfg) {
+// ---------- live git sync between one person's Macs (kit/docs/two-macs.md; opt-in: --live-sync) ----------
+const LS_AGENT = 'in.mithtech.livesync', OLD_AGENT = 'in.mithtech.stignore';
+const plistPath = (label) => path.join(HOME, 'Library', 'LaunchAgents', `${label}.plist`);
+const SHIP = path.join(KIT, 'scripts', 'ship.mjs').replace(/\\/g, '/');
+const shipAlias = () => `!node "${SHIP}"`;
+function plistXml() {
   const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
   return `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-  <key>Label</key><string>${AGENT}</string>
-  <key>ProgramArguments</key><array><string>${esc(process.execPath)}</string><string>${esc(path.join(KIT, 'scripts', 'stignore.mjs'))}</string><string>--quiet</string><string>--root</string><string>${esc(cfg.codingRoot)}</string></array>
-  <key>StartInterval</key><integer>3600</integer>
+  <key>Label</key><string>${LS_AGENT}</string>
+  <key>ProgramArguments</key><array><string>${esc(process.execPath)}</string><string>${esc(path.join(KIT, 'scripts', 'livesync.mjs'))}</string><string>run</string><string>--quiet</string></array>
+  <key>StartInterval</key><integer>600</integer>
   <key>RunAtLoad</key><true/>
-  <key>StandardErrorPath</key><string>${esc(path.join(CLAUDE_DIR, 'mithtech-kit-stignore.log'))}</string>
+  <key>LowPriorityIO</key><true/>
+  <key>EnvironmentVariables</key><dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string><key>CLAUDE_CONFIG_DIR</key><string>${esc(CLAUDE_DIR)}</string></dict>
+  <key>StandardErrorPath</key><string>${esc(path.join(CLAUDE_DIR, 'mithtech-livesync.err.log'))}</string>
 </dict></plist>
 `;
 }
-function gitFlow(cfg) {
-  if (dry) return 'git flow: dry run';
-  const notes = [];
-  if (run('git', ['town', '--version']).code !== 0) {
-    if (process.platform === 'darwin' && run('brew', ['--version']).code === 0) {
-      const b = run('brew', ['install', 'git-town'], { timeout: 600000 });
-      notes.push(b.code === 0 ? 'git-town installed' : `git-town install failed: ${(b.err || b.out).split('\n').pop()}`);
-    } else notes.push('git-town missing: install it (https://www.git-town.com/install)');
-  }
-  for (const [name, sub] of Object.entries(ALIASES)) run('git', ['config', '--global', `alias.${name}`, aliasCmd(sub)]);
-  run('git', ['config', '--global', 'git-town.branch-prefix', `${cfg.devicePrefix}/`]);
-  notes.push(`aliases git start/sync/ship/flow-setup; branch prefix ${cfg.devicePrefix}/`);
-  if (process.platform === 'darwin' && cfg.codingRoot) {
-    const xml = plistXml(cfg);
-    if (readText(AGENT_PLIST) !== xml) {
-      fs.mkdirSync(path.dirname(AGENT_PLIST), { recursive: true });
-      if (!exists(AGENT_PLIST)) recordCreated(AGENT_PLIST);
-      const uid = process.getuid();
-      run('launchctl', ['bootout', `gui/${uid}/${AGENT}`]);
-      fs.writeFileSync(AGENT_PLIST, xml);
-      const r = run('launchctl', ['bootstrap', `gui/${uid}`, AGENT_PLIST]);
-      notes.push(r.code === 0 ? 'hourly Syncthing ignore job loaded' : `launchd: ${(r.err || r.out).split('\n')[0]}`);
-    }
-  }
-  return `git flow: ${notes.join('; ')}`;
+const launchctl = (...a) => run('launchctl', a);
+function unloadAgent(label) {
+  if (!exists(plistPath(label))) return false;
+  launchctl('bootout', `gui/${process.getuid()}/${label}`);
+  fs.rmSync(plistPath(label), { force: true });
+  return true;
 }
-function gitFlowDoctor(cfg) {
+function liveSyncSetup(cfg) {
+  if (dry) return 'live sync: dry run';
+  const notes = [];
+  // v1.3.0 leftovers (Git Town flow, Syncthing ignore job); git-town itself stays installed
+  if (process.platform === 'darwin' && unloadAgent(OLD_AGENT)) notes.push('removed the old Syncthing ignore job');
+  for (const a of ['start', 'sync', 'flow-setup']) if (/flow\.mjs/.test(run('git', ['config', '--global', `alias.${a}`]).out)) run('git', ['config', '--global', '--unset', `alias.${a}`]);
+  if (run('git', ['config', '--global', 'git-town.branch-prefix']).out === `${cfg.devicePrefix}/`) run('git', ['config', '--global', '--unset', 'git-town.branch-prefix']);
+  run('git', ['config', '--global', 'alias.ship', shipAlias()]);
+  notes.push('git ship alias');
+  // CODING_ROOT / SHARED_ROOT for sessions and scripts (paths differ per Mac)
+  const s = readJSON(SETTINGS, {});
+  const env = { ...(s.env || {}) };
+  if (cfg.codingRoot) env.CODING_ROOT = cfg.codingRoot;
+  if (cfg.sharedRoot) env.SHARED_ROOT = cfg.sharedRoot;
+  if (JSON.stringify(env) !== JSON.stringify(s.env || {})) { backup(SETTINGS); writeJSON(SETTINGS, { ...s, env }); notes.push('CODING_ROOT in settings'); }
+  if (process.platform === 'darwin') {
+    if (cfg.liveSync) {
+      const xml = plistXml();
+      if (readText(plistPath(LS_AGENT)) !== xml) {
+        fs.mkdirSync(path.dirname(plistPath(LS_AGENT)), { recursive: true });
+        if (!exists(plistPath(LS_AGENT))) recordCreated(plistPath(LS_AGENT));
+        launchctl('bootout', `gui/${process.getuid()}/${LS_AGENT}`);
+        fs.writeFileSync(plistPath(LS_AGENT), xml);
+        const r = launchctl('bootstrap', `gui/${process.getuid()}`, plistPath(LS_AGENT));
+        notes.push(r.code === 0 ? 'live sync job loaded (every 10 min)' : `launchd: ${(r.err || r.out).split('\n')[0]}`);
+      }
+      for (const tool of ['pnpm', 'gh']) if (run(tool, ['--version']).code !== 0 && run('brew', ['--version']).code === 0) {
+        const b = run('brew', ['install', tool], { timeout: 600000 });
+        notes.push(b.code === 0 ? `${tool} installed` : `${tool} install failed`);
+      }
+    } else if (unloadAgent(LS_AGENT)) notes.push('live sync job removed (liveSync is off)');
+  }
+  return `live sync: ${cfg.liveSync ? 'on' : 'off'}; ${notes.join('; ')}`;
+}
+function liveSyncDoctor(cfg) {
   const out = [];
   const ok = (b, m) => out.push(`${b ? 'ok  ' : 'FAIL'} ${m}`);
-  const gt = run('git', ['town', '--version']);
-  ok(gt.code === 0, gt.code === 0 ? gt.out : 'git-town not installed; run node kit/install.mjs (or brew install git-town)');
-  const pre = run('git', ['config', '--global', 'git-town.branch-prefix']).out;
-  ok(!!cfg.devicePrefix && pre === `${cfg.devicePrefix}/`, `device branch prefix: ${pre || 'not set'}${pre === `${cfg.devicePrefix}/` ? '' : `; expected ${cfg.devicePrefix}/ (run node kit/install.mjs)`}`);
-  const al = Object.entries(ALIASES).every(([n, sub]) => run('git', ['config', '--global', `alias.${n}`]).out === aliasCmd(sub));
-  ok(al, al ? 'git aliases start/sync/ship/flow-setup point at this kit' : 'git aliases missing or stale; run node kit/install.mjs');
-  if (cfg.codingRoot && exists(cfg.codingRoot)) {
-    const text = readText(path.join(cfg.codingRoot, '.stglobalignore'));
-    const repos = findRepos(cfg.codingRoot);
-    const block = currentBlock(text);
-    ok(!!block && block.join('\n') === blockLines(repos).join('\n'), `Syncthing ignore block ${block ? (block.join('\n') === blockLines(repos).join('\n') ? `current (${repos.length} repos)` : 'stale') : 'missing'}; fix: node kit/scripts/stignore.mjs`);
-    const miss = unignored(text, repos);
-    ok(!miss.length, miss.length ? `repo folders not ignored by Syncthing: ${miss.slice(0, 5).join(', ')}${miss.length > 5 ? ` and ${miss.length - 5} more` : ''}` : 'every repo folder is ignored by Syncthing');
-    const noToml = repos.filter((r) => !exists(path.join(cfg.codingRoot, r, 'git-town.toml')) && !/-worktrees\/|\/\.worktrees\//.test(`/${r}/`));
-    out.push(`${noToml.length ? 'warn' : 'ok  '} git-town.toml in ${repos.length - noToml.length}/${repos.length} repos${noToml.length ? ` (missing e.g. ${noToml.slice(0, 3).join(', ')}; run git flow-setup there)` : ''}`);
-  } else out.push(`warn coding root ${cfg.codingRoot || '(unset)'} not mounted; Syncthing checks skipped`);
-  if (process.platform === 'darwin') {
-    const l = run('launchctl', ['print', `gui/${process.getuid()}/${AGENT}`]);
-    ok(l.code === 0, l.code === 0 ? 'hourly Syncthing ignore job loaded' : 'hourly Syncthing ignore job not loaded; run node kit/install.mjs');
+  const warn = (b, m) => out.push(`${b ? 'ok  ' : 'warn'} ${m}`);
+  ok(run('git', ['config', '--global', 'alias.ship']).out === shipAlias(), 'git ship alias points at this kit');
+  ok(!exists(plistPath(OLD_AGENT)), exists(plistPath(OLD_AGENT)) ? 'old Syncthing ignore job still installed; run node kit/install.mjs' : 'no v1.3.0 leftovers');
+  if (!cfg.liveSync) { out.push('ok   live sync: off on this machine (opt in with --live-sync)'); return out; }
+  for (const tool of ['gh', 'pnpm', 'scalar']) { const r = run(tool, ['--version']); (tool === 'scalar' ? warn : ok)(r.code === 0, `${tool}: ${r.code === 0 ? r.out.split('\n')[0] : 'not installed'}`); }
+  ok(!!cfg.devicePrefix, `device prefix: ${cfg.devicePrefix || 'not set'}`);
+  const s = readJSON(SETTINGS, {});
+  ok(s.env?.CODING_ROOT === cfg.codingRoot, `CODING_ROOT in settings: ${s.env?.CODING_ROOT || 'missing'}`);
+  ok(!!cfg.sharedRoot && exists(cfg.sharedRoot), `shared folder: ${cfg.sharedRoot || 'not set (--shared-root <dir>)'}${cfg.sharedRoot && !exists(cfg.sharedRoot) ? ' (missing)' : ''}`);
+  if (process.platform === 'darwin') ok(launchctl('print', `gui/${process.getuid()}/${LS_AGENT}`).code === 0, 'live sync job loaded (every 10 min)');
+  if (!cfg.codingRoot || !exists(cfg.codingRoot)) { out.push(`warn coding root ${cfg.codingRoot || '(unset)'} not mounted; repo checks skipped`); return out; }
+  const st = LS.syncthingFolders(HOME).filter((f) => path.resolve(f) === path.resolve(cfg.codingRoot) || path.resolve(cfg.codingRoot).startsWith(path.resolve(f) + path.sep) || path.resolve(f).startsWith(path.resolve(cfg.codingRoot) + path.sep));
+  ok(!st.length, st.length ? `Syncthing still shares ${st.join(', ')}; remove it (code moves only through git)` : 'Syncthing does not share the coding folder');
+  if (cfg.sharedRoot && exists(cfg.sharedRoot)) {
+    const file = LS.registryFile(cfg.sharedRoot);
+    const { repos, copies } = LS.readRegistry(file);
+    const local = LS.findRepos(cfg.codingRoot).filter((r) => git(path.join(cfg.codingRoot, r), 'remote', 'get-url', 'origin').code === 0);
+    const missing = local.filter((r) => !repos[r]);
+    ok(exists(file) && !missing.length, !exists(file) ? 'registry missing; run node kit/scripts/livesync.mjs register --mode off' : missing.length ? `registry lacks ${missing.length} repo(s): ${missing.slice(0, 3).join(', ')}; run livesync.mjs register` : `registry covers ${local.length} local repos (${Object.values(repos).filter((e) => e.mode === 'live').length} live)`);
+    warn(!copies.length, copies.length ? `${copies.length} Syncthing conflict copies of repos.json (merged on the next job run)` : 'no registry conflict copies');
+    const paused = Object.keys(repos).filter((r) => { const i = LS.repoInfo(path.join(cfg.codingRoot, r)); return i && LS.pausedReason(i.gitDir); });
+    ok(!paused.length, paused.length ? `paused repos: ${paused.join(', ')} (open a session there; Claude helps clear it)` : 'no paused repos');
   }
+  const t0 = Date.now();
+  const audit = auditAll(cfg.codingRoot);
+  const work = audit.filter((a) => a.items.length), oldWt = audit.filter((a) => a.oldWorktrees.length);
+  warn(!work.length, work.length ? `unpushed or uncommitted work in ${work.length} repo(s), e.g. ${work.slice(0, 3).map((a) => `${a.rel} (${a.items[0]})`).join(', ')}; full list: livesync.mjs audit (check before any destructive step)` : `every repo committed and pushed (${Math.round((Date.now() - t0) / 1000)} s)`);
+  warn(!oldWt.length, oldWt.length ? `worktrees older than 1 day in ${oldWt.length} repo(s), e.g. ${oldWt[0].oldWorktrees[0]}` : 'no worktrees older than 1 day');
   return out;
 }
+
 
 // ---------- doctor ----------
 function doctor() {
@@ -261,7 +288,7 @@ function doctor() {
   const rc = run(process.execPath, [path.join(KIT, 'scripts', 'rules.mjs'), '--check']);
   ok(rc.code === 0, `RULES.md and skill rule blocks ${rc.code === 0 ? 'in sync' : 'stale: ' + rc.err}`);
   ok(exists(GLOBAL_MD) && readText(GLOBAL_MD).includes(KS), 'global CLAUDE.md has the kit block');
-  out.push(...gitFlowDoctor(cfg));
+  out.push(...liveSyncDoctor(cfg));
   out.push(...conflicts());
   return out;
 }
@@ -301,7 +328,7 @@ else {
   out.push(`kit v${kitVersion()} on ${cfg.machine} (${process.platform}); coding root ${cfg.codingRoot}`);
   out.push(`${installPlugin(has('--update'))}; ${mergeSettings()}; ${writeGlobalMd()}`);
   out.push(...conflicts());
-  out.push(gitFlow(cfg));
+  out.push(liveSyncSetup(cfg));
   out.push(skillSync());
 }
 if (!quiet || out.some((l) => l.startsWith('FAIL'))) console.log(out.join('\n'));

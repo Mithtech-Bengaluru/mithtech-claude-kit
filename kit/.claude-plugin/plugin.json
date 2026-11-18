@@ -1,6 +1,6 @@
 {
   "name": "mithtech",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Mithtech kit: orchestrate with approval gates, reuse-first stack skills, guardrail hooks, self-update.",
   "author": {
     "name": "Mithtech"

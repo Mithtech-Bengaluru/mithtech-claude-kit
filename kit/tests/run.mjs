@@ -9,8 +9,7 @@ import { KIT } from '../lib/common.mjs';
 import { validate } from '../lib/inbox.mjs';
 import { validateRegistry } from '../lib/skills.mjs';
 import * as R from '../lib/route.mjs';
-import * as ST from '../lib/stignore.mjs';
-import { devicePrefix, findGate, townToml, prBody } from '../scripts/flow.mjs';
+import { liveSyncTests } from './livesync.mjs';
 
 const quiet = process.argv.includes('--quiet');
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mithtech-kit-test-'));
@@ -288,50 +287,16 @@ fs.rmSync(path.join(env.CLAUDE_CONFIG_DIR, 'mithtech-kit.local.json'), { force: 
 const sdc = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'skills.mjs'), 'docs', '--check'], { encoding: 'utf8' });
 t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
 
-// two-Mac git flow: Syncthing ignore block, device prefix, gate lookup, sync-conflict guard
+// sync-conflict guard, git ship alias target, live sync
 {
-  const root = path.join(tmp, 'coding');
-  const mk = (rel, gitFile = false) => { const d = path.join(root, rel); fs.mkdirSync(d, { recursive: true }); if (gitFile) fs.writeFileSync(path.join(d, '.git'), 'gitdir: x\n'); else fs.mkdirSync(path.join(d, '.git'), { recursive: true }); };
-  mk('alpha'); mk('alpha/nested'); mk('bench/apps/erp'); mk('deep/a/b/c/repo'); mk('alpha-worktrees/u1', true);
-  mk('web/node_modules/pkg'); mk('Plugins&Ext/med[x]');
-  fs.mkdirSync(path.join(root, 'plain/docs'), { recursive: true });
-  const repos = ST.findRepos(root);
-  t('stignore finds repos at any depth, stops at a repo root, skips node_modules',
-    JSON.stringify(repos) === JSON.stringify(['Plugins&Ext/med[x]', 'alpha', 'alpha-worktrees/u1', 'bench/apps/erp', 'deep/a/b/c/repo']), repos.join(','));
-  const user = '// mine\n(?d).DS_Store\nnode_modules\n';
-  fs.writeFileSync(path.join(root, '.stglobalignore'), user);
-  const g1 = ST.generate(root);
-  const txt = fs.readFileSync(path.join(root, '.stglobalignore'), 'utf8');
-  t('stignore keeps user lines and adds the block', txt.startsWith(user.trimEnd()) && txt.includes(ST.BEGIN) && txt.includes('/alpha\n') && txt.includes('/Plugins&Ext/med\\[x\\]') && g1.changed);
-  t('stignore is idempotent', ST.generate(root).changed === false);
-  t('stignore: every repo ignored after generate', ST.unignored(txt, repos).length === 0);
-  mk('newrepo');
-  t('stignore: a new repo is reported as not ignored', JSON.stringify(ST.unignored(txt, ST.findRepos(root))) === '["newrepo"]');
-  t('stignore: unanchored user line covers a repo', ST.unignored('alpha\n', ['x/alpha', 'beta']).join() === 'beta');
-  const chk = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'stignore.mjs'), '--root', root, '--check'], { env, encoding: 'utf8' });
-  t('stignore --check fails on a stale block and names the repo', chk.status === 1 && /newrepo/.test(chk.stdout), chk.stdout);
-  ST.generate(root);
-  const t2 = fs.readFileSync(path.join(root, '.stglobalignore'), 'utf8');
-  const nr = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'stignore.mjs')], { env, cwd: root, encoding: 'utf8' });
-  t('stignore without a coding root writes nothing', nr.status === 0 && /no coding root/.test(nr.stdout));
-  t('stignore replaces the block in place', t2.split(ST.BEGIN).length === 2 && t2.includes('/newrepo') && t2.startsWith('// mine'));
-  t('device prefix from host name', devicePrefix('Manojs-MacBook-Air.local') === 'air' && devicePrefix("Manoj's Mac mini") === 'mini' && devicePrefix('Studio.lan') === 'studio');
-  const gr = path.join(tmp, 'gaterepo');
-  fs.mkdirSync(path.join(gr, '.claude'), { recursive: true });
-  t('ship gate: none defined', findGate(gr, null) === null);
-  fs.writeFileSync(path.join(gr, 'package.json'), JSON.stringify({ scripts: { gate: 'node t.js' } }));
-  t('ship gate: npm gate script', findGate(gr, null)?.cmd === 'npm run -s gate');
-  fs.writeFileSync(path.join(gr, '.claude', 'gate'), '# gate\nmake check\n');
-  t('ship gate: .claude/gate wins over npm', findGate(gr, null)?.cmd === 'make check');
-  t('ship gate: --gate flag wins', findGate(gr, 'x y')?.from === '--gate');
-  t('ship PR body records the gate result', /PASS/.test(prBody({ cmd: 'make check', from: '.claude/gate' }, { code: 0, out: 'ok' }, false)) && /--no-gate/.test(prBody(null, null, false)));
-  t('git-town.toml: merge sync, ff-only main, api ship', /feature-strategy = "merge"/.test(townToml()) && /perennial-strategy = "ff-only"/.test(townToml()) && /strategy = "api"/.test(townToml()) && /main = "develop"/.test(townToml('develop')));
   fs.writeFileSync(path.join(repo, 'a.sync-conflict-20261117-1.md'), 'x');
   t('guard blocks git add of a sync-conflict file', bash('git add a.sync-conflict-20261117-1.md', repo).code === 2);
   t('guard blocks git add -A with a sync-conflict file present', bash('git add -A', repo).code === 2);
   t('guard allows git add of a normal file', bash('git add src/x.js', repo).code === 0);
   fs.rmSync(path.join(repo, 'a.sync-conflict-20261117-1.md'));
   t('guard allows git add -A when no conflict file', bash('git add -A', repo).code === 0);
+  t('guard allows pushing the sync branch', bash('git push origin wip', repo).code === 0);
+  liveSyncTests(t, tmp, env);
 }
 
 // generated files in sync

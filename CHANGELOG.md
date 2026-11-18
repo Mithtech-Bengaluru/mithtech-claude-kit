@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+- Live git sync between one person's Macs (`kit/docs/two-macs.md`), opt-in per machine (`install.mjs --live-sync --shared-root <dir>`). Replaces the 1.3.0 Git Town flow and the Syncthing ignore generator (removed; git-town itself is not uninstalled).
+- `scripts/livesync.mjs`: launchd job `in.mithtech.livesync` every 10 min commits idle edits on the sync branch `wip`, rebases and pushes; pauses a repo on conflict (`.git/live-sync-paused`, notification) and goes on with the rest; refuses secrets and files over 50 MB; never pushes main. Registry `<shared>/coding/repos.json` (relative paths; live / pull / off), placeholders with partial clone on demand, 30-day prune of clean pushed clones, weekly cache clean, `audit` for unpushed or uncommitted work.
+- `git ship` (`scripts/ship.mjs`, plain git + gh): sync, merge main in, local gate, PR with the gate result, squash-merge, main merged back into wip.
+- `scripts/secrets.mjs`: secrets in `<shared>/secrets/<repo>/`, linked into repos and kept out of git.
+- Hooks: SessionStart pulls first, clones placeholders, shows paused repos; new Stop hook commits and pushes each turn and hands a conflict to Claude once; new SessionEnd hook folds a temporary device worktree into wip.
+- Installer sets `CODING_ROOT` / `SHARED_ROOT` in settings and the `git ship` alias; doctor checks live sync (job, tools, registry, paused repos, Syncthing not sharing the coding folder, unpushed work, old worktrees). Rule E13 and the global CLAUDE.md line now describe live git sync.
+
 ## 1.3.0
 - Two Macs, one main branch (`kit/docs/two-macs.md`): Git Town on every repo. New `kit/scripts/flow.mjs` behind the git aliases `git start <task>` (device branch `air/` or `mini/`), `git sync` and `git ship` (sync, local gate, PR with the gate result, squash-merge on GitHub, prune; never pushes main). `git flow-setup` writes the shared `git-town.toml`.
 - Syncthing never syncs a git repo: `kit/scripts/stignore.mjs` writes one ignore line per repo (any depth) into a marked block in `<coding>/.stglobalignore` and keeps the user's lines. Runs from the installer, the SessionStart hook (hourly at most) and the launchd job `in.mithtech.stignore` (hourly). `--check` names repo folders that are not ignored.

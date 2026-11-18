@@ -41,7 +41,7 @@ node kit/scripts/skills.mjs sync [--dry-run] [--force]
 This computer's own record is `~/.claude/mithtech-skills.local.json`. Skills the kit did not install are never touched; existing ones are adopted. Removed skills go to `~/.claude/skills/.trash`. Opt a computer out of a skill with `skillsExclude` in `~/.claude/mithtech-kit.local.json`. Sync only copies files from the pinned commit and runs no third-party script. Anyone who can push to main can add a source, so review `git log -- kit/registry` and read a new skill before you trust it.
 
 ## Layout
-- `kit/`: the plugin (`skills/`, `agents/`, `hooks/`, `registry/`), `install.mjs`, `maintain.mjs`, `review.mjs`, `dupcheck.mjs`, `driftcheck.mjs`, `index.mjs`, `routing.json`, `rules.json` (source of `RULES.md`), `templates/`, `patterns/`, `tests/`, `docs/two-macs.md` (Git Town flow for two Macs: `git start`, `git sync`, `git ship`).
+- `kit/`: the plugin (`skills/`, `agents/`, `hooks/`, `registry/`), `install.mjs`, `maintain.mjs`, `review.mjs`, `dupcheck.mjs`, `driftcheck.mjs`, `index.mjs`, `routing.json`, `rules.json` (source of `RULES.md`), `templates/`, `patterns/`, `tests/`, `docs/two-macs.md` (opt-in live git sync between one person's Macs; `git ship`).
 - `catalog/`: Mithtech apps and plugins (G0 searches it). `docs/naming-audit.md`: naming report.
 - `RULES.md`: the same rules for people, generated from `kit/rules.json`. `SKILLS.md`: the skill list and how to use each skill, generated from `kit/registry/skills.json`.
 - `ClaudeSetup.md`: the prompt that built this kit. `archive/`: older versions.
