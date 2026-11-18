@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.0
+- Two Macs, one main branch (`kit/docs/two-macs.md`): Git Town on every repo. New `kit/scripts/flow.mjs` behind the git aliases `git start <task>` (device branch `air/` or `mini/`), `git sync` and `git ship` (sync, local gate, PR with the gate result, squash-merge on GitHub, prune; never pushes main). `git flow-setup` writes the shared `git-town.toml`.
+- Syncthing never syncs a git repo: `kit/scripts/stignore.mjs` writes one ignore line per repo (any depth) into a marked block in `<coding>/.stglobalignore` and keeps the user's lines. Runs from the installer, the SessionStart hook (hourly at most) and the launchd job `in.mithtech.stignore` (hourly). `--check` names repo folders that are not ignored.
+- Installer: installs git-town, the aliases, the device prefix (`devicePrefix` in the local config, from the host name) and the launchd job. Doctor checks all of them, the ignore block and `git-town.toml` coverage. The local config now keeps `mainPushRepos` across reinstalls.
+- Rule E13 and a TWO MACS line in the global CLAUDE.md. The guard blocks `git add`/`git commit` that would stage a `*.sync-conflict-*` file.
+
 ## 1.2.0
 - Skill registry: `kit/registry/skills.json` is the master list; `SKILLS.md` (generated) says where each skill comes from and how to use it. New `skills.mjs sync|list|add|remove|docs`. Each computer installs missing skills, updates pinned commits and uninstalls skills that master dropped (daily SessionStart sync, every installer run, `--doctor` check). Removed skills go to `~/.claude/skills/.trash`; skills the kit did not install are never touched.
 - First registry: founder-skill (11), rea, impeccable, fundraising-skills (10), brag (2), taste-skill, rasterless, anatomy.

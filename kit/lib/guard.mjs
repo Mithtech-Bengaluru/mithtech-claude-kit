@@ -77,6 +77,26 @@ function gitPush({ w, dir }, cfg = {}) {
   }
   return null;
 }
+// Syncthing conflict copies (*.sync-conflict-*) never go into git: block git add/commit that would stage one.
+function syncConflict({ w, dir }) {
+  if (!/(^|\/)git$/.test(w[0])) return null;
+  let i = 1, d = dir;
+  while (i < w.length && w[i].startsWith('-')) {
+    if (w[i] === '-C' && w[i + 1]) { d = path.resolve(d, w[i + 1]); i += 2; }
+    else if (['-c', '--git-dir', '--work-tree', '--namespace'].includes(w[i])) i += 2;
+    else i++;
+  }
+  const sub = w[i], args = w.slice(i + 1);
+  if (sub !== 'add' && sub !== 'commit') return null;
+  const why = 'a *.sync-conflict-* file would be committed; merge it by hand and delete it first';
+  if (args.some((a) => /sync-conflict/i.test(a))) return deny(why);
+  const broad = sub === 'add' ? args.some((a) => ['-A', '--all', '.', '-u', '--update', ':/'].includes(a) || /\*/.test(a))
+    : args.some((a) => /^-[a-zA-Z]*a[a-zA-Z]*$/.test(a) || a === '--all');
+  const staged = git(d, 'diff', '--cached', '--name-only').out;
+  if (sub === 'commit' && /sync-conflict/i.test(staged)) return deny(why);
+  if (broad && /sync-conflict/i.test(git(d, 'status', '--porcelain', '--untracked-files=all').out)) return deny(why);
+  return null;
+}
 // bench site commands: migrate only on dev/test sites; dev-site migrate/backup/run-tests are pre-approved here
 // (instead of wildcard allow rules in settings.json).
 function benchSite({ w }, cfg) {
@@ -99,7 +119,7 @@ function bash(cmd, cwd, cfg) {
   if (raw) for (const r of R.gitPushRaw || []) if (rx(r.re).test(cmd)) return deny(r.why);
   let allow = null;
   for (const c of commands(cmd, cwd)) {
-    const d = gitPush(c, cfg) || benchSite(c, cfg);
+    const d = gitPush(c, cfg) || syncConflict(c) || benchSite(c, cfg);
     if (d && d.decision !== 'allow') return d;
     if (d) allow = allow || d;
   }

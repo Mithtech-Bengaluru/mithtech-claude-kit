@@ -16,6 +16,7 @@ Generated from `kit/rules.json` by `node kit/scripts/rules.mjs`; edit that file,
 - Keep secrets out of git, images, logs and shared files. Use environment variables.
 - Never copy a database between machines without asking.
 - We use GitHub Free. Do not add or rely on GitHub Actions, required status checks, Codespaces, Copilot or other paid GitHub features. Run the gate locally (or on the home cluster with Offload) before every pull request and put the result in the PR.
+- Every project in the coding folder uses Git Town (kit/docs/two-macs.md). Start every session with `git sync`; end it with `git ship` or a pushed device branch (`air/...`, `mini/...`). Code moves only through GitHub, never through Syncthing. Never commit a `*.sync-conflict-*` file.
 
 ## Communication
 - Before a medium or large task, restate it in at most 7 bullets (goal, scope, placement, assumptions, done when) and get a yes.

@@ -26,6 +26,9 @@ if (!st.lastSkillSync || Date.now() - Date.parse(st.lastSkillSync) > 24 * 3600e3
   sk.unref();
 }
 
+// Syncthing must never sync a git repo: refresh the ignore block in the background (at most hourly)
+spawn(process.execPath, [path.join(KIT, 'scripts', 'stignore.mjs'), '--quiet', '--if-older', '60'], { detached: true, stdio: 'ignore' }).unref();
+
 const top = git(cwd, 'rev-parse', '--show-toplevel').out || cwd;
 const branch = git(cwd, 'rev-parse', '--abbrev-ref', 'HEAD').out || '-';
 const has = (f) => exists(path.join(top, f));
@@ -46,6 +49,10 @@ if (exists(tasks)) {
     const gate = (s.match(/^gate:\s*(.+)$/im) || [])[1] || '?';
     out.push(`program: ${progs[0].d} | gate: ${gate} | resume: ORCHESTRATE resume ${progs[0].d}`);
   }
+}
+if (top !== cwd || exists(path.join(top, '.git'))) {
+  out.push(has('git-town.toml') ? 'git: run `git sync` now; end with `git ship` or a pushed device branch'
+    : 'git: no git-town.toml here; run `git flow-setup`, commit it, then `git sync`');
 }
 const read = ['CLAUDE.md', 'HANDOFF.md'].filter(has);
 if (read.length) out.push(`read first: ${read.join(', ')}`);

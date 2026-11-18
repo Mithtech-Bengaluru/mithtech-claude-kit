@@ -5,7 +5,9 @@
 //   node kit/install.mjs --doctor [--probe-models]   checks and fixes new conflicts
 //   node kit/install.mjs --uninstall    remove the kit and restore backups
 //   Every run also syncs skills with the master list (kit/registry/skills.json on main).
-// Options: --coding-root <dir>, --machine <name>, --quiet, --dry-run
+// Options: --coding-root <dir>, --machine <name>, --device-prefix <air|mini|...>, --quiet, --dry-run
+//   Also sets up the two-Mac git flow: git-town, git aliases (start/sync/ship), device branch prefix,
+//   and an hourly launchd job that keeps Syncthing away from git repos (kit/docs/two-macs.md).
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -15,6 +17,8 @@ import {
 } from './lib/common.mjs';
 import { scanConflicts, restoreConflicts } from './lib/conflicts.mjs';
 import { checkRouting } from './lib/route.mjs';
+import { devicePrefix } from './scripts/flow.mjs';
+import { findRepos, currentBlock, blockLines, unignored } from './lib/stignore.mjs';
 
 const args = process.argv.slice(2);
 const has = (k) => args.includes(k);
@@ -40,7 +44,9 @@ function ensureLocalConfig() {
     kitPath: REPO, os: process.platform, claudeDir: CLAUDE_DIR,
     devSites: cfg.devSites || [], customerApps: cfg.customerApps || {}, prodPatterns: cfg.prodPatterns || [],
     ownGitOwners: cfg.ownGitOwners || [], privateNames: cfg.privateNames || [], projects: cfg.projects || [],
-    benchPath: cfg.benchPath || null, allowFable: cfg.allowFable ?? false, ...pick(cfg, ['worktreeRoot', 'lastModelProbe']),
+    benchPath: cfg.benchPath || null, allowFable: cfg.allowFable ?? false,
+    devicePrefix: val('--device-prefix') || cfg.devicePrefix || devicePrefix(os.hostname()),
+    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'mainPushRepos']),
   };
   if (!dry) { if (!exists(LOCAL_CFG)) recordCreated(LOCAL_CFG); saveLocalConfig(next); }
   return next;
@@ -125,6 +131,77 @@ function skillSync() {
   return r.code === 0 ? (r.out || 'skills: in sync') : `skills: sync problem: ${(r.err || r.out).split('\n')[0]}. Retry: node kit/scripts/skills.mjs sync`;
 }
 
+// ---------- two-Mac git flow (kit/docs/two-macs.md) ----------
+const AGENT = 'in.mithtech.stignore';
+const AGENT_PLIST = path.join(HOME, 'Library', 'LaunchAgents', `${AGENT}.plist`);
+const FLOW = path.join(KIT, 'scripts', 'flow.mjs').replace(/\\/g, '/');
+const ALIASES = { start: 'start', sync: 'sync', ship: 'ship', 'flow-setup': 'setup' };
+const aliasCmd = (sub) => `!node "${FLOW}" ${sub}`;
+function plistXml(cfg) {
+  const esc = (x) => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key><string>${AGENT}</string>
+  <key>ProgramArguments</key><array><string>${esc(process.execPath)}</string><string>${esc(path.join(KIT, 'scripts', 'stignore.mjs'))}</string><string>--quiet</string><string>--root</string><string>${esc(cfg.codingRoot)}</string></array>
+  <key>StartInterval</key><integer>3600</integer>
+  <key>RunAtLoad</key><true/>
+  <key>StandardErrorPath</key><string>${esc(path.join(CLAUDE_DIR, 'mithtech-kit-stignore.log'))}</string>
+</dict></plist>
+`;
+}
+function gitFlow(cfg) {
+  if (dry) return 'git flow: dry run';
+  const notes = [];
+  if (run('git', ['town', '--version']).code !== 0) {
+    if (process.platform === 'darwin' && run('brew', ['--version']).code === 0) {
+      const b = run('brew', ['install', 'git-town'], { timeout: 600000 });
+      notes.push(b.code === 0 ? 'git-town installed' : `git-town install failed: ${(b.err || b.out).split('\n').pop()}`);
+    } else notes.push('git-town missing: install it (https://www.git-town.com/install)');
+  }
+  for (const [name, sub] of Object.entries(ALIASES)) run('git', ['config', '--global', `alias.${name}`, aliasCmd(sub)]);
+  run('git', ['config', '--global', 'git-town.branch-prefix', `${cfg.devicePrefix}/`]);
+  notes.push(`aliases git start/sync/ship/flow-setup; branch prefix ${cfg.devicePrefix}/`);
+  if (process.platform === 'darwin' && cfg.codingRoot) {
+    const xml = plistXml(cfg);
+    if (readText(AGENT_PLIST) !== xml) {
+      fs.mkdirSync(path.dirname(AGENT_PLIST), { recursive: true });
+      if (!exists(AGENT_PLIST)) recordCreated(AGENT_PLIST);
+      const uid = process.getuid();
+      run('launchctl', ['bootout', `gui/${uid}/${AGENT}`]);
+      fs.writeFileSync(AGENT_PLIST, xml);
+      const r = run('launchctl', ['bootstrap', `gui/${uid}`, AGENT_PLIST]);
+      notes.push(r.code === 0 ? 'hourly Syncthing ignore job loaded' : `launchd: ${(r.err || r.out).split('\n')[0]}`);
+    }
+  }
+  return `git flow: ${notes.join('; ')}`;
+}
+function gitFlowDoctor(cfg) {
+  const out = [];
+  const ok = (b, m) => out.push(`${b ? 'ok  ' : 'FAIL'} ${m}`);
+  const gt = run('git', ['town', '--version']);
+  ok(gt.code === 0, gt.code === 0 ? gt.out : 'git-town not installed; run node kit/install.mjs (or brew install git-town)');
+  const pre = run('git', ['config', '--global', 'git-town.branch-prefix']).out;
+  ok(!!cfg.devicePrefix && pre === `${cfg.devicePrefix}/`, `device branch prefix: ${pre || 'not set'}${pre === `${cfg.devicePrefix}/` ? '' : `; expected ${cfg.devicePrefix}/ (run node kit/install.mjs)`}`);
+  const al = Object.entries(ALIASES).every(([n, sub]) => run('git', ['config', '--global', `alias.${n}`]).out === aliasCmd(sub));
+  ok(al, al ? 'git aliases start/sync/ship/flow-setup point at this kit' : 'git aliases missing or stale; run node kit/install.mjs');
+  if (cfg.codingRoot && exists(cfg.codingRoot)) {
+    const text = readText(path.join(cfg.codingRoot, '.stglobalignore'));
+    const repos = findRepos(cfg.codingRoot);
+    const block = currentBlock(text);
+    ok(!!block && block.join('\n') === blockLines(repos).join('\n'), `Syncthing ignore block ${block ? (block.join('\n') === blockLines(repos).join('\n') ? `current (${repos.length} repos)` : 'stale') : 'missing'}; fix: node kit/scripts/stignore.mjs`);
+    const miss = unignored(text, repos);
+    ok(!miss.length, miss.length ? `repo folders not ignored by Syncthing: ${miss.slice(0, 5).join(', ')}${miss.length > 5 ? ` and ${miss.length - 5} more` : ''}` : 'every repo folder is ignored by Syncthing');
+    const noToml = repos.filter((r) => !exists(path.join(cfg.codingRoot, r, 'git-town.toml')) && !/-worktrees\/|\/\.worktrees\//.test(`/${r}/`));
+    out.push(`${noToml.length ? 'warn' : 'ok  '} git-town.toml in ${repos.length - noToml.length}/${repos.length} repos${noToml.length ? ` (missing e.g. ${noToml.slice(0, 3).join(', ')}; run git flow-setup there)` : ''}`);
+  } else out.push(`warn coding root ${cfg.codingRoot || '(unset)'} not mounted; Syncthing checks skipped`);
+  if (process.platform === 'darwin') {
+    const l = run('launchctl', ['print', `gui/${process.getuid()}/${AGENT}`]);
+    ok(l.code === 0, l.code === 0 ? 'hourly Syncthing ignore job loaded' : 'hourly Syncthing ignore job not loaded; run node kit/install.mjs');
+  }
+  return out;
+}
+
 // ---------- doctor ----------
 function doctor() {
   const cfg = localConfig();
@@ -184,6 +261,7 @@ function doctor() {
   const rc = run(process.execPath, [path.join(KIT, 'scripts', 'rules.mjs'), '--check']);
   ok(rc.code === 0, `RULES.md and skill rule blocks ${rc.code === 0 ? 'in sync' : 'stale: ' + rc.err}`);
   ok(exists(GLOBAL_MD) && readText(GLOBAL_MD).includes(KS), 'global CLAUDE.md has the kit block');
+  out.push(...gitFlowDoctor(cfg));
   out.push(...conflicts());
   return out;
 }
@@ -223,6 +301,7 @@ else {
   out.push(`kit v${kitVersion()} on ${cfg.machine} (${process.platform}); coding root ${cfg.codingRoot}`);
   out.push(`${installPlugin(has('--update'))}; ${mergeSettings()}; ${writeGlobalMd()}`);
   out.push(...conflicts());
+  out.push(gitFlow(cfg));
   out.push(skillSync());
 }
 if (!quiet || out.some((l) => l.startsWith('FAIL'))) console.log(out.join('\n'));
