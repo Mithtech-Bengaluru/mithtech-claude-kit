@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.3
+- Live sync: the shared root defaults to `<Syncthing "default" folder>/0000.codesync`, found per Mac from the Syncthing config (`--shared-root auto`; an explicit `--shared-root <dir>` still wins). No separate Syncthing folder is needed. Doctor shows the resolved root, checks `SHARED_ROOT` and warns when the root is not inside a Syncthing folder. Docs and Mac mini adopt steps use only the "default" folder.
+
 ## 1.4.2
 - Live sync: sync commits use local time; a first push reports only new commits. Doctor checks Scalar with `scalar version`. The installer reloads the live sync job when it is not loaded. Kit gate in `.claude/gate` for `git ship`. First release shipped through live sync and `git ship`.
 

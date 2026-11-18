@@ -18,7 +18,7 @@ import { scanConflicts, restoreConflicts } from './lib/conflicts.mjs';
 import { checkRouting } from './lib/route.mjs';
 import * as LS from './lib/livesync.mjs';
 import { devicePrefix } from './lib/livesync.mjs';
-import { auditAll } from './scripts/livesync.mjs';
+import { auditAll, liveConfig } from './scripts/livesync.mjs';
 
 const args = process.argv.slice(2);
 const has = (k) => args.includes(k);
@@ -47,7 +47,8 @@ function ensureLocalConfig() {
     benchPath: cfg.benchPath || null, allowFable: cfg.allowFable ?? false,
     devicePrefix: val('--device-prefix') || cfg.devicePrefix || devicePrefix(os.hostname()),
     liveSync: has('--live-sync') ? true : has('--no-live-sync') ? false : cfg.liveSync ?? false,
-    sharedRoot: val('--shared-root') || cfg.sharedRoot || null,
+    // --shared-root auto (or no value ever set): use <Syncthing "default" folder>/0000.codesync
+    sharedRoot: val('--shared-root') === 'auto' ? undefined : val('--shared-root') || cfg.sharedRoot || undefined,
     ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'mainPushRepos', 'liveSyncOptions']),
   };
   if (!dry) { if (!exists(LOCAL_CFG)) recordCreated(LOCAL_CFG); saveLocalConfig(next); }
@@ -173,7 +174,8 @@ function liveSyncSetup(cfg) {
   const s = readJSON(SETTINGS, {});
   const env = { ...(s.env || {}) };
   if (cfg.codingRoot) env.CODING_ROOT = cfg.codingRoot;
-  if (cfg.sharedRoot) env.SHARED_ROOT = cfg.sharedRoot;
+  const sharedRoot = liveConfig(cfg).shared;
+  if (sharedRoot) env.SHARED_ROOT = sharedRoot; else delete env.SHARED_ROOT;
   if (JSON.stringify(env) !== JSON.stringify(s.env || {})) { backup(SETTINGS); writeJSON(SETTINGS, { ...s, env }); notes.push('CODING_ROOT in settings'); }
   if (process.platform === 'darwin') {
     if (cfg.liveSync) {
@@ -206,13 +208,17 @@ function liveSyncDoctor(cfg) {
   ok(!!cfg.devicePrefix, `device prefix: ${cfg.devicePrefix || 'not set'}`);
   const s = readJSON(SETTINGS, {});
   ok(s.env?.CODING_ROOT === cfg.codingRoot, `CODING_ROOT in settings: ${s.env?.CODING_ROOT || 'missing'}`);
-  ok(!!cfg.sharedRoot && exists(cfg.sharedRoot), `shared folder: ${cfg.sharedRoot || 'not set (--shared-root <dir>)'}${cfg.sharedRoot && !exists(cfg.sharedRoot) ? ' (missing)' : ''}`);
+  const shared = liveConfig(cfg).shared;
+  ok(!!shared && exists(shared), `shared root: ${shared || 'none (no Syncthing "default" folder; or set --shared-root <dir>)'}${shared && !exists(shared) ? ' (missing; create it)' : ''}${cfg.sharedRoot ? ' (explicit)' : ' (Syncthing "default"/0000.codesync)'}`);
+  ok(s.env?.SHARED_ROOT === shared, `SHARED_ROOT in settings: ${s.env?.SHARED_ROOT || 'missing'}${s.env?.SHARED_ROOT === shared ? '' : '; run node kit/install.mjs'}`);
+  const inSt = !!shared && LS.syncthingFolders(HOME).some((f) => path.resolve(shared).startsWith(path.resolve(f) + path.sep) || path.resolve(shared) === path.resolve(f));
+  warn(inSt, inSt ? 'shared root is inside a Syncthing folder' : 'shared root is not inside a Syncthing folder (the other Mac will not see the registry)');
   if (process.platform === 'darwin') ok(launchctl('print', `gui/${process.getuid()}/${LS_AGENT}`).code === 0, 'live sync job loaded (every 10 min)');
   if (!cfg.codingRoot || !exists(cfg.codingRoot)) { out.push(`warn coding root ${cfg.codingRoot || '(unset)'} not mounted; repo checks skipped`); return out; }
   const st = LS.syncthingFolders(HOME).filter((f) => path.resolve(f) === path.resolve(cfg.codingRoot) || path.resolve(cfg.codingRoot).startsWith(path.resolve(f) + path.sep) || path.resolve(f).startsWith(path.resolve(cfg.codingRoot) + path.sep));
   ok(!st.length, st.length ? `Syncthing still shares ${st.join(', ')}; remove it (code moves only through git)` : 'Syncthing does not share the coding folder');
-  if (cfg.sharedRoot && exists(cfg.sharedRoot)) {
-    const file = LS.registryFile(cfg.sharedRoot);
+  if (shared && exists(shared)) {
+    const file = LS.registryFile(shared);
     const { repos, copies } = LS.readRegistry(file);
     const local = LS.findRepos(cfg.codingRoot).filter((r) => git(path.join(cfg.codingRoot, r), 'remote', 'get-url', 'origin').code === 0);
     const missing = local.filter((r) => !repos[r]);
