@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "The push guard reads the current branch when the hook runs, so one shell command that creates the wip branch from main and then pushes wip is blocked.",
+  "fix": "Make the guard read the pushed branch name from the push arguments, not the checked-out branch.",
+  "project": "frappe16/apps",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-18T09:29:03.864Z"
+}
