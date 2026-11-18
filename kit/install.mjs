@@ -153,12 +153,25 @@ function projectMds(root) {
   try { for (const d of fs.readdirSync(root)) { const p = path.join(root, d, 'CLAUDE.md'); if (exists(p) && !skip.has(d)) files.add(p); } } catch {}
   return [...files].sort();
 }
+// Never touch work in progress: uncommitted edits to the file, a merge/rebase, or an open Claude session.
+function busyWhy(f) {
+  const info = LS.repoInfo(path.dirname(f));
+  if (!info) return null;
+  const st = git(info.dir, 'status', '--porcelain', '--', path.relative(fs.realpathSync(info.dir), fs.realpathSync(f))).out;
+  if (st && !st.startsWith('??')) return 'uncommitted edits';
+  const b = LS.busy(info.gitDir);
+  if (b) return `git ${b}`;
+  if (LS.activeSession(info.gitDir)) return 'open Claude session';
+  return null;
+}
 function updateProjects() {
   const root = val('--coding-root') || localConfig().codingRoot;
   if (!root || !exists(root)) return ['FAIL coding root not set or not mounted (--coding-root <dir>)'];
   const adopt = new Set(args.filter((a, k) => args[k - 1] === '--adopt').map((a) => path.resolve(a)));
-  const n = { updated: [], current: 0, old: [], other: 0 };
+  const n = { updated: [], current: 0, old: [], other: 0, busy: [] };
   for (const f of projectMds(root)) {
+    const why = busyWhy(f);
+    if (why) { n.busy.push(`${path.relative(root, f)} (${why})`); continue; }
     const cur = readText(f);
     const r = refreshProjectMd(cur, { adopt: adopt.has(f) });
     if (r.kind === 'other') { n.other++; continue; }
@@ -167,7 +180,8 @@ function updateProjects() {
     if (!dry) { backup(f); fs.writeFileSync(f, r.next); }
     n.updated.push(path.relative(root, f));
   }
-  const out = [`project CLAUDE.md: ${dry ? 'would update' : 'updated'} ${n.updated.length}, current ${n.current}, not kit-made ${n.other}, old template ${n.old.length}`];
+  const out = [`project CLAUDE.md: ${dry ? 'would update' : 'updated'} ${n.updated.length}, current ${n.current}, not kit-made ${n.other}, old template ${n.old.length}, busy ${n.busy.length}`];
+  for (const f of n.busy) out.push(`  busy, try later: ${f}`);
   for (const f of n.updated) out.push(`  ${dry ? 'would update' : 'updated'} ${f}`);
   for (const f of n.old) out.push(`  old template, needs a yes: node ${kitPathFwd}/kit/install.mjs --update-projects --adopt ${f}`);
   return out;
@@ -394,7 +408,7 @@ else {
   out.push(skillSync());
 }
 if (!quiet || out.some((l) => l.startsWith('FAIL'))) console.log(out.join('\n'));
-if (!has('--doctor') && !has('--uninstall') && !quiet) {
+if (!has('--doctor') && !has('--uninstall') && !has('--update-projects') && !quiet) {
   console.log('Account-level instructions (Claude Settings > Instructions) cannot be read by the kit: replace them with the 2-line kit pointer from README.md. Restart Claude Code.');
 }
 process.exit(out.some((l) => l.startsWith('FAIL')) ? 1 : 0);

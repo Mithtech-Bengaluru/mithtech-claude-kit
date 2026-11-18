@@ -320,6 +320,14 @@ t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
   const b = rd('b');
   t('project md adopt wraps the kit lines', b.includes('<!-- mithtech-kit:project skill=rust-dev') && b.includes('- Keep crate x small.') && (b.match(/HANDOFF\.md\]/g) || []).length === 1 && !b.includes('blocks edits there.\n'), b);
   t('project md backup kept', fs.readdirSync(path.join(cr, 'b')).some((f) => f.startsWith('CLAUDE.md.bak-')));
+  mk('d', '# D\n<!-- mithtech-kit:project skill=rust-dev v=0.1.0 -->\nold\n<!-- mithtech-kit:end -->\n');
+  spawnSync('git', ['-C', path.join(cr, 'd'), 'add', 'CLAUDE.md']); spawnSync('git', ['-C', path.join(cr, 'd'), '-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', '-c', 'core.hooksPath=/dev/null', 'commit', '-qm', 'x']);
+  fs.appendFileSync(path.join(cr, 'd', 'CLAUDE.md'), 'my edit\n');
+  mk('e', '# E\n<!-- mithtech-kit:project skill=rust-dev v=0.1.0 -->\nold\n<!-- mithtech-kit:end -->\n');
+  fs.mkdirSync(path.join(cr, 'e', '.git', 'rebase-merge'));
+  const ub = up();
+  t('project md skips uncommitted edits', rd('d').includes('old\n') && /busy, try later: d\/CLAUDE.md \(uncommitted edits\)/.test(ub.stdout), ub.stdout);
+  t('project md skips a repo mid-rebase', rd('e').includes('old\n') && /e\/CLAUDE.md \(git rebase-merge\)/.test(ub.stdout), ub.stdout);
   t('project templates carry the kit block', fs.readdirSync(path.join(KIT, 'templates')).filter((f) => /^CLAUDE\..+\.md$/.test(f)).every((f) => fs.readFileSync(path.join(KIT, 'templates', f), 'utf8').includes('{{KIT_BLOCK}}')));
 }
 
