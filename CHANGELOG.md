@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+- Rules refactor: `kit/rules.json` is the one home of every rule. Rules are grouped by concept (session start, reuse, single owner, placement, task size and approvals, screens and UI, git, secrets, databases, third-party code, testing and done, tokens, communication, then each stack). Each rule has a fixed id and, where one exists, the `check` that enforces it.
+- `rules.mjs` now also generates the global CLAUDE.md template from the every-session groups. Stack rules and lessons load only with their skill. Other files (skills, gates.md, two-macs.md, README, ClaudeSetup.md, project templates, SKILLS.md, guard messages, conflicts.json) cite rule ids instead of restating rules.
+- One-off gotchas moved to a `lessons` list, filed by stack. The Meta Embedded Signup and Playwright WebView lessons moved to Next.js (NG07, NG08), and the Android 17 lesson moved to Rust (RG02).
+- Push-to-main block removed for everyone (guard, deny rules, conflict rule, tests). Force-push and `--all/--mirror` stay blocked. E07 now asks for the gate before a push to main. Design questions for a later control: `pending_work/push-main-block.md`.
+- Contradiction resolved toward the enforced behaviour: never edit vendored code (no "unless asked"). Merged: one-question and confirm-first (C01), backups (E28), tax (B12), vendored code (E09). Dropped O04 (it only repeated the every-session rules).
+- The TonalDepth path is now `<coding root>/tonaldepth`; install fills each Mac's coding root.
+
 ## 1.4.3
 - Live sync: the shared root defaults to `<Syncthing "default" folder>/0000.codesync`, found per Mac from the Syncthing config (`--shared-root auto`; an explicit `--shared-root <dir>` still wins). No separate Syncthing folder is needed. Doctor shows the resolved root, checks `SHARED_ROOT` and warns when the root is not inside a Syncthing folder. Docs and Mac mini adopt steps use only the "default" folder.
 

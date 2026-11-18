@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// PreToolUse guard: blocks force-push, pushes to main, prod migrations, secret reads,
+// PreToolUse guard: blocks force-push, prod migrations, secret reads,
 // vendored edits, and (in worker sessions) edits outside .claude/owns.txt.
 // Exit 2 + stderr blocks the call in every permission mode, bypassPermissions included.
 import { decide } from '../lib/guard.mjs';

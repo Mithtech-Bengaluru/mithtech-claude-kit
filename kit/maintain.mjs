@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // COLLECT (maintainer only, manual, zero tokens). Reads inbox/*.json on main (one branch only), validates each
 // entry, shows a summary of 10 lines or fewer and accepts nothing without your yes. On yes:
-// writes lessons into kit/rules.json (as skill gotchas), catalogue entries into catalog/,
+// writes lessons into kit/rules.json (`lessons`), catalogue entries into catalog/,
 // regenerates RULES.md and the skill rule blocks, bumps the version, tags a release, pushes
 // main and the tag, and removes the processed inbox files.
 //   node kit/maintain.mjs [--dry-run]
@@ -20,7 +20,8 @@ if (git(REPO, 'merge', '--ff-only', '--quiet', 'origin/main').code !== 0) die('l
 
 const inboxFiles = fs.existsSync(path.join(REPO, 'inbox')) ? fs.readdirSync(path.join(REPO, 'inbox')).filter((f) => /^[\w.-]+\.json$/.test(f)).map((f) => `inbox/${f}`) : [];
 const rules = readJSON(path.join(KIT, 'rules.json'));
-const allRules = rules.groups.flatMap((g) => g.rules.map((r) => r.text));
+rules.lessons ||= [];
+const allRules = [...rules.groups.flatMap((g) => g.rules.map((r) => r.text)), ...rules.lessons.map((l) => l.text)];
 const accepted = { lesson: [], catalog: [] }, rejected = [];
 const seen = new Set();
 for (const f of inboxFiles) {
@@ -53,12 +54,15 @@ const ans = (await rl.question('Accept the valid entries, release and remove the
 rl.close();
 if (ans !== 'y' && ans !== 'yes') { console.log('Nothing changed.'); process.exit(0); }
 
-// write lessons as gotchas in the right group; catalogue entries as files
+// write lessons into the lessons list (id <stack letter>G<nn>, next free number); catalogue entries as files
+const PFX = { frappe: 'F', medusa: 'M', nextjs: 'N', rust: 'R', other: 'O', enterprise: 'E' };
 for (const l of accepted.lesson) {
-  const g = rules.groups.find((x) => x.id === l.stack) || rules.groups.find((x) => x.id === 'other');
-  const n = g.rules.filter((r) => r.kind === 'gotcha').length + 1;
+  const stack = PFX[l.stack] ? l.stack : 'other';
+  const re = new RegExp(`^${PFX[stack]}G(\\d+)$`);
+  const n = Math.max(0, ...rules.lessons.map((x) => Number((x.id.match(re) || [])[1] || 0))) + 1;
   const fix = l.fix.replace(/[.\s]+$/, '');
-  g.rules.push({ id: `${g.id[0].toUpperCase()}G${String(n).padStart(2, '0')}`, kind: 'gotcha', text: `${fix}; ${l.lesson.charAt(0).toLowerCase()}${l.lesson.slice(1).replace(/[.\s]+$/, '')}.`, source: l.project, added: l.created.slice(0, 10) });
+  const why = l.lesson.replace(/[.\s]+$/, '');
+  rules.lessons.push({ id: `${PFX[stack]}G${String(n).padStart(2, '0')}`, stack, text: `${fix}. ${why.charAt(0).toUpperCase()}${why.slice(1)}.`, source: l.project, added: l.created.slice(0, 10) });
 }
 writeJSON(path.join(KIT, 'rules.json'), rules);
 for (const c of accepted.catalog) {
@@ -76,7 +80,7 @@ fs.writeFileSync(path.join(KIT, 'VERSION'), next + '\n');
 const pj = path.join(KIT, '.claude-plugin', 'plugin.json');
 writeJSON(pj, { ...readJSON(pj), version: next });
 git(REPO, 'rm', '--quiet', '--ignore-unmatch', '--', ...inboxFiles);
-git(REPO, 'add', 'kit', 'catalog', 'RULES.md', 'SKILLS.md');
+git(REPO, 'add', 'kit', 'catalog', 'RULES.md', 'LESSONS.md', 'SKILLS.md');
 const msg = `kit v${next}: ${accepted.lesson.length} lesson(s), ${accepted.catalog.length} catalogue entr(ies)`;
 if (git(REPO, 'commit', '--quiet', '-m', msg).code !== 0) die('commit failed');
 const signed = !!git(REPO, 'config', 'user.signingkey').out;

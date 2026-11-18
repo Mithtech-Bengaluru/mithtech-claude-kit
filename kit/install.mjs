@@ -49,7 +49,7 @@ function ensureLocalConfig() {
     liveSync: has('--live-sync') ? true : has('--no-live-sync') ? false : cfg.liveSync ?? false,
     // --shared-root auto (or no value ever set): use <Syncthing "default" folder>/0000.codesync
     sharedRoot: val('--shared-root') === 'auto' ? undefined : val('--shared-root') || cfg.sharedRoot || undefined,
-    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'mainPushRepos', 'liveSyncOptions']),
+    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'liveSyncOptions']),
   };
   if (!dry) { if (!exists(LOCAL_CFG)) recordCreated(LOCAL_CFG); saveLocalConfig(next); }
   return next;
@@ -106,7 +106,10 @@ function mergeSettings() {
 
 // ---------- global CLAUDE.md ----------
 function writeGlobalMd() {
-  const tpl = readText(path.join(KIT, 'templates', 'global-CLAUDE.md')).replaceAll('{{KIT}}', `${kitPathFwd}/kit`).replaceAll('{{VERSION}}', kitVersion());
+  // Paths differ per Mac: <coding root> becomes this Mac's coding root when it is set.
+  const root = localConfig().codingRoot;
+  let tpl = readText(path.join(KIT, 'templates', 'global-CLAUDE.md')).replaceAll('{{KIT}}', `${kitPathFwd}/kit`).replaceAll('{{VERSION}}', kitVersion());
+  if (root) tpl = tpl.replaceAll('<coding root>', root.replaceAll('\\', '/'));
   const lines = tpl.trim().split('\n').length;
   if (lines > 58) throw new Error(`global CLAUDE.md template has ${lines} lines (limit 60)`);
   const block = `${KS}\n${tpl.trim()}\n${KE}`;

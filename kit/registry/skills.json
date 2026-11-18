@@ -87,7 +87,7 @@
       "id": "impeccable",
       "repo": "pbakaus/impeccable",
       "ref": "d41d9860b0094dcb68030657da63461212835aaa",
-      "use": "Ask Claude to design, critique, audit, polish, simplify or animate a UI, or to write DESIGN.md. Example: \"critique this dashboard\" or \"make this landing page bolder\". Pair it with the TonalDepth rule for Mithtech UIs.",
+      "use": "Ask Claude to design, critique, audit, polish, simplify or animate a UI, or to write DESIGN.md. Example: \"critique this dashboard\" or \"make this landing page bolder\". Pair it with rule E25 (TonalDepth) for Mithtech UIs.",
       "note": "",
       "added": "2026-11-17",
       "addedBy": "Manojs-Mac-mini",

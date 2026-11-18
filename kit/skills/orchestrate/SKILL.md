@@ -12,13 +12,12 @@ You are the orchestrator: the only session the user talks to. Default: Sonnet, m
 - `docs/programs/<slug>/` (committed): `requirements.md` (ID index), `modules/<module>/G1.md`, `modules/<module>/G2.html`, `modules/<module>/G3.md`, `adr/ADR-NNN-*.md`, `approvals.md`, `plan.md`, `tracker.md`, `briefs/<unit>.md`.
 - `.claude/tasks/<slug>/` (gitignored): `status.md` (first line `gate: <G0|G1|G2|G3|wave N|ship>`), `questions.md`, `routing.log`, `tokens.log`.
 - Read these small files, not old chat. Start fresh between gates and waves. Resume with `ORCHESTRATE resume <slug>`: read status.md, tracker.md and questions.md, then continue.
-- If the repo has its own coordinator/brief/contract workflow (for example FieldOps or merqPOS), map this skill onto its files. Never create a second workflow.
+- When the repo has its own workflow (rule E17), map this skill onto its files. Never create a second workflow.
 
 ## 2. Size and gates
-- S: G0 reuse check in one line, then build.
-- M: CONFIRM FIRST bullets, G0, then ONE mini pack for approval: placement (generic or customer app), data changes (existing vs new), wireframe and software flow if a page is added or changed (then UI/UX review), test plan, token estimate. Then build.
-- L: CONFIRM FIRST bullets, then G0, G1, G2, G3 per module. Read `gates.md` in this skill folder for the pack contents and the TOGAF ADM mapping.
-- CONFIRM FIRST (M and L): restate in at most 7 bullets: Goal, In scope, Out of scope, Placement, Assumptions (only ones you cannot check), Done when. Ask with AskUserQuestion: "Correct (Recommended)" / "Change something". Headless: print the bullets and the question as plain text and stop.
+- S and M: follow rule E04 (G0 is the reuse check).
+- L: CONFIRM FIRST, then G0, G1, G2, G3 per module. Read `gates.md` in this skill folder for the pack contents and the TOGAF ADM mapping.
+- CONFIRM FIRST is rule C01. Headless: print the bullets and the question as plain text, then stop.
 - Approval: the user approves G1, G2, G3 in that order, per module, on one page: `node <kit>/review.mjs <slug>` (run it in the background from the project root; it prints a localhost URL). Decisions land in `docs/programs/<slug>/approvals.md`. Never treat chat as approval for L gates. After G3 the plan is frozen; a change request re-opens only the affected pack and brief.
 
 ## 3. Large specs (hundreds of pages)
@@ -52,7 +51,7 @@ Never read the raw spec yourself. Run an intake unit (route `intake`): it splits
 - Merge one unit at a time into `feat/<slug>`. Run the checker agent on the unit diff (it reads diffs, not whole files). The checker fails anything not in an approved pack, and any requirement ID without code and a test.
 - Update `tracker.md` (requirement ID -> brief -> owner -> test -> status) after each merge.
 - TESTS: only the orchestrator runs tests on a shared bench site or test database. Units commit and stop. Merge and gate one branch at a time, then re-run the full gate and give drift fixes to the unit that changed the behaviour. No GitHub Actions: the gate runs locally or on the cluster (Offload).
-- SHIP: merge the remote main into `feat/<slug>` first (keep the approved version), then push `feat/<slug>` (never main) and open a PR with the gate result. The guard blocks pushes to main even after a chat yes: give the owner the exact command. Deploy to staging if the project's CLAUDE.md defines it. Production only after the user's explicit yes.
+- SHIP: merge the remote main into `feat/<slug>` first (keep the approved version), then push `feat/<slug>` and open a PR with the gate result (rules E07 and E12). Push main only after the gate passes and the user says yes. Deploy to staging if the project's CLAUDE.md defines it. Production follows rule E08.
 - LEARN: at program end the checker records lessons (section "Lessons" in the checker agent) with `node <kit>/scripts/contribute.mjs lesson ...`.
 - CLEANUP (automatic, no question; route `light`, cleanup agent): right after each unit merges and passes the gate, remove its worktree (`target/` first), its `unit/<slug>/<unit>` branch, and any Claude session that worked only on that unit. Keep a unit that is blocked, running or unmerged. At wave end, merge every remaining done unit into `feat/<slug>` so one branch holds all the work. Never delete `feat/<slug>`, main or the orchestrator session.
 

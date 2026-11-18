@@ -1,596 +1,165 @@
 {
-  "_doc": "Single source of the kit rules. RULES.md and the rule blocks in the stack skills are generated from this file by `node kit/scripts/rules.mjs`. Edit here, never in the generated blocks. Style: one line, imperative, specific, reason in a few words if not obvious.",
+  "_doc": "Single source of every kit rule and lesson. `node kit/scripts/rules.mjs` generates RULES.md, the global CLAUDE.md template (groups with skill null: they apply to every session) and the rule and lesson blocks in the stack skills. Edit here only; other files cite rule ids. A rule has one trigger, one action and an optional reason; `check` names the hook, gate or checker that enforces it. Ids never change; a merged rule leaves a gap. Style: C04 to C06.",
   "groups": [
-    {
-      "id": "everyone",
-      "title": "Everyone",
-      "skill": null,
-      "rules": [
-        {
-          "id": "E01",
-          "text": "Check what already exists before building: our apps and plugins, installed apps, and the platform's built-in features."
-        },
-        {
-          "id": "E02",
-          "text": "Give every record and setting one owner. Link to it; never copy it or create a second version."
-        },
-        {
-          "id": "E03",
-          "text": "Put code in the app or module that owns the feature. A new app, plugin or service needs approval."
-        },
-        {
-          "id": "E04",
-          "text": "Size the task first. Small: build. Medium: one plan approval. Large: approve architecture, wireframes, software flow, UI/UX and build plan before building. Any screen change: approve wireframe, then flow, then UI/UX, and show screenshots against them while building."
-        },
-        {
-          "id": "E05",
-          "text": "Build everything that was approved, and nothing that was not."
-        },
-        {
-          "id": "E06",
-          "text": "Call a task done only when the project's checks pass, every approved requirement is built and tested, and nothing is stubbed."
-        },
-        {
-          "id": "E07",
-          "text": "Never push to main, master or production, and never force-push, without approval."
-        },
-        {
-          "id": "E08",
-          "text": "Get explicit approval for production deploys and production data changes. Back up before any migration."
-        },
-        {
-          "id": "E09",
-          "text": "Never edit third-party or upstream code (frappe, erpnext, hrms, india_compliance, @medusajs core, node_modules, generated code)."
-        },
-        {
-          "id": "E10",
-          "text": "Keep secrets out of git, images, logs and shared files. Use environment variables."
-        },
-        {
-          "id": "E11",
-          "text": "Never copy a database between machines without asking."
-        },
-        {
-          "id": "E12",
-          "text": "We use GitHub Free. Do not add or rely on GitHub Actions, required status checks, Codespaces, Copilot or other paid GitHub features. Run the gate locally (or on the home cluster with Offload) before every pull request and put the result in the PR."
-        },
-        {
-          "id": "E13",
-          "text": "Where live git sync is on (one person's own Macs; kit/docs/two-macs.md): work on the sync branch `wip`, which the job and the session hooks commit and push. Put finished work on main only with `git ship` (local gate, PR, squash-merge). Never push main directly, never force-push, never commit a secret or a `*.sync-conflict-*` file."
-        }
-      ]
-    },
-    {
-      "id": "communication",
-      "title": "Communication",
-      "skill": null,
-      "rules": [
-        {
-          "id": "C01",
-          "text": "Before a medium or large task, restate it in at most 7 bullets (goal, scope, placement, assumptions, done when) and get a yes."
-        },
-        {
-          "id": "C02",
-          "text": "Give the answer first. Keep messages to 10 lines unless detail is asked for."
-        },
-        {
-          "id": "C03",
-          "text": "Ask one question at a time, with 2 to 4 options and the recommended one first."
-        },
-        {
-          "id": "C04",
-          "text": "Write one idea per sentence. Keep instructions under 20 words and descriptions under 25."
-        },
-        {
-          "id": "C05",
-          "text": "Use active voice. Start instructions with a verb."
-        },
-        {
-          "id": "C06",
-          "text": "Use one term for one meaning, every time. Avoid noun clusters of more than 3 words."
-        }
-      ]
-    },
-    {
-      "id": "frappe",
-      "title": "Frappe / ERPNext",
-      "skill": "frappe-dev",
-      "rules": [
-        {
-          "id": "F01",
-          "text": "Name every Mithtech app `framith_<name>` (snake_case). Users see only the product name: app_title, labels, page titles and the README title never say \"Framith\" (`framith_tradedeal` shows \"Trade Deal\")."
-        },
-        {
-          "id": "F02",
-          "text": "Build the generic product app first (`framith_<product>`), complete and configurable through its Single Settings DocType."
-        },
-        {
-          "id": "F03",
-          "text": "Put each customer's changes in their own app (`framith_<customer>`), which lists the generic apps in required_apps. No customer logic in generic apps; never fork a generic app per customer.",
-          "claude": "Customer app `framith_<customer>` holds only that customer's Custom Fields, Property Setters, print formats, workspaces, fixtures and small overrides; it lists the generic apps in required_apps. Never put a customer check in generic code; never fork a generic app per customer."
-        },
-        {
-          "id": "F04",
-          "text": "If other customers could use a change, build it in the generic app behind a setting. Otherwise put it in the customer app. Say which and why."
-        },
-        {
-          "id": "F05",
-          "text": "Use the standard masters (Company, Customer, Supplier, Item, UOM, Price List, Employee, Address, Contact, Account, Cost Center, Warehouse, tax templates). Never duplicate a DocType or field; check India Compliance, HRMS and our framith_ apps too.",
-          "claude": "ERPNext/Frappe masters own their data: Company, Customer, Supplier, Item, Item Group, UOM, Price List, Employee, Address, Contact, Account, Cost Center, Warehouse, tax templates, and the masters of HRMS, India Compliance and our framith_ apps. Never create a DocType or field that duplicates one (for example a custom GSTIN field: India Compliance has `gstin`; a second wallet app: customer_wallet exists). Use Link fields, not copied values; fetch_from for read-only display."
-        },
-        {
-          "id": "F06",
-          "text": "Do not store computed values unless performance needs it, and then say why."
-        },
-        {
-          "id": "F07",
-          "text": "Extend before creating: Custom Fields, Property Setters, doc_events, override_doctype_class, hooks, standard reports, Print Designer, Workflows. Create a DocType only when nothing can be extended."
-        },
-        {
-          "id": "F08",
-          "text": "Keep one owning app per domain across all our framith_ apps."
-        },
-        {
-          "id": "F09",
-          "text": "Classify every app as OWN or VENDORED. Never edit vendored apps (including our forks of frappe and erpnext) unless asked."
-        },
-        {
-          "id": "F10",
-          "text": "Site-only changes (Custom Fields, Property Setters, Server/Client Scripts, Customize Form) are fine while working. Package them in the owning app before production.",
-          "claude": "Package for production: fixtures of the owning app (module set to that app's module, filtered fixtures) or install/patch code for fields and property setters; controllers, hooks and API files for server logic; doctype_js for client logic. Test packaged changes on a fresh site before release."
-        },
-        {
-          "id": "F11",
-          "text": "When site-only changes exist, suggest which app each belongs in, with the reason. Move nothing without approval, and never in bulk. Remove the database-only copy only after a tested move and a yes."
-        },
-        {
-          "id": "F12",
-          "text": "Treat older apps without the `framith_` prefix with care: report first; change them only with an approved plan, a backup and a trial on a copy of the site."
-        },
-        {
-          "id": "F13",
-          "text": "Export Custom Fields and Property Setters as fixtures filtered by module; blanket fixtures overwrite other apps."
-        },
-        {
-          "id": "F14",
-          "text": "Put data changes in idempotent patches listed in patches.txt."
-        },
-        {
-          "id": "F15",
-          "text": "Query with frappe.qb or get_all with explicit fields. No SQL string concatenation and no get_doc inside loops.",
-          "claude": "Use frappe.qb or get_all with explicit fields; db.get_value, bulk operations, frappe.enqueue (idempotent jobs), frappe.cache, search_index on filtered fields. No SQL concatenation; no get_doc in loops."
-        },
-        {
-          "id": "F16",
-          "text": "Check permissions in every whitelisted method. Use roles and User Permissions, never hardcoded users. Respect company filters.",
-          "claude": "Whitelisted functions check permissions; ignore_permissions only with a comment saying why; roles and User Permissions, never hardcoded users; respect company filters."
-        },
-        {
-          "id": "F17",
-          "text": "Never write GL or stock ledger entries by hand; use ERPNext controllers. Respect submit, cancel and amend, accounting dimensions and fiscal years."
-        },
-        {
-          "id": "F18",
-          "text": "Send Indian tax through India Compliance."
-        },
-        {
-          "id": "F19",
-          "text": "Keep settings in one Single Settings DocType per app; hardcode nothing. Wrap strings in _(). Use naming series."
-        },
-        {
-          "id": "F20",
-          "text": "Make apps distributable: required_apps, version branch, README, CHANGELOG, semver, clean after_install and before_uninstall."
-        },
-        {
-          "id": "F21",
-          "text": "Write FrappeTestCase tests for every DocType you touch. Run module tests while working and app tests before push."
-        },
-        {
-          "id": "F22",
-          "text": "Run `bench --site <site> backup` before migrate. Migrate automatically only on dev and test sites."
-        },
-        {
-          "id": "F23",
-          "text": "Run `bench build --app <app>` only for the app you changed."
-        },
-        {
-          "id": "F24",
-          "text": "Run the drift check before every production release and weekly on live customer sites."
-        },
-        {
-          "id": "F25",
-          "text": "Ship a generic app only when every requirement ID in its approved spec is built and tested. Keep partial apps on a feature branch."
-        },
-        {
-          "id": "FG01",
-          "kind": "gotcha",
-          "text": "Run deletes in bench console with frappe.db.commit(); bench execute did not commit a frappe.client.delete.",
-          "source": "kit pilot",
-          "added": "2026-11-08"
-        },
-        {
-          "id": "FG02",
-          "kind": "gotcha",
-          "text": "Drop the column yourself after deleting a test Custom Field on a dev site; Frappe keeps the database column.",
-          "source": "kit pilot",
-          "added": "2026-11-08"
-        },
-        {
-          "id": "FG03",
-          "kind": "gotcha",
-          "text": "Name the controller class exactly as the DocType without spaces, acronyms as written (`SCException`); a title-cased class makes migrate delete the DocType as an orphan.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG04",
-          "kind": "gotcha",
-          "text": "Guard engine-only fields with a higher permlevel or a validate check; Frappe does not enforce read-only fields on the server, so the REST API can change them.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG05",
-          "kind": "gotcha",
-          "text": "Read child-table values from the browser with frappe.client.get_value and `parent` set; frappe.db.get_value on a child DocType returns only name.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG06",
-          "kind": "gotcha",
-          "text": "Set a custom new-record dialog in the listview `primary_action`; Frappe 16 resets the Add button after listview onload.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG07",
-          "kind": "gotcha",
-          "text": "Follow `amended_from` in submit hooks, or block amending system-made documents; Cancel-then-Amend gives a new name.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG08",
-          "kind": "gotcha",
-          "text": "Take the row lock first in the transaction, or read balances with locking reads; MariaDB keeps the old snapshot after plain reads.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG09",
-          "kind": "gotcha",
-          "text": "Load the same app checkout for every bench call on a site, and clear the site cache after one that did not; Redis caches the module map per site.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG10",
-          "kind": "gotcha",
-          "text": "Rename an app in this order: add the new package beside the old, switch dependents, rename each site, migrate, remove the old package. Rehearse on a throwaway site through its own apps file.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG11",
-          "kind": "gotcha",
-          "text": "Read dict hooks per app in install order (Frappe merges them into lists of values). In hook tests, assert on the doctype keys and add a positive control.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG12",
-          "kind": "gotcha",
-          "text": "Fill the item-wise rates JSON for every item when a script sets a Bill of Entry IGST row to Actual; India Compliance rejects it empty.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG13",
-          "kind": "gotcha",
-          "text": "Wrap the ERPNext test bootstrap to relax only the India Compliance checks it fails (zero-rate template, no HSN, non-GST state); load test data once on the baseline site.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG14",
-          "kind": "gotcha",
-          "text": "Translate at request time only; translating labels at module import freezes the first request language in each worker.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG15",
-          "kind": "gotcha",
-          "text": "Put the nvm Node 24 folder first on PATH before get-app or build on a server; a non-interactive ssh shell picks the system Node.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "FG16",
-          "kind": "gotcha",
-          "text": "Patch shared dicts once in the main thread around worker threads; mock.patch.dict inside threads leaks the patched value.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        }
-      ]
-    },
-    {
-      "id": "medusa",
-      "title": "Medusa",
-      "skill": "medusa-dev",
-      "rules": [
-        {
-          "id": "M01",
-          "text": "Name every Mithtech plugin, module or extension `mithusa-<name>` and keep our npm scope (`@mithtech-medusa/mithusa-<name>`). Users see only the product name: admin labels, page titles and the README title never say \"Mithusa\"."
-        },
-        {
-          "id": "M02",
-          "text": "Build generic `mithusa-` plugins first. Put customer-only code in the customer's Medusa project, or in `mithusa-<customer>` if several of their stores share it."
-        },
-        {
-          "id": "M03",
-          "text": "Detect the Medusa version. These rules are for v2; say so when a project is v1."
-        },
-        {
-          "id": "M04",
-          "text": "Check built-in commerce modules, installed plugins, our mithusa- plugins, src/modules, workflows and routes before building. For a new project, check medusa-factory first."
-        },
-        {
-          "id": "M05",
-          "text": "Place code in this order and say which and why: the module or plugin that owns the domain, a generic mithusa- plugin, then the customer project's src/. A new module or plugin needs approval."
-        },
-        {
-          "id": "M06",
-          "text": "Extend, never fork core: module links, workflow hooks and steps, subscribers, src/api routes, admin widgets, Query for cross-module reads."
-        },
-        {
-          "id": "M07",
-          "text": "Treat ERPNext as the book of record for invoices and tax when connected. Medusa never recalculates statutory tax."
-        },
-        {
-          "id": "M08",
-          "text": "Put business logic in workflows with compensation. Keep routes thin and zod-validated."
-        },
-        {
-          "id": "M09",
-          "text": "Define models with model.define and generate migrations with the CLI. No cross-module database access."
-        },
-        {
-          "id": "M10",
-          "text": "Use strict TypeScript with no `any`. Verify webhooks and make them idempotent."
-        },
-        {
-          "id": "M11",
-          "text": "Publish plugins with semver, @medusajs/* as peerDependencies, README and CHANGELOG, to the private registry with your own npm config; never put a token in a file."
-        }
-      ]
-    },
-    {
-      "id": "nextjs",
-      "title": "Next.js and JS sites",
-      "skill": "nextjs-js",
-      "rules": [
-        {
-          "id": "N01",
-          "text": "Reuse existing components. Add no new framework or dependency without approval."
-        },
-        {
-          "id": "N02",
-          "text": "Read configuration from the environment."
-        },
-        {
-          "id": "N03",
-          "text": "Keep accessibility and performance budgets."
-        },
-        {
-          "id": "N04",
-          "text": "On CMS and marketing sites, change no URL; SEO checks must pass."
-        },
-        {
-          "id": "N05",
-          "text": "Run lint, typecheck and format before every commit."
-        },
-        {
-          "id": "NG01",
-          "kind": "gotcha",
-          "text": "Read every statement Payload migrate:create generates; strip changes outside your collections and list that drift in the PR.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "NG02",
-          "kind": "gotcha",
-          "text": "Start Web Workers inline from a blob URL at module load, before long synchronous work, and allow blob: workers in the CSP; Chrome starts a URL worker only on a free main-thread task.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "NG03",
-          "kind": "gotcha",
-          "text": "Add a silence watchdog (about 12 s without host messages) to WebRTC guests; a crashed host leaves the data channel open and close never fires.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "NG04",
-          "kind": "gotcha",
-          "text": "Build production in a checkout with its own deps and env, or use the release image build as the check; worktree builds fail on symlinked node_modules and blocked env.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "NG05",
-          "kind": "gotcha",
-          "text": "Compose TonalDepth pages without a bare main element and write actions as buttons; compat styles hit bare main and link colour beats component classes.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "NG06",
-          "kind": "gotcha",
-          "text": "Check layouts at the real inner width (the browser pane can be narrower than requested), test a minimum width per main area, set the theme per check, and confirm the pane is visible (a hidden pane freezes animations).",
-          "source": "inbox",
-          "added": "2026-11-17"
-        }
-      ]
-    },
-    {
-      "id": "rust",
-      "title": "Rust",
-      "skill": "rust-dev",
-      "rules": [
-        {
-          "id": "R01",
-          "text": "Keep core crates free of network and connector dependencies."
-        },
-        {
-          "id": "R02",
-          "text": "Use no unwrap or todo!() on feature paths."
-        },
-        {
-          "id": "R03",
-          "text": "Keep clippy clean with the repo's config."
-        },
-        {
-          "id": "R04",
-          "text": "Run `cargo test -p <crate>` while working and the full gate before push. Limit build parallelism."
-        },
-        {
-          "id": "R05",
-          "text": "Keep Tauri commands as thin wrappers over core. Commit generated TypeScript types."
-        },
-        {
-          "id": "RG01",
-          "kind": "gotcha",
-          "text": "Add the register and remove listener commands to a Tauri 2 mobile plugin command list and default permissions, then test on an emulator; otherwise events never reach the UI.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        }
-      ]
-    },
-    {
-      "id": "other",
-      "title": "Other stacks (Go, Flutter, Python, Tally TDL, Docker/k3s)",
-      "skill": "other-stack",
-      "rules": [
-        {
-          "id": "O01",
-          "text": "Read the project's CLAUDE.md for its gate command."
-        },
-        {
-          "id": "O02",
-          "text": "Follow the stack's official style guide and linters."
-        },
-        {
-          "id": "O03",
-          "text": "Look up the official docs before using an unfamiliar API."
-        },
-        {
-          "id": "O04",
-          "text": "Apply the same reuse, single-owner, placement and safety rules as every other stack."
-        },
-        {
-          "id": "OG01",
-          "kind": "gotcha",
-          "text": "Read Meta Embedded Signup phone and account IDs from the popup message event, and request contacts and history sync right after onboarding; it expires in 24 hours.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "OG02",
-          "kind": "gotcha",
-          "text": "Attach Playwright to Android WebView with its Android device API (not plain CDP) and clear colour-scheme emulation before theme checks.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "OG03",
-          "kind": "gotcha",
-          "text": "Request the local network permission for Android 17 (API 37) apps that reach private addresses: debug builds always, release builds only for private LAN servers.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        }
-      ]
-    },
-    {
-      "id": "enterprise",
-      "title": "Business software (all stacks)",
-      "skill": "enterprise-core",
-      "rules": [
-        {
-          "id": "B01",
-          "text": "Take the tenant from the logged-in session, never from the request."
-        },
-        {
-          "id": "B02",
-          "text": "Check permissions and record scope on the server, not only in the UI."
-        },
-        {
-          "id": "B03",
-          "text": "Never use floats for money or quantities. Do no money math in the UI."
-        },
-        {
-          "id": "B04",
-          "text": "Never edit posted documents. Corrections are new documents."
-        },
-        {
-          "id": "B05",
-          "text": "Write the document and its outbox row in one transaction."
-        },
-        {
-          "id": "B06",
-          "text": "Put idempotency keys on commands and webhooks. Retry with backoff and a dead-letter queue."
-        },
-        {
-          "id": "B07",
-          "text": "Version offline sync and test its conflict rules."
-        },
-        {
-          "id": "B08",
-          "text": "Keep migrations compatible with the previous release."
-        },
-        {
-          "id": "B09",
-          "text": "Mask personal data in logs."
-        },
-        {
-          "id": "B10",
-          "text": "Avoid N+1 queries. Paginate every list."
-        },
-        {
-          "id": "B11",
-          "text": "Add a regression test for every bug you fix."
-        },
-        {
-          "id": "EG01",
-          "kind": "gotcha",
-          "text": "Read a payout balance as of the run date (or block overlapping runs) and test out-of-order periods; mixed dates paid one balance twice.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "EG02",
-          "kind": "gotcha",
-          "text": "Cap text length before PII regexes, keep dates out of the phone pattern and test date-plus-phone strings; long text made the email pattern quadratic.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "EG03",
-          "kind": "gotcha",
-          "text": "Make every database change safe to run twice and rehearse it on a copy of production data; a branch script can repeat changes production already has.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        },
-        {
-          "id": "EG04",
-          "kind": "gotcha",
-          "text": "Start local test servers with an allow-list of env vars (database URL, app secret); a full env file can reach real ERP, push and mail services.",
-          "source": "inbox",
-          "added": "2026-11-17"
-        }
-      ]
-    }
+    { "id": "session", "title": "Session start", "skill": null, "rules": [
+      { "id": "E17", "text": "At session start, read the project CLAUDE.md, then HANDOFF.md, then only the docs the task needs. Follow the repo's own coordinator, brief or contract workflow when it has one (for example FieldOps, merqPOS)." },
+      { "id": "E18", "text": "When a task matches a recipe in `<kit>/patterns/`, follow it and skip planning." },
+      { "id": "E19", "text": "Before you change code, load the stack skill. Also load enterprise-core when the change touches business rules or data. Use the orchestrate skill for multi-session work." },
+      { "id": "E20", "text": "Before you start a session, worker or subagent, get its model and effort from `node <kit>/scripts/route.mjs <route-id|describe:work> [--floor id]`. Pass both on the call.", "check": "route-guard" },
+      { "id": "E21", "text": "To run an app, follow the coding root CLAUDE.md (Offload) when it exists.", "check": "offload hook" }
+    ] },
+    { "id": "reuse", "title": "Reuse", "skill": null, "rules": [
+      { "id": "E01", "text": "Before you build, check the project index, the catalogue (`<kit>/../catalog/`), installed apps, modules, plugins and components, and built-in features. If something exists or extends easily, stop: say what and where, and advise extend or rebuild." },
+      { "id": "N01", "text": "Add no new framework or dependency without approval." }
+    ] },
+    { "id": "owner", "title": "Single owner", "skill": null, "rules": [
+      { "id": "E02", "text": "Give every master record and setting one owner: an existing DocType, module or table. Link to the owner; never copy it or create a duplicate DocType, model, field, table or setting.", "check": "dupcheck" }
+    ] },
+    { "id": "placement", "title": "Placement", "skill": null, "rules": [
+      { "id": "E03", "text": "Put code in the existing app, module, plugin or crate that owns its domain. State where and why, with one alternative." },
+      { "id": "E23", "text": "Get approval before you create a new app, module, plugin or service." },
+      { "id": "E16", "text": "Build the generic, setting-driven app first. Put a change other customers could use in the generic app, behind a setting. Put every other change in that customer's one customer app. Say which and why." }
+    ] },
+    { "id": "sizing", "title": "Task size and approvals", "skill": null, "rules": [
+      { "id": "E04", "text": "Size every task before you start. S (bug fix, one field, small change, pattern match): do a one-line reuse check, then build. M (one feature): confirm it (C01) and check reuse. Then get approval for one mini pack: placement, data changes (existing or new), wireframe and flow if a page changes, test plan, token estimate. L (module, app, program): use the orchestrate skill." },
+      { "id": "E05", "text": "Build everything that was approved, and nothing that was not." },
+      { "id": "E24", "text": "Show the full item in chat with every approval request: pack, wireframe, diff, contract change or screenshot. A path or summary is not enough; relay a worker's pack in full." },
+      { "id": "E08", "text": "Get explicit approval before every production deploy and every production data change.", "check": "guard ask; conflicts" }
+    ] },
+    { "id": "ui", "title": "Screens and UI", "skill": null, "rules": [
+      { "id": "E14", "text": "For a task that adds or changes a screen, get three approvals, in order. 1: wireframe. 2: software flow (Mermaid: screens, actions, states, roles, errors, empty and loading). 3: UI/UX review against TonalDepth (layout, accessibility, light and dark, mobile). Build only after all three. Show screenshots next to them at each UI milestone. A screen change re-opens only the affected approval." },
+      { "id": "E25", "text": "Build every UI with TonalDepth (`<coding root>/tonaldepth`, npm `@mithtech-bengaluru/tonaldepth-*`): its tokens, Mithtech colours, subtle claymorphism, light and dark modes. Use no raw colours and no outline-only depth. Copy this rule into every UI brief." }
+    ] },
+    { "id": "git", "title": "Git and GitHub", "skill": null, "rules": [
+      { "id": "E07", "text": "Never force-push or push with --all or --mirror. Run the project's gate before you push main; `git ship` runs it and opens the PR.", "check": "guard; settings deny; conflicts" },
+      { "id": "E12", "text": "Use only free GitHub features: no Actions, required status checks, Codespaces or Copilot. Before every pull request, run the gate locally or on the home cluster (Offload), and put the result in the PR body.", "check": "git ship; conflicts" },
+      { "id": "E13", "text": "With live git sync on (`<kit>/docs/two-macs.md`), work on `wip`. SessionStart pulls it, Stop pushes it after each turn, and a job syncs idle repos. When SessionStart says PAUSED, help clear it first. Never commit a `*.sync-conflict-*` file.", "check": "livesync; guard (sync-conflict files)" }
+    ] },
+    { "id": "secrets", "title": "Secrets", "skill": null, "rules": [
+      { "id": "E10", "text": "Read secrets and configuration from environment variables. Keep secrets out of git, images, logs and shared files.", "check": "guard; settings deny; livesync" }
+    ] },
+    { "id": "databases", "title": "Databases", "skill": null, "rules": [
+      { "id": "E28", "text": "Back up the database before every migration." },
+      { "id": "E11", "text": "Never copy a database between machines without asking.", "check": "conflicts" }
+    ] },
+    { "id": "thirdparty", "title": "Third-party code", "skill": null, "rules": [
+      { "id": "E09", "text": "Never edit vendored code: frappe, erpnext, hrms, india_compliance, other third-party apps, our forks of them, @medusajs core, node_modules, generated code.", "check": "guard; settings deny; conflicts" }
+    ] },
+    { "id": "testing", "title": "Testing and done", "skill": null, "rules": [
+      { "id": "E29", "text": "Run targeted tests while you work, and the full gate once before you push." },
+      { "id": "E06", "text": "Call a task done only when its gate passes locally and every approved requirement is built and tested, with no stub or mock. Then update the status.", "check": "git ship; conflicts" },
+      { "id": "E26", "text": "Before a test that drives or captures the screen, move every monitor to an empty desktop (Mission Control). Never test over open windows. Copy this rule into every GUI-test brief." },
+      { "id": "E30", "text": "After you fix a bug or finish a program, record lessons with `node <kit>/scripts/contribute.mjs lesson ...`." }
+    ] },
+    { "id": "tokens", "title": "Tokens", "skill": null, "rules": [
+      { "id": "E22", "text": "Grep the index before you read code. Read only the lines you need, and never re-read an unchanged file." },
+      { "id": "E31", "text": "Show diffs, not full files; never echo code. Write briefs in words, not pasted code." }
+    ] },
+    { "id": "communication", "title": "Communication", "skill": null, "rules": [
+      { "id": "C02", "text": "Answer first. Keep a message to 10 lines unless asked for detail. Do not narrate, recap the request or repeat a question.", "check": "conflicts" },
+      { "id": "C07", "text": "Label message blocks **Telling** (facts, results, recommendations) and **Asking** (one question)." },
+      { "id": "C01", "text": "Ask one question at a time: 2 to 4 options with short labels, the recommended one first and marked (Recommended), with AskUserQuestion when available. Before an M or L task, restate it in at most 7 bullets: goal, in scope, out of scope, placement, assumptions you cannot check, done when. Then ask: Correct / Change something." },
+      { "id": "C04", "text": "Write one idea per sentence. Keep instructions under 20 words and descriptions under 25. Apply C04 to C06 to messages, briefs, packs and reports, not to code or logs." },
+      { "id": "C05", "text": "Use active voice. Start every instruction with a verb." },
+      { "id": "C06", "text": "Use one term for one meaning, every time. Avoid noun clusters of more than 3 words." },
+      { "id": "C08", "text": "End a task with a report of at most 8 lines: branch, commits, gate result, deploy status, pending items, risks, tokens used vs budget." }
+    ] },
+    { "id": "frappe", "title": "Frappe / ERPNext", "skill": "frappe-dev", "rules": [
+      { "id": "F01", "text": "Name every Mithtech app `framith_<name>` (snake_case). Show users only the product name: `framith_tradedeal` shows \"Trade Deal\" in app_title, labels, page titles and the README." },
+      { "id": "F03", "text": "Keep only that customer's Custom Fields, Property Setters, print formats, workspaces, fixtures and small overrides in the customer app `framith_<customer>`. List the generic apps in its required_apps. Never put a customer check in generic code, and never fork a generic app per customer." },
+      { "id": "F19", "text": "Keep each app's settings in one Single Settings DocType; hardcode nothing. Wrap user-facing strings in _(). Use naming series." },
+      { "id": "F05", "text": "Treat these masters as owners: Company, Customer, Supplier, Item, Item Group, UOM, Price List, Employee, Address, Contact, Account, Cost Center, Warehouse, tax templates, and the masters of HRMS, India Compliance and our framith_ apps. Never duplicate one: India Compliance has `gstin`; customer_wallet exists. Use Link fields, and fetch_from for read-only display." },
+      { "id": "F06", "text": "Store no computed value unless a measured query is too slow. Then record why in the PR." },
+      { "id": "F07", "text": "Extend before you create: Custom Fields, Property Setters, doc_events, override_doctype_class, hooks, standard reports, Print Designer, Workflows. Create a DocType only when nothing can be extended." },
+      { "id": "F09", "text": "Classify every app as OWN or VENDORED in `.claude/vendored.txt`." },
+      { "id": "F10", "text": "Make site-only changes (Custom Fields, Property Setters, Server and Client Scripts, Customize Form) freely while you work. Before production, package them in the owning app. Put fields in fixtures (F13) or install and patch code. Put server logic in controllers, hooks and API files, and client logic in doctype_js. Test the packaged changes on a fresh site." },
+      { "id": "F11", "text": "When site-only changes exist, suggest an app for each, with the reason. Move nothing without approval, and never in bulk. Remove the database copy only after a tested move and a yes." },
+      { "id": "F12", "text": "Before you change an older app without the `framith_` prefix, report its contents and the risk. Change it only with an approved plan, a backup and a trial on a site copy." },
+      { "id": "F13", "text": "Export Custom Fields and Property Setters as fixtures filtered by module. Blanket fixtures overwrite other apps." },
+      { "id": "F14", "text": "Put data changes in idempotent patches listed in patches.txt." },
+      { "id": "F15", "text": "Query with frappe.qb, or with get_all and explicit fields. Prefer db.get_value, bulk operations, idempotent frappe.enqueue jobs, frappe.cache and search_index on filtered fields. Never concatenate SQL, and never call get_doc inside a loop." },
+      { "id": "F16", "text": "Check permissions in every whitelisted method. Use ignore_permissions only with a comment that says why. Use roles and User Permissions, never hardcoded users. Respect company filters." },
+      { "id": "F17", "text": "Never write GL or stock ledger entries by hand; use the ERPNext controllers. Respect submit, cancel and amend, accounting dimensions and fiscal years." },
+      { "id": "F20", "text": "Make apps distributable: required_apps, a version branch, README, CHANGELOG, semver, and clean after_install and before_uninstall hooks." },
+      { "id": "F21", "text": "Write FrappeTestCase tests for every DocType you touch." },
+      { "id": "F22", "text": "Migrate automatically only on dev and test sites.", "check": "guard" },
+      { "id": "F23", "text": "Run `bench build --app <app>` only for the app you changed." },
+      { "id": "F24", "text": "Run the drift check (`node <kit>/driftcheck.mjs <site>`) before every production release and weekly on live customer sites." },
+      { "id": "F25", "text": "Keep a generic app on a feature branch until every requirement ID in its approved spec is built and tested." }
+    ] },
+    { "id": "medusa", "title": "Medusa", "skill": "medusa-dev", "rules": [
+      { "id": "M01", "text": "Name every Mithtech plugin, module or extension `mithusa-<name>`. Show users only the product name in admin labels, page titles and the README." },
+      { "id": "M03", "text": "Detect the Medusa version. These rules are for v2; say so when a project is v1." },
+      { "id": "M04", "text": "Before you build, check the built-in commerce modules, installed plugins, our mithusa- plugins, src/modules, workflows and routes. For a new project, check medusa-factory first." },
+      { "id": "M05", "text": "Place code in this order: the module or plugin that owns the domain, a generic mithusa- plugin, then the customer project's src/. Say which and why." },
+      { "id": "M02", "text": "Put customer-only code in the customer's Medusa project, or in `mithusa-<customer>` when several of their stores share it." },
+      { "id": "M06", "text": "Extend core, never fork it: module links, workflow hooks and steps, subscribers, src/api routes, admin widgets, and Query for cross-module reads." },
+      { "id": "M08", "text": "Put business logic in workflows with compensation. Keep routes thin and validate them with zod." },
+      { "id": "M09", "text": "Define models with model.define and generate migrations with the CLI. Never access another module's tables." },
+      { "id": "M10", "text": "Use strict TypeScript with no `any`. Verify the signature of every webhook." },
+      { "id": "M11", "text": "Publish plugins as `@mithtech-medusa/mithusa-<name>` to the private registry, with your own npm config. Use semver, @medusajs/* as peerDependencies, a README and a CHANGELOG." }
+    ] },
+    { "id": "nextjs", "title": "Next.js and JS sites", "skill": "nextjs-js", "rules": [
+      { "id": "N03", "text": "Pass the project's accessibility and performance checks before every pull request." },
+      { "id": "N04", "text": "Change no URL on CMS and marketing sites. Keep the SEO checks passing." },
+      { "id": "N05", "text": "Run lint, typecheck and format before every commit." }
+    ] },
+    { "id": "rust", "title": "Rust", "skill": "rust-dev", "rules": [
+      { "id": "R01", "text": "Keep core crates free of network and connector dependencies." },
+      { "id": "R02", "text": "Use no unwrap or todo!() on feature paths." },
+      { "id": "R03", "text": "Keep clippy clean with the repo's config." },
+      { "id": "R04", "text": "Limit build parallelism with `CARGO_BUILD_JOBS=4` (or `-j 4`)." },
+      { "id": "R05", "text": "Keep Tauri commands as thin wrappers over core. Commit the generated TypeScript types." }
+    ] },
+    { "id": "other", "title": "Other stacks (Go, Flutter, Python, Tally TDL, Docker/k3s)", "skill": "other-stack", "rules": [
+      { "id": "O01", "text": "Read the project's CLAUDE.md for its gate command. If it has none, propose one and ask." },
+      { "id": "O02", "text": "Follow the stack's official style guide and linters." },
+      { "id": "O03", "text": "Read the official docs before you use an unfamiliar API." }
+    ] },
+    { "id": "enterprise", "title": "Business software (all stacks)", "skill": "enterprise-core", "rules": [
+      { "id": "B01", "text": "Take the tenant from the logged-in session, never from the request." },
+      { "id": "B02", "text": "Check permissions and record scope on the server, not only in the UI." },
+      { "id": "B03", "text": "Never use floats for money or quantities. Do no money math in the UI." },
+      { "id": "B04", "text": "Never edit a posted document. Make each correction a new document." },
+      { "id": "B05", "text": "Write the document and its outbox row in one transaction." },
+      { "id": "B06", "text": "Put idempotency keys on every command and webhook. Retry with backoff, then send failures to a dead-letter queue." },
+      { "id": "B07", "text": "Version offline sync and test its conflict rules." },
+      { "id": "B08", "text": "Keep migrations compatible with the previous release. Make every data change safe to run twice. Rehearse it on a copy of production data." },
+      { "id": "B09", "text": "Mask personal data in logs." },
+      { "id": "B10", "text": "Never run a database query inside a loop over records. Paginate every list endpoint." },
+      { "id": "B11", "text": "Add a regression test for every bug you fix." },
+      { "id": "B12", "text": "Calculate Indian tax only with India Compliance. When Medusa connects to ERPNext, ERPNext owns invoices and tax; Medusa never recalculates statutory tax." }
+    ] }
+  ],
+  "lessons": [
+    { "id": "FG01", "stack": "frappe", "text": "Run deletes in bench console and call frappe.db.commit(). bench execute did not commit a frappe.client.delete.", "source": "kit pilot", "added": "2026-11-08" },
+    { "id": "FG02", "stack": "frappe", "text": "Drop the database column yourself after you delete a test Custom Field on a dev site. Frappe keeps the column.", "source": "kit pilot", "added": "2026-11-08" },
+    { "id": "FG03", "stack": "frappe", "text": "Name the controller class exactly as the DocType, without spaces and with acronyms as written (`SCException`). With a title-cased class, migrate deletes the DocType as an orphan.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG04", "stack": "frappe", "text": "Guard engine-only fields with a higher permlevel or a validate check. Frappe does not enforce read-only fields on the server, so the REST API can change them.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG05", "stack": "frappe", "text": "Read child-table values from the browser with frappe.client.get_value and `parent` set. frappe.db.get_value on a child DocType returns only the name.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG06", "stack": "frappe", "text": "Set a custom new-record dialog in the listview `primary_action`. Frappe 16 resets the Add button after listview onload.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG07", "stack": "frappe", "text": "Follow `amended_from` in submit hooks, or block amending system-made documents. Cancel-then-Amend gives the document a new name.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG08", "stack": "frappe", "text": "Take the row lock first in the transaction, or read balances with locking reads. After a plain read, MariaDB keeps the old snapshot.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG09", "stack": "frappe", "text": "Load the same app checkout for every bench call on a site. Clear the site cache after a call that did not. Redis caches the module map per site.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG10", "stack": "frappe", "text": "Rename an app in this order: add the new package beside the old one, switch the dependents, rename each site, migrate, remove the old package. Rehearse it on a throwaway site with its own apps file.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG11", "stack": "frappe", "text": "Read dict hooks per app in install order; Frappe merges them into lists of values. In hook tests, assert on the doctype keys and add a positive control.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG12", "stack": "frappe", "text": "Fill the item-wise rates JSON for every item when a script sets a Bill of Entry IGST row to Actual. India Compliance rejects an empty JSON.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG13", "stack": "frappe", "text": "Wrap the ERPNext test bootstrap to relax only the India Compliance checks it fails: zero-rate template, no HSN, non-GST state. Load test data once on the baseline site.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG14", "stack": "frappe", "text": "Translate labels at request time only. A translation at module import freezes the first request's language in each worker.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG15", "stack": "frappe", "text": "Put the nvm Node 24 folder first on PATH before get-app or build on a server. A non-interactive ssh shell picks the system Node.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "FG16", "stack": "frappe", "text": "Patch shared dicts once in the main thread, around the worker threads. mock.patch.dict inside a thread leaks the patched value.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG01", "stack": "nextjs", "text": "Read every statement that Payload migrate:create generates. Strip changes outside your collections, and list that drift in the PR.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG02", "stack": "nextjs", "text": "Start Web Workers inline from a blob URL at module load, before long synchronous work. Allow blob: workers in the CSP. Chrome starts a URL worker only on a free main-thread task.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG03", "stack": "nextjs", "text": "Add a silence watchdog to WebRTC guests (about 12 s without host messages). A crashed host leaves the data channel open, and close never fires.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG04", "stack": "nextjs", "text": "Build production in a checkout with its own dependencies and env, or use the release image build as the check. Worktree builds fail on symlinked node_modules and blocked env files.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG05", "stack": "nextjs", "text": "Compose TonalDepth pages without a bare main element, and write actions as buttons. Compat styles hit a bare main, and link colour beats component classes.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG06", "stack": "nextjs", "text": "Check layouts at the real inner width; the browser pane can be narrower than requested. Test a minimum width per main area, and set the theme per check. Confirm that the pane is visible; a hidden pane freezes animations.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG07", "stack": "nextjs", "text": "Read the Meta Embedded Signup phone and account IDs from the popup message event. Request contacts and history sync right after onboarding; that window closes after 24 hours.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "NG08", "stack": "nextjs", "text": "Attach Playwright to an Android WebView through its Android device API, not plain CDP. Clear colour-scheme emulation before theme checks.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "RG01", "stack": "rust", "text": "Add the register and remove listener commands to the command list and default permissions of a Tauri 2 mobile plugin. Then test on an emulator. Without them, events never reach the UI.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "RG02", "stack": "rust", "text": "Request the local network permission in Android 17 (API 37) apps that reach private addresses. Debug builds always need it; release builds need it only for private LAN servers.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "EG01", "stack": "enterprise", "text": "Read a payout balance as of the run date, or block overlapping runs. Test out-of-order periods; mixed dates once paid one balance twice.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "EG02", "stack": "enterprise", "text": "Cap the text length before PII regexes, and keep dates out of the phone pattern. Test date-plus-phone strings; long text made the email pattern quadratic.", "source": "inbox", "added": "2026-11-17" },
+    { "id": "EG04", "stack": "enterprise", "text": "Start local test servers with an allow-list of env vars, such as the database URL and app secret. A full env file can reach real ERP, push and mail services.", "source": "inbox", "added": "2026-11-17" }
   ]
 }
