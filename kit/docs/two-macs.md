@@ -20,23 +20,24 @@ For one person who works on the same projects on two Macs (here a MacBook Air an
   - SessionStart commits leftovers and pulls first. It clones a placeholder folder on demand, and it shows a paused repo so Claude can help clear it.
   - Stop (end of each turn) commits and pushes. On a conflict it asks Claude once to resolve it.
   - SessionEnd folds a temporary device worktree (`air/<task>`) into `wip` and removes it.
-- **The shared folder** is one Syncthing folder, id `shared`, on both Macs (here `/Volumes/Extreme/Shared` and `/Volumes/bay/Shared`). It holds the registry, secrets and non-code folders. No other Syncthing folder is used for this.
-- **The registry** `<shared>/coding/repos.json` lists every repo: its path relative to the coding root, the remote, the main branch, and a mode. `live` syncs `wip`. `pull` is for third-party clones: fetch and fast-forward only, never committed. `off` is not synced. The shared folder syncs through Syncthing. A Syncthing conflict copy of the registry is merged automatically.
+- **The shared root** is the subfolder `0000.codesync` of the Syncthing "default" folder on each Mac (here `/Volumes/Extreme/Sync/0000.codesync`, on the mini `/Volumes/bay/Sync/0000.codesync`). The kit finds it from the Syncthing config; `--shared-root <dir>` overrides it. It holds the registry (`coding/repos.json`), secrets (`secrets/`), non-code folders and the Mac mini freeze (`_mini-freeze/`). Nothing else in the "default" folder is touched.
+- **The registry** `<shared root>/coding/repos.json` lists every repo: its path relative to the coding root, the remote, the main branch, and a mode. `live` syncs `wip`. `pull` is for third-party clones: fetch and fast-forward only, never committed. `off` is not synced. The shared root syncs through Syncthing. A Syncthing conflict copy of the registry is merged automatically.
 - **Only active projects are cloned.**
   - A registry repo missing on a Mac is an empty placeholder folder. Opening it in Claude makes a partial clone (`--filter=blob:none`; Scalar for repos with more than 5,000 files).
   - A `live` repo untouched for 30 days goes back to a placeholder, but only when it is clean and pushed, with no stash, no worktree and no ignored files other than caches. `keep: true` and `frappe*/` repos are never pruned.
   - Each week, git-ignored `.next`, `dist` and `.turbo` folders are removed in projects idle for 14 days.
-- **Secrets** live in `<shared>/secrets/<repo path>/` and are linked into the repo. `secrets.mjs adopt` moves them there; `secrets.mjs link` recreates the links on the other Mac. Git never sees them.
+- **Secrets** live in `<shared root>/secrets/<repo path>/` and are linked into the repo. `secrets.mjs adopt` moves them there; `secrets.mjs link` recreates the links on the other Mac. Git never sees them.
 
 ## Setup (once per Mac)
 
 ```bash
-node ~/mithtech-claude-kit/kit/install.mjs --live-sync --shared-root /Volumes/Extreme/Shared
+node ~/mithtech-claude-kit/kit/install.mjs --live-sync --shared-root auto
 node ~/mithtech-claude-kit/kit/scripts/livesync.mjs register --mode off
 node ~/mithtech-claude-kit/kit/install.mjs --doctor
 ```
 
 - `--live-sync` loads the job, sets `CODING_ROOT` and `SHARED_ROOT`, and installs pnpm and gh if they are missing. Turn it off with `--no-live-sync`.
+- `--shared-root auto` uses `<Syncthing "default" folder>/0000.codesync`. Create that folder once; Syncthing then syncs it to the other Mac.
 - `register --mode off` adds every local repo with a remote as `off`. Switch a repo on when its `main` is clean: `livesync.mjs register --set <path>=live`.
 - In the Claude desktop app, set the Code tab branch prefix to the device prefix (`air` or `mini`).
 
@@ -79,8 +80,8 @@ Log: `~/.claude/mithtech-livesync.log`.
 
 Run these steps on the Mac mini after the MacBook Air has consolidated every repo onto `main` and switched it to `live`. Work may have happened on the mini after its freeze, so capture it before any reset.
 
-1. Pull the kit and install it with live sync: `git -C ~/mithtech-claude-kit pull --ff-only`, then `node ~/mithtech-claude-kit/kit/install.mjs --live-sync --shared-root /Volumes/bay/Shared` (use the mini's real Shared path). Check that the device prefix is `mini`.
-2. Syncthing: remove the "coding" folder. Add the folder id `shared` (label "Shared") at `/Volumes/bay/Shared`, shared with the MacBook Air (`/Volumes/Extreme/Shared` there). Never touch the "default" folder. Wait until the registry `Shared/coding/repos.json` has arrived.
+1. Pull the kit and install it with live sync: `git -C ~/mithtech-claude-kit pull --ff-only`, then `node ~/mithtech-claude-kit/kit/install.mjs --live-sync --shared-root auto`. Check that the device prefix is `mini` and that doctor shows the shared root `/Volumes/bay/Sync/0000.codesync`.
+2. Syncthing: remove the "coding" folder. Add no other folder: the existing "default" folder carries `0000.codesync`. Do not change, move or delete anything else in the "default" folder. Wait until `Sync/0000.codesync/coding/repos.json` has arrived.
 3. Capture post-freeze work in every repo, before any reset:
    - compare local refs and the working tree with the freeze (the `mini/*` branches on GitHub and the bundles);
    - commit any new dirty work;

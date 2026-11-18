@@ -412,3 +412,20 @@ export function syncthingFolders(home) {
   }
   return [];
 }
+// Path of one Syncthing folder by id (for example "default"), or null.
+export function syncthingFolder(home, id) {
+  for (const f of [path.join(home, 'Library', 'Application Support', 'Syncthing', 'config.xml'), path.join(home, '.local', 'state', 'syncthing', 'config.xml'), path.join(home, '.config', 'syncthing', 'config.xml')]) {
+    let x; try { x = fs.readFileSync(f, 'utf8'); } catch { continue; }
+    for (const m of x.matchAll(/<folder\b[^>]*>/g)) {
+      const fid = (m[0].match(/\bid="([^"]*)"/) || [])[1], fp = (m[0].match(/\bpath="([^"]*)"/) || [])[1];
+      if (fid === id && fp) return fp.replace(/^~(?=\/)/, home);
+    }
+  }
+  return null;
+}
+// Shared sync data lives in one subfolder of the Syncthing "default" folder, on every Mac.
+export const SHARED_SUBDIR = '0000.codesync';
+export function defaultSharedRoot(home) {
+  const d = syncthingFolder(home, 'default');
+  return d ? path.join(d, SHARED_SUBDIR) : null;
+}

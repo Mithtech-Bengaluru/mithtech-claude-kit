@@ -14,15 +14,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { CLAUDE_DIR, localConfig, readJSON, writeJSON } from '../lib/common.mjs';
+import { CLAUDE_DIR, HOME, localConfig, readJSON, writeJSON } from '../lib/common.mjs';
 import * as L from '../lib/livesync.mjs';
 
 export const STATE_FILE = path.join(CLAUDE_DIR, 'mithtech-livesync.state.json');
 export const LOG_FILE = path.join(CLAUDE_DIR, 'mithtech-livesync.log');
 
-export function liveConfig(cfg = localConfig()) {
+// sharedRoot: an explicit path in the local config, else <Syncthing "default" folder>/0000.codesync on this Mac.
+export function liveConfig(cfg = localConfig(), home = HOME) {
   const root = process.env.CODING_ROOT || cfg.codingRoot || null;
-  const shared = process.env.SHARED_ROOT || cfg.sharedRoot || null;
+  const shared = cfg.sharedRoot || L.defaultSharedRoot(home) || process.env.SHARED_ROOT || null;
   return {
     ...L.DEFAULTS, ...(cfg.liveSyncOptions || {}),
     enabled: !!cfg.liveSync, root, shared, device: cfg.devicePrefix || 'dev',
@@ -67,7 +68,7 @@ export function runJob(c, { force = false } = {}) {
   const out = [];
   try {
     if (!c.root || !fs.existsSync(c.root)) return [`coding root ${c.root || '(unset)'} not mounted`];
-    if (!c.registry) return ['no sharedRoot in the local config'];
+    if (!c.registry) return ['no shared root: no Syncthing "default" folder and no sharedRoot in the local config'];
     const due = (k, h) => force || !st[k] || Date.now() - Date.parse(st[k]) > h * 3600e3;
     let { repos, copies } = L.readRegistry(c.registry);
     if (due('lastHourly', 1) || copies.length) {
@@ -171,7 +172,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const r = L.cloneRepo(c.root, pos[0], e, c);
     console.log(`${pos[0]}: ${r.note}`); process.exit(r.ok ? 0 : 1);
   } else if (cmd === 'register') {
-    if (!c.root || !c.registry) die('set codingRoot and sharedRoot (node kit/install.mjs --live-sync --shared-root <dir>)');
+    if (!c.root || !c.registry) die('set codingRoot, and a Syncthing "default" folder (or --shared-root <dir>) (node kit/install.mjs --live-sync)');
     const { repos, copies } = L.readRegistry(c.registry);
     const r = L.register(c.root, repos, { mode: val('--mode') || c.newRepoMode || 'off', ownOwners: c.ownOwners });
     for (let i = 0; i < args.length; i++) if (args[i] === '--set') {
