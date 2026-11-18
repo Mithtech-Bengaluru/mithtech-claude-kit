@@ -141,7 +141,8 @@ export function commitAll(dir, { maxMB = DEFAULTS.maxMB, shared = null, device =
   }
   if (g(dir, 'diff', '--cached', '--quiet').code === 0) return { committed: 0, refused };
   const n = g(dir, 'diff', '--cached', '--name-only').out.split('\n').filter(Boolean).length;
-  const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+  const d = new Date(), z = (x) => String(x).padStart(2, '0');
+  const stamp = `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
   const r = g(dir, 'commit', '--no-verify', '-q', '-m', `sync(${device}): ${n} file${n === 1 ? '' : 's'}, ${stamp}`);
   return { committed: r.code === 0 ? n : 0, refused, error: r.code ? r.err : null };
 }
@@ -198,7 +199,7 @@ export function syncRepo(dir, o = {}) {
       out.pulled = behind;
     }
   }
-  const ahead = hasUp ? Number(g(dir, 'rev-list', '--count', '@{u}..HEAD').out || 0) : 1;
+  const ahead = hasUp ? Number(g(dir, 'rev-list', '--count', '@{u}..HEAD').out || 0) : Math.max(1, Number(g(dir, 'rev-list', '--count', 'HEAD', '--not', '--remotes').out || 0));
   if (ahead) {
     if (PROTECTED.test(branch) || branch === opt.main) return { ...out, status: 'error', note: `refusing to push ${branch}` };
     let p = g(dir, 'push', '-q', ...(hasUp ? [] : ['-u']), 'origin', `HEAD:refs/heads/${branch}`);
@@ -209,7 +210,7 @@ export function syncRepo(dir, o = {}) {
       p = g(dir, 'push', '-q', 'origin', `HEAD:refs/heads/${branch}`);
     }
     if (p.code) return { ...out, status: 'error', note: `push failed: ${p.err.split('\n')[0]}` };
-    out.pushed = hasUp ? ahead : Number(g(dir, 'rev-list', '--count', 'HEAD').out || 0);
+    out.pushed = ahead;
   }
   return out;
 }

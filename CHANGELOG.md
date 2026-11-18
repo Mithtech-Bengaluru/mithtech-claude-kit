@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.2
+- Live sync: sync commits use local time; a first push reports only new commits. Doctor checks Scalar with `scalar version`. The installer reloads the live sync job when it is not loaded. Kit gate in `.claude/gate` for `git ship`. First release shipped through live sync and `git ship`.
+
 ## 1.4.1
 - Live sync: repos the job (or `register`) finds start as `off`, never `live`; a repo goes live only by `livesync.mjs register --set <path>=live` (or `newRepoMode` in the local config). Found when the first job run on an empty registry marked 82 own repos live (stopped before it touched any repo).
 
