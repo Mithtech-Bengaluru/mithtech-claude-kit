@@ -6,6 +6,7 @@ import { KIT } from '../lib/common.mjs';
 import * as L from '../lib/livesync.mjs';
 import { findGate, prBody } from '../scripts/ship.mjs';
 import { adopt, link } from '../scripts/secrets.mjs';
+import { liveConfig } from '../scripts/livesync.mjs';
 
 export function liveSyncTests(t, tmp, baseEnv) {
   const T = path.join(tmp, 'live');
@@ -76,7 +77,7 @@ export function liveSyncTests(t, tmp, baseEnv) {
 
   // refusals
   write(path.join(M, '.env.local'), 'KEY=1\n'); write(path.join(M, '.env.example'), 'KEY=\n');
-  write(path.join(M, 'keys/id.txt'), '-----BEGIN OPENSSH PRIVATE KEY-----\nabc\n');
+  write(path.join(M, 'keys/id.txt'), ['-----BEGIN', 'OPENSSH PRIVATE KEY-----'].join(' ') + '\nabc\n');
   write(path.join(M, 'big.bin'), Buffer.alloc(1.5 * 1024 * 1024));
   write(path.join(M, 'ok.txt'), 'fine\n');
   r = L.syncRepo(M, opts);
@@ -218,5 +219,9 @@ export function liveSyncTests(t, tmp, baseEnv) {
   t('device prefix from host name', L.devicePrefix('Manojs-MacBook-Air.local') === 'air' && L.devicePrefix("Manoj's Mac mini") === 'mini' && L.devicePrefix('Studio.lan') === 'studio');
   const fh = path.join(T, 'home'); write(path.join(fh, 'Library', 'Application Support', 'Syncthing', 'config.xml'), '<configuration><folder id="default" label="Default" path="/Volumes/X/Sync" type="sendreceive"></folder><folder id="c" path="~/Coding"></folder></configuration>');
   t('syncthing: reads shared folder paths', L.syncthingFolders(fh).join() === `/Volumes/X/Sync,${fh}/Coding`);
+  t('syncthing: folder path by id', L.syncthingFolder(fh, 'default') === '/Volumes/X/Sync' && L.syncthingFolder(fh, 'nope') === null);
+  t('shared root: <default folder>/0000.codesync unless set', L.defaultSharedRoot(fh) === '/Volumes/X/Sync/0000.codesync'
+    && liveConfig({}, fh).shared === '/Volumes/X/Sync/0000.codesync' && liveConfig({ sharedRoot: '/x' }, fh).shared === '/x'
+    && liveConfig({}, fh).registry === '/Volumes/X/Sync/0000.codesync/coding/repos.json');
   t('main on the remote never moved (whole suite)', git(bare, 'rev-parse', 'main').out === mainSha);
 }
