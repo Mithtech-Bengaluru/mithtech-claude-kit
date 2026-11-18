@@ -300,6 +300,29 @@ t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
   liveSyncTests(t, tmp, env);
 }
 
+// project CLAUDE.md updater: marked blocks refresh, old template files need --adopt, other files stay
+{
+  const cr = path.join(tmp, 'coding');
+  const mk = (rel, text) => { fs.mkdirSync(path.join(cr, rel), { recursive: true }); spawnSync('git', ['init', '-q', path.join(cr, rel)]); fs.writeFileSync(path.join(cr, rel, 'CLAUDE.md'), text); };
+  mk('a', '# A\n## Gate\n- npm test\n\n<!-- mithtech-kit:project skill=nextjs-js v=0.1.0 -->\n## Kit\n- old line\n<!-- mithtech-kit:end -->\n');
+  const oldB = '# B\n## Gate (must pass before "done")\n- cargo test\n\n## OWN vs VENDORED\n- OWN: src\nVendored paths are listed in `.claude/vendored.txt`; the kit guard blocks edits there.\n\n## Project hard rules\n- Follow the Mithtech kit rules (global CLAUDE.md) and the rust-dev skill.\n- Keep crate x small.\n\nCurrent state and history: [HANDOFF.md](HANDOFF.md).\n';
+  mk('b', oldB);
+  mk('c', '# C\nfree notes\n');
+  const up = (...a) => spawnSync(process.execPath, [path.join(KIT, 'install.mjs'), '--update-projects', '--coding-root', cr, ...a], { env, encoding: 'utf8' });
+  const rd = (r) => fs.readFileSync(path.join(cr, r, 'CLAUDE.md'), 'utf8');
+  const d = up('--dry-run');
+  t('project md dry run changes nothing', /would update 1/.test(d.stdout) && rd('a').includes('- old line'), d.stdout + d.stderr);
+  const u = up();
+  t('project md marked block refreshed', !rd('a').includes('- old line') && rd('a').includes('nextjs-js skill') && rd('a').startsWith('# A\n## Gate\n- npm test\n'), u.stdout + u.stderr);
+  t('project md old template needs a yes', rd('b') === oldB && /old template, needs a yes/.test(u.stdout));
+  t('project md free-form file untouched', rd('c') === '# C\nfree notes\n');
+  up('--adopt', path.join(cr, 'b', 'CLAUDE.md'));
+  const b = rd('b');
+  t('project md adopt wraps the kit lines', b.includes('<!-- mithtech-kit:project skill=rust-dev') && b.includes('- Keep crate x small.') && (b.match(/HANDOFF\.md\]/g) || []).length === 1 && !b.includes('blocks edits there.\n'), b);
+  t('project md backup kept', fs.readdirSync(path.join(cr, 'b')).some((f) => f.startsWith('CLAUDE.md.bak-')));
+  t('project templates carry the kit block', fs.readdirSync(path.join(KIT, 'templates')).filter((f) => /^CLAUDE\..+\.md$/.test(f)).every((f) => fs.readFileSync(path.join(KIT, 'templates', f), 'utf8').includes('{{KIT_BLOCK}}')));
+}
+
 // generated files in sync
 const rc = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'rules.mjs'), '--check'], { encoding: 'utf8' });
 t('RULES.md and skill blocks in sync', rc.status === 0, rc.stderr.trim());

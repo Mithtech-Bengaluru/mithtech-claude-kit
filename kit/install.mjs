@@ -4,6 +4,7 @@
 //   node kit/install.mjs --update       after a pull (also run by the self-updater)
 //   node kit/install.mjs --doctor [--probe-models]   checks and fixes new conflicts
 //   node kit/install.mjs --uninstall    remove the kit and restore backups
+//   node kit/install.mjs --update-projects [--dry-run] [--adopt <CLAUDE.md>]   refresh the kit block in project CLAUDE.md files
 //   Every run also syncs skills with the master list (kit/registry/skills.json on main).
 // Options: --coding-root <dir>, --machine <name>, --device-prefix <air|mini|...>, --quiet, --dry-run
 //   --live-sync / --no-live-sync, --shared-root <dir>: live git sync between one person's Macs (kit/docs/two-macs.md)
@@ -120,6 +121,56 @@ function writeGlobalMd() {
   if (next === cur) return 'global CLAUDE.md up to date';
   if (!dry) { if (cur) backup(GLOBAL_MD); else recordCreated(GLOBAL_MD); fs.writeFileSync(GLOBAL_MD, next); }
   return cur ? 'global CLAUDE.md updated' : 'global CLAUDE.md created';
+}
+
+// ---------- project CLAUDE.md files (from kit/templates/CLAUDE.<stack>.md) ----------
+// The kit owns only the block between PS... and KE. Marked files and {{KIT_BLOCK}} placeholders update
+// automatically; an old unmarked template file changes only with --adopt <its path> (one per yes).
+const PS = '<!-- mithtech-kit:project';
+const OLD_KIT_LINES = [/^- Follow the Mithtech kit rules \(global CLAUDE\.md\) and the [\w-]+ skill\.?\s*$/, /^Vendored paths are listed in `\.claude\/vendored\.txt`;.*$/, /^Current state and history: \[HANDOFF\.md\]\(HANDOFF\.md\)\.?\s*$/];
+function projectBlock(skill) {
+  return [`${PS} skill=${skill} v=${kitVersion()} -->`, '## Kit',
+    `- Follow the Mithtech kit rules (global CLAUDE.md) and the ${skill} skill.`,
+    '- Vendored paths are listed in `.claude/vendored.txt`; the kit guard blocks edits there (rule E09).',
+    '- Production deploys and production data changes need explicit approval (rule E08).',
+    '- Current state and history: [HANDOFF.md](HANDOFF.md).', KE].join('\n');
+}
+const skillOf = (text) => (text.match(/skill=([\w-]+)/) || text.match(/and the ([\w-]+) skill/) || [, 'other-stack'])[1];
+function refreshProjectMd(text, { adopt = false } = {}) {
+  const i = text.indexOf(PS), j = i >= 0 ? text.indexOf(KE, i) : -1;
+  if (i >= 0 && j > i) { const next = text.slice(0, i) + projectBlock(skillOf(text.slice(i, j))) + text.slice(j + KE.length); return { kind: 'marked', next }; }
+  if (text.includes('{{KIT_BLOCK}}')) return { kind: 'placeholder', next: text.replace('{{KIT_BLOCK}}', projectBlock(skillOf(text))) };
+  if (!/^## OWN vs VENDORED/m.test(text) || !/^## Gate/m.test(text)) return { kind: 'other', next: text };
+  if (!adopt) return { kind: 'old', next: text };
+  const kept = text.split('\n').filter((l) => !OLD_KIT_LINES.some((re) => re.test(l))).join('\n').trimEnd();
+  return { kind: 'old', next: `${kept}\n\n${projectBlock(skillOf(text))}\n` };
+}
+function projectMds(root) {
+  const skip = new Set();
+  try { const reg = LS.readRegistry(liveConfig().registry); for (const [rel, e] of Object.entries(reg?.repos || {})) if (e.mode === 'pull') skip.add(rel); } catch {}
+  const files = new Set();
+  for (const rel of LS.findRepos(root)) if (!skip.has(rel)) for (const f of ['CLAUDE.md', '.claude/CLAUDE.md']) { const p = path.join(root, rel, f); if (exists(p)) files.add(p); }
+  try { for (const d of fs.readdirSync(root)) { const p = path.join(root, d, 'CLAUDE.md'); if (exists(p) && !skip.has(d)) files.add(p); } } catch {}
+  return [...files].sort();
+}
+function updateProjects() {
+  const root = val('--coding-root') || localConfig().codingRoot;
+  if (!root || !exists(root)) return ['FAIL coding root not set or not mounted (--coding-root <dir>)'];
+  const adopt = new Set(args.filter((a, k) => args[k - 1] === '--adopt').map((a) => path.resolve(a)));
+  const n = { updated: [], current: 0, old: [], other: 0 };
+  for (const f of projectMds(root)) {
+    const cur = readText(f);
+    const r = refreshProjectMd(cur, { adopt: adopt.has(f) });
+    if (r.kind === 'other') { n.other++; continue; }
+    if (r.kind === 'old' && r.next === cur) { n.old.push(f); continue; }
+    if (r.next === cur) { n.current++; continue; }
+    if (!dry) { backup(f); fs.writeFileSync(f, r.next); }
+    n.updated.push(path.relative(root, f));
+  }
+  const out = [`project CLAUDE.md: ${dry ? 'would update' : 'updated'} ${n.updated.length}, current ${n.current}, not kit-made ${n.other}, old template ${n.old.length}`];
+  for (const f of n.updated) out.push(`  ${dry ? 'would update' : 'updated'} ${f}`);
+  for (const f of n.old) out.push(`  old template, needs a yes: node ${kitPathFwd}/kit/install.mjs --update-projects --adopt ${f}`);
+  return out;
 }
 
 // ---------- conflicts ----------
@@ -332,6 +383,7 @@ if (!exists(CLAUDE_DIR)) fs.mkdirSync(CLAUDE_DIR, { recursive: true });
 
 let out = [];
 if (has('--uninstall')) out = uninstall();
+else if (has('--update-projects')) out = updateProjects();
 else if (has('--doctor')) { ensureLocalConfig(); out = doctor(); }
 else {
   const cfg = ensureLocalConfig();

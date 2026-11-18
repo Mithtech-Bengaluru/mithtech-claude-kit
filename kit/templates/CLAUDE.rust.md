@@ -18,17 +18,15 @@ Purpose: {{PURPOSE}}
 ## OWN vs VENDORED
 - OWN: all workspace crates
 - VENDORED: `target/`, `vendor/` (if present), generated code
-Vendored paths are listed in `.claude/vendored.txt`; the kit guard blocks edits there (rule E09).
 
 ## Project hard rules
-- Follow the Mithtech kit rules (global CLAUDE.md) and the rust-dev skill.
 {{HARD_RULES}}
 
 ## Data home and deploy
 - Data home: {{DATA_HOME}}
-- Default branch: {{BRANCH}}. Staging: {{STAGING}}. Production: {{PRODUCTION}} (needs an explicit yes).
+- Default branch: {{BRANCH}}. Staging: {{STAGING}}. Production: {{PRODUCTION}}.
 
 ## Gotchas (max 15 lines)
 {{GOTCHAS}}
 
-Current state and history: [HANDOFF.md](HANDOFF.md).
+{{KIT_BLOCK}}
