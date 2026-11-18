@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Brag and promo videos were saved inside project folders as untracked promo_video folders, up to 369 MB per repo.",
+  "fix": "Owner rule: save every brag or promo video in the coding root folder 000.Video, one subfolder per repo, never inside a repo.",
+  "project": "two-macs",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-18T09:52:13.802Z"
+}

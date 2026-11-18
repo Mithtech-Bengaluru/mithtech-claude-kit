@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Kit test cleanup failed about half the runs with ENOTEMPTY because detached hook children still wrote into the temp dir",
+  "fix": "Remove test temp dirs with rmSync maxRetries and retryDelay",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-18T09:14:49.523Z"
+}
