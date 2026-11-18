@@ -41,13 +41,13 @@ node kit/scripts/skills.mjs sync [--dry-run] [--force]
 This computer's own record is `~/.claude/mithtech-skills.local.json`. Skills the kit did not install are never touched; existing ones are adopted. Removed skills go to `~/.claude/skills/.trash`. Opt a computer out of a skill with `skillsExclude` in `~/.claude/mithtech-kit.local.json`. Sync only copies files from the pinned commit and runs no third-party script. Anyone who can push to main can add a source, so review `git log -- kit/registry` and read a new skill before you trust it.
 
 ## Layout
-- `kit/`: the plugin (`skills/`, `agents/`, `hooks/`, `registry/`), `install.mjs`, `maintain.mjs`, `review.mjs`, `dupcheck.mjs`, `driftcheck.mjs`, `index.mjs`, `routing.json`, `rules.json` (source of `RULES.md`), `templates/`, `patterns/`, `tests/`, `docs/two-macs.md` (opt-in live git sync between one person's Macs; `git ship`).
+- `kit/`: the plugin (`skills/`, `agents/`, `hooks/`, `registry/`), `install.mjs`, `maintain.mjs`, `review.mjs`, `dupcheck.mjs`, `driftcheck.mjs`, `index.mjs`, `routing.json`, `rules.json` (the one home of every rule and lesson; source of `RULES.md`, the global CLAUDE.md template and the skill rule blocks), `templates/`, `patterns/`, `tests/`, `docs/two-macs.md` (opt-in live git sync between one person's Macs; `git ship`).
 - `catalog/`: Mithtech apps and plugins (G0 searches it). `docs/naming-audit.md`: naming report.
-- `RULES.md`: the same rules for people, generated from `kit/rules.json`. `SKILLS.md`: the skill list and how to use each skill, generated from `kit/registry/skills.json`.
-- `ClaudeSetup.md`: the prompt that built this kit. `archive/`: older versions.
+- `RULES.md`: the rules for people, generated from `kit/rules.json`; other files cite rule ids. `SKILLS.md`: the skill list and how to use each skill, generated from `kit/registry/skills.json`.
+- `ClaudeSetup.md`: the prompt that built this kit; its rules cite ids in `kit/rules.json`.
 
 ## GitHub plan
-Mithtech uses GitHub Free. No GitHub Actions CI, required status checks, Codespaces, Copilot or other paid features. Every test and gate runs locally (or on the home cluster with Offload) before a push to main; the commit message records the gate result. Kit tests: `node kit/tests/run.mjs`.
+Mithtech uses GitHub Free (rule E12). Kit tests: `node kit/tests/run.mjs`.
 
 ## Security
-The repo is public and its code runs on every developer's machine. `main` is the only branch: no force-push and no deletion (repository ruleset), but any org member with write access commits to it directly, so read every diff you pull; only maintainers create release tags; the updater refuses tags whose commit is not on main. No hostnames, IPs, customer names, registry URLs or secrets in this repo: those go in each machine's local config.
+The repo is public and its code runs on every developer's machine. `main` changes only through pull requests (`git ship`, rule E07); `wip` is the live sync branch (rule E13). No force-push and no deletion of `main` (repository ruleset). Any org member with write access can merge, so read every diff you pull; only maintainers create release tags; the updater refuses tags whose commit is not on main. No hostnames, IPs, customer names, registry URLs or secrets in this repo: those go in each machine's local config.

@@ -303,7 +303,7 @@ t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
 const rc = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'rules.mjs'), '--check'], { encoding: 'utf8' });
 t('RULES.md and skill blocks in sync', rc.status === 0, rc.stderr.trim());
 
-fs.rmSync(tmp, { recursive: true, force: true });
+fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); // detached hook children may still write here
 const failed = results.filter((r) => !r.ok);
 if (!quiet) for (const r of results) console.log(`${r.ok ? 'ok  ' : 'FAIL'} ${r.name}${r.detail && !r.ok ? ` (${r.detail})` : ''}`);
 else for (const r of failed) console.log(`FAIL ${r.name}${r.detail ? ` (${r.detail})` : ''}`);

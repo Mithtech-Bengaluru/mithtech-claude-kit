@@ -11,7 +11,7 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 - No secrets in any file; name env variables only. Never read credentials folders or .env files.
 - PHASE A (read-only): discover, then show me one short plan: files to create or change, and backups. Wait for my yes. PHASE B: write.
 - During setup do not build, install project deps, migrate, start servers or run project tests.
-- Talk to me in the kit's style (section 3.1, COMMUNICATION). One question at a time, as clickable options.
+- Talk to me in the kit's style: rules C01 to C08 in `kit/rules.json`.
 
 # 1. DISTRIBUTION AND SELF-UPDATE
 - The folder holding this prompt is the git repo Mithtech-Bengaluru/mithtech-claude-kit (public, the only copy). Build the kit into `kit/` inside it. People install from a shared copy of the folder or a clone.
@@ -47,41 +47,15 @@ Goals, in order: 1) quality work that reuses what exists, keeps a single source 
 # 3. KIT CONTENTS
 
 ## 3.0 Mithtech naming and app layering (applies to every project)
-- FRAPPE: every Frappe app Mithtech builds is named `framith_<name>` (snake_case).
-  - GENERIC FIRST: product features are built as generic, configurable apps, `framith_<product>` (for example framith_fieldops, framith_kyc). Behaviour that differs between customers is a setting in the app's Single Settings DocType, never a customer check in code.
-  - CUSTOMER LAYER: each customer gets one app `framith_<customer>` that lists the generic apps in required_apps and holds only that customer's Custom Fields, Property Setters, print formats, workspaces, fixtures and small overrides. No generic logic in a customer app; no customer logic in a generic app; never fork a generic app per customer.
-  - When a customer asks for something: if other customers could use it, build it in the generic app behind a setting; otherwise put it in the customer app. State which and why.
-  - PACKAGE FOR PRODUCTION: Custom Fields, Property Setters, Server Scripts, Client Scripts and Customize Form changes made on a site are fine while working, but anything going to production must be packaged in an app: fixtures of the owning app (module set to that app's module, filtered fixtures) or install/patch code for fields and property setters; controllers, hooks and API files for server logic; the app's JS (doctype_js hooks) for client logic. Packaged changes are tested on a fresh site before release.
-  - SUGGEST, DON'T MOVE: when site-only customisations exist, remind the user and suggest which app each belongs in (generic framith_<product> if other customers could use it, framith_<customer> if not; on a live customer site, the customer's app), with the reason. Move nothing until the user approves each item; never move items at random or in bulk. After a move is approved and tested, offer to remove the database-only copy; remove it only on a yes.
-  - EXISTING NON-FRAMITH APPS (older customer or product apps with other names): be very careful. Report only: what's in them, what would change, the risk on live sites. Never rename, move, merge or delete their DocTypes, fields, fixtures or data without an approved plan, a backup, and a rehearsal on a copy of the site.
-  - DRIFT CHECK (`node kit/driftcheck.mjs <site>`, read-only, no tokens): lists Custom Fields, Property Setters, Server Scripts, Client Scripts, Print Formats, Reports and Workspaces that exist on the site but in no app, with the suggested app for each. It only reports. Run it before every production release and on live customer sites weekly.
-  - COMPLETE FEATURES: a generic app ships only when every requirement ID in its approved spec is built and tested. The checker blocks "done" while any ID is missing. Partial apps stay on a feature branch.
-- MEDUSA: every Medusa plugin, module or extension Mithtech builds is named `mithusa-<name>` (npm package; keep the registry scope we already use, verify it). Same layering: generic `mithusa-<feature>` plugins first; customer-only code lives in that customer's Medusa project (or `mithusa-<customer>` if several of their stores share it).
+- Naming and layering are rules E16, E03, E23, F01, F03, F10 to F12, F24, F25, M01, M02 and M11 in `kit/rules.json`.
 - OTHER STACKS: no prefix rule yet; keep repo names. New rules are added here through the kit repo.
 - NAMING AUDIT (report only): list every Mithtech-owned Frappe app and Medusa plugin that breaks these rules, with the proposed name, what a rename touches (Frappe: app and module names, DocType module fields, hooks, imports, fixtures, patches, installed apps on every site, repo name; Medusa: package name, imports, medusa-config, registry, dependants), the risk on live sites, and a suggested order. Write it to `docs/naming-audit.md` in the kit repo. Rename nothing; each rename is its own size-L program with gates and my approval.
 
 ## 3.1 Global CLAUDE.md (under 60 lines; loads in every session, so every line must earn its tokens)
-- READ FIRST: project CLAUDE.md, then HANDOFF.md, then only the docs your task needs. If the repo has its own coordinator/brief/contract workflow (for example FieldOps, merqPOS), follow it.
-- REUSE FIRST: before building anything, check the project's reuse index (.claude/index/), the Mithtech catalogue (kit `catalog/`), installed apps/modules/plugins and built-in platform features. If it exists or is easy to extend, STOP and tell me what and where, with extend-or-rebuild advice.
-- SINGLE SOURCE OF TRUTH: every master record and setting has one owner (an existing DocType, module or table). Never create a duplicate DocType, model, field, table or setting; link to the owner instead of copying.
-- NAMING AND LAYERING: section 3.0 rules (framith_, mithusa-, generic first, customer layer).
-- PLACEMENT: code goes in the existing app/module/plugin/crate that owns the domain. State where and why, with one alternative. New app/module/plugin/service needs my yes.
-- GATES: size every task (S/M/L, section 3.2) and pass its approval gates before building. Build only what was approved, and all of it.
-- PATTERNS: if a task matches a recipe in the kit's patterns, follow it and skip planning.
-- ROUTING: load the stack skill (frappe-dev, medusa-dev, nextjs-js, rust-dev, other-stack) plus enterprise-core for business logic. Multi-session work: orchestrate.
-- TOKENS: grep the index before reading code; read only needed lines; never re-read unchanged files; diffs, not full files; no echoing code; briefs, not pasted code; targeted tests while working, full gate once; no speculative features or extra dependencies.
-- SAFETY: never force-push or push to main/master/production unless I ask; production deploys and production data changes need my explicit yes; backup before migrate; never edit vendored/upstream code (frappe, erpnext, hrms, india_compliance and other third-party apps, @medusajs core, node_modules, generated code); never copy databases between machines without asking.
-- DONE = the project's gate passes, every approved requirement built and tested, no stub/mock on a feature claimed done, status updated.
-- RUNNING APPS: follow the coding root CLAUDE.md (Offload) when present.
-- COMMUNICATION: answer first. Label blocks **Telling** (facts, results, recommendations) and **Asking** (one question). At most 10 lines unless I ask for detail. No narration, no recap of what I said, no repeated questions.
-- QUESTIONS AS OPTIONS: ask with the clickable question tool (AskUserQuestion) whenever it is available: 2–4 options, the recommended one first and marked (Recommended), short labels. Use plain text only when the tool is unavailable (for example in headless runs).
-- CONFIRM FIRST (M and L tasks): before any work, restate the request in at most 7 bullets: Goal, In scope, Out of scope, Placement, Assumptions (only ones you can't check), Done when. Ask me to confirm with options (Correct / Change something). Skip for S tasks.
-- WRITING STYLE (ASD-STE100 writing rules, without the restricted dictionary): one idea per sentence; instructions max 20 words, descriptions max 25; active voice; instructions start with a verb; one term per meaning, used the same way every time; no noun clusters of more than 3 words. Applies to messages, RULES.md, briefs, packs and reports; not to code or logs.
-- FINAL REPORT (max 8 lines): branch, commits, gate result, deploy status, pending items, risks, tokens used vs budget.
+`node kit/scripts/rules.mjs` generates the template `kit/templates/global-CLAUDE.md` from the `kit/rules.json` groups with `skill: null`: the rules for every session, one line per concept, with their ids. Edit `kit/rules.json`, never the template.
 
 ## 3.2 Task sizes and approval gates (the orchestrate skill owns these)
-- S (bug fix, one field, one small change, or a pattern match): G0 reuse check in one line, then build.
-- M (one feature): CONFIRM FIRST bullets, G0, then ONE mini pack for approval: placement (generic or customer app), data changes (existing vs new), wireframe if it adds or changes a page, test plan, token estimate. Then build.
+- S and M: rule E04.
 - L (module, app or program): CONFIRM FIRST bullets, then the full gates, organised by TOGAF ADM (table below):
   - G0 REUSE: Haiku reads the reuse index and catalogue and lists, per requirement, exists / extend / new, with the owner.
   - G1 ARCHITECTURE (TOGAF-lite, one pack per module): business capabilities, application placement (generic framith_/mithusa- app vs customer app), data model marking reused vs extended vs new entities, integration flows, key decisions as ADRs. Diagrams in Mermaid.
@@ -150,33 +124,7 @@ Verify the current models (Haiku 5.5, Sonnet 5.5, Opus 5.5, Fable 5.1 at the tim
 - CI CHECK PER PROJECT: the same dupcheck plus naming and placement checks run on every pull request (local pre-push hook; no GitHub Actions, we use GitHub Free), so developers who don't use Claude follow the rules too.
 
 ## 3.6 Stack skills (short rules; loaded only when the stack matches)
-### frappe-dev
-- SINGLE SOURCE OF TRUTH: ERPNext/Frappe masters are the only owners of their data: Company, Customer, Supplier, Item, Item Group, UOM, Price List, Employee, Address, Contact, Account, Cost Center, Warehouse, Tax templates, and the masters of HRMS, India Compliance and our framith_ apps. Never create a DocType or field that duplicates one (for example a custom GSTIN field when India Compliance already has one, or a second wallet app). Link fields, not copied values; fetch_from for read-only display. Computed values aren't stored unless needed for performance, and then say why.
-- Classify every app as OWN or VENDORED (vendored includes our forks of frappe/erpnext). Never edit vendored apps unless I ask.
-- Generic framith_<product> app first, customer framith_<customer> app for customisations (section 3.0).
-- Extend first: Custom Fields, Property Setters, doc_events, override_doctype_class, hooks, standard reports, Print Designer, Workflows. New DocType only after G0 shows nothing to extend.
-- Check across our framith_ apps too: one domain, one owning app.
-- Logic for production lives in app code; site-only Server/Client Scripts and Customize Form changes are packaged into the suggested app before release, after the user approves (section 3.0). frappe.qb or get_all with explicit fields; no SQL concatenation; no get_doc in loops; db.get_value, bulk ops, frappe.enqueue (idempotent), frappe.cache, search_index on filtered fields.
-- Permissions: whitelisted functions check permissions; ignore_permissions only with a comment; roles and User Permissions, never hardcoded users; respect company filters.
-- Accounting: never write GL/Stock ledger rows by hand (use ERPNext controllers); respect submit/cancel/amend, accounting dimensions, fiscal years. Indian tax through india_compliance.
-- Settings in one Single "Settings" DocType per app; nothing hardcoded. Strings in _(). Naming series.
-- Distributable: fixtures filtered by module/app; idempotent patches in patches.txt; required_apps; version branch; README, CHANGELOG, semver; clean after_install/before_uninstall.
-- Gate: FrappeTestCase for every DocType touched; module tests while working, app tests before push; `bench --site <site> backup` before migrate; migrate automatically only on dev/test sites; `bench build --app <app>` for the changed app only.
-### medusa-dev
-- Detect the version; rules are for v2 (say so if v1).
-- Check built-in commerce modules, installed and our mithusa- plugins, src/modules, workflows and routes first. New project: check medusa-factory before hand-assembling.
-- PLACEMENT ORDER (state which and why): 1) the existing module/plugin that owns the domain, 2) a generic mithusa- plugin if reusable across clients, 3) the customer's project src/ if customer-only. New module/plugin needs my yes.
-- Extend, don't fork: module links, workflow hooks and steps, subscribers, src/api routes, admin widgets, Query for cross-module reads. ERPNext is the book of record for invoices and tax when connected; Medusa never recalculates statutory tax.
-- Logic in workflows with compensation; thin zod-validated routes; model.define; CLI migrations; no cross-module DB access; strict TS, no any; webhooks verified and idempotent.
-- Plugins: semver, @medusajs/* as peerDependencies, README + CHANGELOG, published to the private registry with the user's own npm config (never a token in a file).
-### nextjs-js
-Reuse components; no new framework or dependency without asking; config from env; accessibility and performance budgets; on CMS/marketing sites no URL may change and SEO checks must pass; lint, typecheck, format before commit.
-### rust-dev
-Core crates never depend on network or connectors; no unwrap/todo! on feature paths; clippy clean with repo config; `cargo test -p <crate>` while working, full gate before push; limit build parallelism; Tauri commands are thin wrappers over core; generated TS types committed.
-### other-stack
-For Go, Flutter, Python, TDL and anything else: read the project's CLAUDE.md for its gate; follow the stack's official style and linters; look up docs before writing unfamiliar APIs; same reuse, SSOT, placement and safety rules.
-### enterprise-core (for any business logic, all stacks)
-Tenant from the session, never the request; server-side permission plus record scope; money and quantities never floats, no money math in the UI; posted documents immutable, corrections are new documents; document and outbox row in one transaction; idempotency keys on commands and webhooks; retries with backoff and dead-letter; offline sync versioned with tested conflict rules; migrations backward-compatible; PII masked in logs; no N+1, paginate everything; a regression test for every bug fixed.
+Each stack skill (frappe-dev, medusa-dev, nextjs-js, rust-dev, other-stack, enterprise-core) gets its rules from its group in `kit/rules.json` and its lessons from `lessons` there, through `node kit/scripts/rules.mjs`. Never restate a rule in a skill; cite its id.
 
 ## 3.7 Patterns (kit `patterns/`, one short recipe each)
 Ready answers for common tasks so they skip planning: package site customisations (driftcheck, suggest the app per item, move only approved items, test on a fresh site, remove database-only copies only on a yes), field on a standard master (Custom Field + fixture in the right framith_ app), customer-specific print format, new setting (Single Settings DocType field), report on existing data (Query/Script Report, no new table), webhook in/out (signature check, idempotency key, background job, integration log), Medusa link to a core model, Medusa admin widget, scheduled job. Recipes grow through the learning loop.

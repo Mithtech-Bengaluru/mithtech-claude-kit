@@ -73,7 +73,7 @@ Log: `~/.claude/mithtech-livesync.log`.
 
 ## Rules
 
-- Rule E13: work on `wip`. Only `git ship` puts work on `main`. Never push `main` directly, never force-push, never commit a secret or a `*.sync-conflict-*` file.
+- Rules E07, E10 and E13 in `kit/rules.json` apply.
 - Never reset, delete or re-clone a repo before `livesync.mjs audit` shows it clean and pushed.
 
 ## Mac mini adopt

@@ -5,6 +5,9 @@ import path from 'node:path';
 import { KIT, CLAUDE_DIR, CONFLICT_LOG, readJSON, readText, writeJSON, backup, exists } from './common.mjs';
 
 const C = readJSON(path.join(KIT, 'conflicts.json'), { rules: [], settings: {} });
+// the replacement line is the kit rule itself, read from its one home in kit/rules.json
+const RULES = Object.fromEntries(readJSON(path.join(KIT, 'rules.json'), { groups: [] }).groups.flatMap((g) => g.rules.map((r) => [r.id, r.text])));
+const kitLine = (r) => (RULES[r.rule] ? `${r.rule} ${RULES[r.rule]}` : `kit rule ${r.rule}`);
 const KIT_START = '<!-- mithtech-kit:start -->', KIT_END = '<!-- mithtech-kit:end -->';
 const logLine = (o) => fs.appendFileSync(CONFLICT_LOG, JSON.stringify({ date: new Date().toISOString(), ...o }) + '\n');
 
@@ -72,7 +75,7 @@ export function scanConflicts(cfg, { dry = false } = {}) {
       if (inKit) return l;
       const r = hits.find((h) => new RegExp(h.re, 'i').test(clean(l)));
       if (!r) return l;
-      const nl = `${(l.match(/^\s*([-*]\s+)?/) || [''])[0]}[kit] ${r.kit}`;
+      const nl = `${(l.match(/^\s*([-*]\s+)?/) || [''])[0]}[kit] ${kitLine(r)}`;
       changes.push({ file, scope, rule: r.id, old: l.trim(), new: nl.trim() });
       changed = true;
       return nl;

@@ -20,7 +20,7 @@ Purpose: {{PURPOSE}}
 ## OWN vs VENDORED
 - OWN: {{OWN}}
 - VENDORED: `@medusajs/*`, `node_modules/`, generated `.medusa/`
-Vendored paths are listed in `.claude/vendored.txt`; the kit guard blocks edits there.
+Vendored paths are listed in `.claude/vendored.txt`; the kit guard blocks edits there (rule E09).
 
 ## Project hard rules
 - Follow the Mithtech kit rules (global CLAUDE.md) and the medusa-dev skill.

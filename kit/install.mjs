@@ -106,7 +106,10 @@ function mergeSettings() {
 
 // ---------- global CLAUDE.md ----------
 function writeGlobalMd() {
-  const tpl = readText(path.join(KIT, 'templates', 'global-CLAUDE.md')).replaceAll('{{KIT}}', `${kitPathFwd}/kit`).replaceAll('{{VERSION}}', kitVersion());
+  // Paths differ per Mac: <coding root> becomes this Mac's coding root when it is set.
+  const root = localConfig().codingRoot;
+  let tpl = readText(path.join(KIT, 'templates', 'global-CLAUDE.md')).replaceAll('{{KIT}}', `${kitPathFwd}/kit`).replaceAll('{{VERSION}}', kitVersion());
+  if (root) tpl = tpl.replaceAll('<coding root>', root.replaceAll('\\', '/'));
   const lines = tpl.trim().split('\n').length;
   if (lines > 58) throw new Error(`global CLAUDE.md template has ${lines} lines (limit 60)`);
   const block = `${KS}\n${tpl.trim()}\n${KE}`;

@@ -107,7 +107,7 @@ function benchSite({ w }, cfg) {
   const isDev = site && (rx(R.devSitePattern).test(site) || (cfg.devSites || []).includes(site));
   if (sub === 'migrate') {
     if (!site) return ask('bench migrate without --site runs on every site');
-    if (!isDev) return deny(`migrate on non-dev site ${site} is blocked`);
+    if (!isDev) return deny(`migrate on non-dev site ${site} is blocked (rule F22)`);
   }
   if (isDev && ['migrate', 'backup', 'run-tests'].includes(sub)) return { decision: 'allow', reason: `Mithtech kit: ${sub} on dev site ${site}.` };
   return null;
@@ -134,12 +134,12 @@ function bash(cmd, cwd, cfg) {
 function edit(abs, cwd) {
   const top = norm(git(path.dirname(abs), 'rev-parse', '--show-toplevel').out || cwd);
   const rel = abs.startsWith(top + '/') ? abs.slice(top.length + 1) : abs;
-  for (const g of R.alwaysVendored || []) if (globToRegex(g).test(abs)) return deny(`${rel} is vendored/generated; never edit it`);
+  for (const g of R.alwaysVendored || []) if (globToRegex(g).test(abs)) return deny(`${rel} is vendored/generated; never edit it (rule E09)`);
   const vend = findUp(path.dirname(abs), '.claude/vendored.txt');
   if (vend) {
     const root = norm(path.dirname(path.dirname(vend)));
     const r2 = abs.startsWith(root + '/') ? abs.slice(root.length + 1) : abs;
-    for (const line of lines(vend)) if (globToRegex(line).test(r2)) return deny(`${r2} is vendored (${line}); edit only if the user asks`);
+    for (const line of lines(vend)) if (globToRegex(line).test(r2)) return deny(`${r2} is vendored (${line}); never edit it (rule E09)`);
   }
   // worker sessions: owns.txt at the worktree root limits edits
   const owns = path.join(top, '.claude', 'owns.txt');
