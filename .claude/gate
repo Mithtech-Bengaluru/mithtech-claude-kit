@@ -1,0 +1,2 @@
+# kit gate (git ship runs the first command line)
+node kit/tests/run.mjs --quiet && node kit/scripts/rules.mjs --check && node kit/scripts/skills.mjs docs --check

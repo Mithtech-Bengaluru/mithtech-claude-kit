@@ -178,7 +178,8 @@ function liveSyncSetup(cfg) {
   if (process.platform === 'darwin') {
     if (cfg.liveSync) {
       const xml = plistXml();
-      if (readText(plistPath(LS_AGENT)) !== xml) {
+      const loaded = launchctl('print', `gui/${process.getuid()}/${LS_AGENT}`).code === 0;
+      if (readText(plistPath(LS_AGENT)) !== xml || !loaded) {
         fs.mkdirSync(path.dirname(plistPath(LS_AGENT)), { recursive: true });
         if (!exists(plistPath(LS_AGENT))) recordCreated(plistPath(LS_AGENT));
         launchctl('bootout', `gui/${process.getuid()}/${LS_AGENT}`);
@@ -201,7 +202,7 @@ function liveSyncDoctor(cfg) {
   ok(run('git', ['config', '--global', 'alias.ship']).out === shipAlias(), 'git ship alias points at this kit');
   ok(!exists(plistPath(OLD_AGENT)), exists(plistPath(OLD_AGENT)) ? 'old Syncthing ignore job still installed; run node kit/install.mjs' : 'no v1.3.0 leftovers');
   if (!cfg.liveSync) { out.push('ok   live sync: off on this machine (opt in with --live-sync)'); return out; }
-  for (const tool of ['gh', 'pnpm', 'scalar']) { const r = run(tool, ['--version']); (tool === 'scalar' ? warn : ok)(r.code === 0, `${tool}: ${r.code === 0 ? r.out.split('\n')[0] : 'not installed'}`); }
+  for (const tool of ['gh', 'pnpm', 'scalar']) { const r = run(tool, [tool === 'scalar' ? 'version' : '--version']); (tool === 'scalar' ? warn : ok)(r.code === 0, `${tool}: ${r.code === 0 ? r.out.split('\n')[0] : 'not installed'}`); }
   ok(!!cfg.devicePrefix, `device prefix: ${cfg.devicePrefix || 'not set'}`);
   const s = readJSON(SETTINGS, {});
   ok(s.env?.CODING_ROOT === cfg.codingRoot, `CODING_ROOT in settings: ${s.env?.CODING_ROOT || 'missing'}`);
