@@ -71,7 +71,8 @@ export function runJob(c, { force = false } = {}) {
     const due = (k, h) => force || !st[k] || Date.now() - Date.parse(st[k]) > h * 3600e3;
     let { repos, copies } = L.readRegistry(c.registry);
     if (due('lastHourly', 1) || copies.length) {
-      const r = L.register(c.root, repos, { ownOwners: c.ownOwners });
+      // new repos start as off: a repo goes live only when you set it (livesync.mjs register --set <path>=live)
+      const r = L.register(c.root, repos, { mode: c.newRepoMode || 'off', ownOwners: c.ownOwners });
       const made = L.placeholders(c.root, repos);
       if (r.added.length || copies.length || !fs.existsSync(c.registry)) L.writeRegistry(c.registry, repos, copies);
       if (r.added.length) out.push(`registered ${r.added.join(', ')}`);
@@ -172,7 +173,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   } else if (cmd === 'register') {
     if (!c.root || !c.registry) die('set codingRoot and sharedRoot (node kit/install.mjs --live-sync --shared-root <dir>)');
     const { repos, copies } = L.readRegistry(c.registry);
-    const r = L.register(c.root, repos, { mode: val('--mode'), ownOwners: c.ownOwners });
+    const r = L.register(c.root, repos, { mode: val('--mode') || c.newRepoMode || 'off', ownOwners: c.ownOwners });
     for (let i = 0; i < args.length; i++) if (args[i] === '--set') {
       const [rel, mode] = String(args[i + 1]).split('=');
       if (!repos[rel]) die(`${rel} is not a registered repo`);

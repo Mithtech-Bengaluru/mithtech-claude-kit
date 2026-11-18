@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.1
+- Live sync: repos the job (or `register`) finds start as `off`, never `live`; a repo goes live only by `livesync.mjs register --set <path>=live` (or `newRepoMode` in the local config). Found when the first job run on an empty registry marked 82 own repos live (stopped before it touched any repo).
+
 ## 1.4.0
 - Live git sync between one person's Macs (`kit/docs/two-macs.md`), opt-in per machine (`install.mjs --live-sync --shared-root <dir>`). Replaces the 1.3.0 Git Town flow and the Syncthing ignore generator (removed; git-town itself is not uninstalled).
 - `scripts/livesync.mjs`: launchd job `in.mithtech.livesync` every 10 min commits idle edits on the sync branch `wip`, rebases and pushes; pauses a repo on conflict (`.git/live-sync-paused`, notification) and goes on with the rest; refuses secrets and files over 50 MB; never pushes main. Registry `<shared>/coding/repos.json` (relative paths; live / pull / off), placeholders with partial clone on demand, 30-day prune of clean pushed clones, weekly cache clean, `audit` for unpushed or uncommitted work.
