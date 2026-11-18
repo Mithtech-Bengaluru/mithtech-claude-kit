@@ -200,6 +200,20 @@ export function liveSyncTests(t, tmp, baseEnv) {
   const sm = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'ship.mjs'), '--dry-run'], { cwd: src, env, encoding: 'utf8' });
   t('ship: refuses to run on main', sm.status === 1 && /not main/.test(sm.stderr));
 
+  // the job never makes a repo live by itself
+  {
+    const jr = path.join(T, 'jobroot'), js = path.join(T, 'jobshared'), jc = path.join(T, 'jobclaude');
+    fs.mkdirSync(jr); fs.mkdirSync(js); fs.mkdirSync(jc);
+    const JP = path.join(jr, 'own'); git(jr, 'clone', '-q', bare, JP); ident(JP);
+    git(JP, 'remote', 'set-url', 'origin', bare);
+    write(path.join(JP, 'dirty.txt'), 'x'); age(path.join(JP, 'dirty.txt'), 60);
+    fs.writeFileSync(path.join(jc, 'mithtech-kit.local.json'), JSON.stringify({ liveSync: true, codingRoot: jr, sharedRoot: js, devicePrefix: 't', ownGitOwners: ['me'] }));
+    const jenv = { ...env, CLAUDE_CONFIG_DIR: jc };
+    spawnSync(process.execPath, [path.join(KIT, 'scripts', 'livesync.mjs'), 'run', '--quiet'], { env: jenv, encoding: 'utf8' });
+    const jreg = L.readRegistry(L.registryFile(js)).repos;
+    t('job: a first run registers repos as off and commits nothing', jreg.own?.mode === 'off' && !git(JP, 'ls-files').out.includes('dirty.txt') && git(JP, 'branch', '--show-current').out === 'main', JSON.stringify(jreg));
+  }
+
   // misc
   t('device prefix from host name', L.devicePrefix('Manojs-MacBook-Air.local') === 'air' && L.devicePrefix("Manoj's Mac mini") === 'mini' && L.devicePrefix('Studio.lan') === 'studio');
   const fh = path.join(T, 'home'); write(path.join(fh, 'Library', 'Application Support', 'Syncthing', 'config.xml'), '<configuration><folder id="default" label="Default" path="/Volumes/X/Sync" type="sendreceive"></folder><folder id="c" path="~/Coding"></folder></configuration>');
