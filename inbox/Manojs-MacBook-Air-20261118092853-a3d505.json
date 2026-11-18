@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "System python3 cannot compile framith apps: they use Python 3.14 unparenthesized except clauses (PEP 758).",
+  "fix": "Use the bench env python (frappe16/env/bin/python) for compile or lint checks.",
+  "project": "frappe16/apps",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-18T09:28:53.516Z"
+}
