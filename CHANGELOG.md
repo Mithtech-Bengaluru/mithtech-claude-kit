@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+- `install.mjs --update-projects [--dry-run] [--adopt <CLAUDE.md>]` keeps project CLAUDE.md files current. It rewrites only the kit block (`<!-- mithtech-kit:project ... -->`), fills `{{KIT_BLOCK}}` in new files, and converts an old-template file only with `--adopt`. Each change gets a dated backup.
+- It skips work in progress: uncommitted edits to the file, a merge or rebase, an open Claude session, third-party (`pull`) repos and free-form files.
+- The five project templates end with the kit block placeholder.
+
 ## 1.5.0
 - Rules refactor: `kit/rules.json` is the one home of every rule. Rules are grouped by concept (session start, reuse, single owner, placement, task size and approvals, screens and UI, git, secrets, databases, third-party code, testing and done, tokens, communication, then each stack). Each rule has a fixed id and, where one exists, the `check` that enforces it.
 - `rules.mjs` now also generates the global CLAUDE.md template from the every-session groups. Stack rules and lessons load only with their skill. Other files (skills, gates.md, two-macs.md, README, ClaudeSetup.md, project templates, SKILLS.md, guard messages, conflicts.json) cite rule ids instead of restating rules.
