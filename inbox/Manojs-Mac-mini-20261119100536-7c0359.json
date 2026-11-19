@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "The routing guard does not accept a route name followed by a full stop on the same line",
+  "fix": "Route, floor and program names sit on separate lines with no trailing punctuation",
+  "project": "polemarch_tradeterminal",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-19T10:05:36.579Z"
+}
