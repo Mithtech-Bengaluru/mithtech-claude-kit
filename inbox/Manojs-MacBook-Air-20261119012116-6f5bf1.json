@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "A deleted repo came back in repos.json because the other Mac still had the folder and its hourly register re-added it.",
+  "fix": "Add registry tombstones: register skips a path marked deleted until a user clears it.",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T01:21:16.060Z"
+}
