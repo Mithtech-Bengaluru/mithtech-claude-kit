@@ -19,6 +19,7 @@ import { scanConflicts, restoreConflicts } from './lib/conflicts.mjs';
 import { checkRouting } from './lib/route.mjs';
 import * as LS from './lib/livesync.mjs';
 import { devicePrefix } from './lib/livesync.mjs';
+import { freeGB } from './lib/sweep.mjs';
 import { auditAll, liveConfig } from './scripts/livesync.mjs';
 
 const args = process.argv.slice(2);
@@ -50,7 +51,7 @@ function ensureLocalConfig() {
     liveSync: has('--live-sync') ? true : has('--no-live-sync') ? false : cfg.liveSync ?? false,
     // --shared-root auto (or no value ever set): use <Syncthing "default" folder>/0000.codesync
     sharedRoot: val('--shared-root') === 'auto' ? undefined : val('--shared-root') || cfg.sharedRoot || undefined,
-    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'liveSyncOptions']),
+    ...pick(cfg, ['worktreeRoot', 'lastModelProbe', 'liveSyncOptions', 'sweep']),
   };
   if (!dry) { if (!exists(LOCAL_CFG)) recordCreated(LOCAL_CFG); saveLocalConfig(next); }
   return next;
@@ -282,6 +283,8 @@ function liveSyncDoctor(cfg) {
   const inSt = !!shared && LS.syncthingFolders(HOME).some((f) => path.resolve(shared).startsWith(path.resolve(f) + path.sep) || path.resolve(shared) === path.resolve(f));
   warn(inSt, inSt ? 'shared root is inside a Syncthing folder' : 'shared root is not inside a Syncthing folder (the other Mac will not see the registry)');
   if (process.platform === 'darwin') ok(launchctl('print', `gui/${process.getuid()}/${LS_AGENT}`).code === 0, 'live sync job loaded (every 10 min)');
+  const sweepRoots = cfg.sweep?.targetRoots || [], freeHome = freeGB(HOME);
+  warn(sweepRoots.length > 0, sweepRoots.length ? `disk sweep: ${sweepRoots.length} build target root(s)${freeHome == null ? '' : `; ${Math.round(freeHome)} GB free`}` : 'disk sweep: no build target roots on this Mac; add one with node kit/scripts/livesync.mjs sweep --add-root <dir>');
   if (!cfg.codingRoot || !exists(cfg.codingRoot)) { out.push(`warn coding root ${cfg.codingRoot || '(unset)'} not mounted; repo checks skipped`); return out; }
   const st = LS.syncthingFolders(HOME).filter((f) => path.resolve(f) === path.resolve(cfg.codingRoot) || path.resolve(cfg.codingRoot).startsWith(path.resolve(f) + path.sep) || path.resolve(f).startsWith(path.resolve(cfg.codingRoot) + path.sep));
   ok(!st.length, st.length ? `Syncthing still shares ${st.join(', ')}; remove it (code moves only through git)` : 'Syncthing does not share the coding folder');

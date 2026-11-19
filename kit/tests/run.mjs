@@ -5,15 +5,18 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { KIT } from '../lib/common.mjs';
 import { validate } from '../lib/inbox.mjs';
 import { validateRegistry } from '../lib/skills.mjs';
 import * as R from '../lib/route.mjs';
 import { liveSyncTests } from './livesync.mjs';
+import { sweepTests } from './sweep.mjs';
+import { makeTmp, removeStale } from './tmp.mjs';
 
 const quiet = process.argv.includes('--quiet');
-const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'mithtech-kit-test-'));
-const env = { ...process.env, CLAUDE_CONFIG_DIR: path.join(tmp, 'claude') };
+const tmp = makeTmp();
+const env = { ...process.env, CLAUDE_CONFIG_DIR: path.join(tmp, 'claude'), MITHTECH_NO_BACKGROUND: '1' };
 fs.mkdirSync(env.CLAUDE_CONFIG_DIR);
 const results = [];
 const t = (name, ok, detail = '') => results.push({ name, ok, detail });
@@ -75,6 +78,11 @@ t('offload down asks', /"ask"/.test(bash('offload down myapp').out));
 t('plain command allowed', bash('ls -la').code === 0 && !bash('ls -la').out);
 const ss = hook('session-start.mjs', { cwd: repo, hook_event_name: 'SessionStart' });
 t('session start prints <= 5 lines', ss.code === 0 && ss.out.trim().split('\n').length <= 5 && /project: repo/.test(ss.out), ss.out.trim().split('\n')[0]);
+{
+  let s = {};
+  try { s = JSON.parse(fs.readFileSync(path.join(env.CLAUDE_CONFIG_DIR, 'mithtech-kit.state.json'), 'utf8')); } catch {}
+  t('session start starts no background child in tests', !s.lastCheck && !s.lastSkillSync);
+}
 
 // dupcheck against a sample index
 const bench = path.join(tmp, 'bench');
@@ -331,11 +339,29 @@ t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
   t('project templates carry the kit block', fs.readdirSync(path.join(KIT, 'templates')).filter((f) => /^CLAUDE\..+\.md$/.test(f)).every((f) => fs.readFileSync(path.join(KIT, 'templates', f), 'utf8').includes('{{KIT_BLOCK}}')));
 }
 
+// disk sweep (interim, per Mac)
+sweepTests(t, tmp, env);
+
+// test temp folder: removed after a crash; stale leftovers removed
+{
+  const base = path.join(tmp, 'tmpbase');
+  fs.mkdirSync(base);
+  const code = `import { makeTmp } from ${JSON.stringify(pathToFileURL(path.join(KIT, 'tests', 'tmp.mjs')).href)}; console.log(makeTmp(${JSON.stringify(base)})); throw new Error('boom');`;
+  const r = spawnSync(process.execPath, ['--input-type=module', '-e', code], { encoding: 'utf8' });
+  const made = r.stdout.trim();
+  t('test temp folder removed after a crash', r.status !== 0 && made.startsWith(base) && !fs.existsSync(made), r.stderr.slice(0, 200));
+  const old = path.join(base, 'mithtech-kit-test-old'), fresh = path.join(base, 'mithtech-kit-test-new'), other = path.join(base, 'other-old');
+  for (const d of [old, fresh, other]) fs.mkdirSync(d);
+  const at = new Date(Date.now() - 2 * 864e5);
+  fs.utimesSync(old, at, at); fs.utimesSync(other, at, at);
+  removeStale(base);
+  t('stale test temp folders removed, others kept', !fs.existsSync(old) && fs.existsSync(fresh) && fs.existsSync(other));
+}
+
 // generated files in sync
 const rc = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'rules.mjs'), '--check'], { encoding: 'utf8' });
 t('RULES.md and skill blocks in sync', rc.status === 0, rc.stderr.trim());
 
-fs.rmSync(tmp, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 }); // detached hook children may still write here
 const failed = results.filter((r) => !r.ok);
 if (!quiet) for (const r of results) console.log(`${r.ok ? 'ok  ' : 'FAIL'} ${r.name}${r.detail && !r.ok ? ` (${r.detail})` : ''}`);
 else for (const r of failed) console.log(`FAIL ${r.name}${r.detail ? ` (${r.detail})` : ''}`);

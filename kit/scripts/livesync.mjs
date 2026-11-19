@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Live git sync between one person's Macs (kit/docs/two-macs.md). Opt-in: liveSync: true in the local config.
 //   livesync.mjs run [--force]          the launchd job (every 10 min): sync live repos, hourly register,
-//                                       daily prune, weekly cache clean
+//                                       daily prune, weekly cache clean, daily disk sweep
 //   livesync.mjs repo [dir] [--now]     sync one repo now (--now: no idle wait)
 //   livesync.mjs audit [--json]         uncommitted / unpushed / stashes / paused / old worktrees, every repo
 //   livesync.mjs resume [dir]           clear a paused repo after you fixed it
@@ -9,13 +9,15 @@
 //   livesync.mjs register [--mode off|live|pull] [--set <rel>=<mode>]   add local repos to the registry
 //   livesync.mjs prune [--dry-run]      list (or prune) idle, clean, pushed clones
 //   livesync.mjs clean-caches [--dry-run]
+//   livesync.mjs sweep [--dry-run] [--add-root <dir>]   delete stale cargo build targets (this Mac only)
 //   livesync.mjs status                 one line per registry repo
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { CLAUDE_DIR, HOME, localConfig, readJSON, writeJSON } from '../lib/common.mjs';
+import { CLAUDE_DIR, HOME, localConfig, readJSON, saveLocalConfig, writeJSON } from '../lib/common.mjs';
 import * as L from '../lib/livesync.mjs';
+import * as S from '../lib/sweep.mjs';
 
 export const STATE_FILE = path.join(CLAUDE_DIR, 'mithtech-livesync.state.json');
 export const LOG_FILE = path.join(CLAUDE_DIR, 'mithtech-livesync.log');
@@ -120,6 +122,29 @@ export function runJob(c, { force = false } = {}) {
   return out;
 }
 
+// Disk sweep (interim, per Mac): once a day, and on every run while free space is under the floor.
+export function runSweep(cfg = localConfig(), { force = false, dry = false, hooks = {} } = {}) {
+  const o = { ...S.SWEEP_DEFAULTS, ...(cfg.sweep || {}) };
+  if (!(o.targetRoots || []).length) return dry ? ['sweep: no build target roots on this Mac (livesync.mjs sweep --add-root <dir>)'] : [];
+  const st = readJSON(STATE_FILE, {});
+  const free = hooks.free || S.freeGB;
+  const low = o.targetRoots.some((r) => { const gb = free(S.expand(r)); return gb != null && gb < o.floorGB; });
+  if (!force && !dry && !low && st.lastSweep && Date.now() - Date.parse(st.lastSweep) < 24 * 3600e3) return [];
+  const r = S.sweep(o, { dry, codingRoot: cfg.codingRoot || null, ...hooks });
+  const out = [
+    ...r.refused.map((x) => `sweep: refused root ${x.root} (${x.why})`),
+    ...r.removed.map((x) => `sweep: ${dry ? 'would remove' : 'removed'} ${x.path} (last build ${x.days} days ago)`),
+    ...(dry ? r.kept.map((x) => `sweep: kept ${x.path} (${x.why})`) : []),
+    ...r.low.map((x) => `sweep: ${x.freeGB} GB free at ${x.root}, under the ${o.floorGB} GB floor`),
+  ];
+  if (dry) return out.length ? out : ['sweep: nothing to remove'];
+  for (const x of r.low) once(st, `sweep-low:${x.root}`, 24, () => notify(`Disk low: ${x.freeGB} GB free after the sweep`));
+  st.lastSweep = new Date().toISOString();
+  writeJSON(STATE_FILE, st);
+  for (const l of out) log(l);
+  return out;
+}
+
 export function auditAll(root) {
   const res = [];
   for (const rel of L.findRepos(root, { worktrees: true })) {
@@ -139,11 +164,23 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const c = liveConfig();
   const cmd = args[0];
   const die = (m, code = 1) => { console.error(`livesync: ${m}`); process.exit(code); };
-  const pos = args.slice(1).filter((a, i, arr) => !a.startsWith('--') && !(i > 0 && ['--mode', '--set'].includes(arr[i - 1])));
+  const pos = args.slice(1).filter((a, i, arr) => !a.startsWith('--') && !(i > 0 && ['--mode', '--set', '--add-root'].includes(arr[i - 1])));
   if (cmd === 'run') {
     if (!c.enabled) { if (!has('--quiet')) console.log('livesync: off on this machine (liveSync is not set)'); process.exit(0); }
-    const out = runJob(c, { force: has('--force') });
+    const out = [...runJob(c, { force: has('--force') }), ...runSweep()];
     if (!has('--quiet')) console.log(out.join('\n') || 'livesync: nothing to do');
+  } else if (cmd === 'sweep') {
+    const cfg = localConfig();
+    const add = val('--add-root');
+    if (has('--add-root')) {
+      if (!add) die('usage: livesync.mjs sweep --add-root <dir>');
+      const root = S.expand(add);
+      const bad = S.rootProblem(root, { codingRoot: cfg.codingRoot || null });
+      if (bad) die(`${root} cannot be a sweep root: ${bad}`);
+      const roots = (cfg.sweep?.targetRoots || []).map((r) => S.expand(r));
+      if (!roots.includes(root)) saveLocalConfig({ ...cfg, sweep: { ...(cfg.sweep || {}), targetRoots: [...roots, root].map((r) => S.collapse(r)) } });
+      console.log(`sweep: ${root} ${roots.includes(root) ? 'is already a root' : 'added'}; check it with: livesync.mjs sweep --dry-run`);
+    } else console.log(runSweep(cfg, { force: true, dry: has('--dry-run') }).join('\n') || 'sweep: nothing to remove');
   } else if (cmd === 'repo') {
     const dir = path.resolve(pos[0] || process.cwd());
     const e = entryFor(c, dir);
@@ -203,7 +240,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
       console.log(`${e.mode.padEnd(4)} ${here.padEnd(11)} ${rel}`);
     }
   } else {
-    console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 13).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
+    console.log(fs.readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').slice(1, 14).map((l) => l.replace(/^\/\/ ?/, '')).join('\n'));
     process.exit(cmd ? 1 : 0);
   }
 }

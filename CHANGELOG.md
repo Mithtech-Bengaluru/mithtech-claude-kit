@@ -3,6 +3,9 @@
 ## Unreleased
 - `git ship` opens and merges the PR on `origin`, even when the repo has an `upstream` remote.
 - `git ship` blocks only real `*.sync-conflict-*` files, not file names that contain "sync-conflict".
+- Interim disk sweep in the live sync job (`livesync.mjs sweep [--dry-run] [--add-root <dir>]`). Once a day it deletes cargo build targets that are over 3 days old and not in use, under the per-Mac `sweep.targetRoots`. Under 30 GB free it runs every 10 minutes with a 1-day limit. Doctor warns while a Mac has no root. Retire it when the NEXUS cleaner ships.
+- Kit tests no longer leak temp folders. `MITHTECH_NO_BACKGROUND` stops the SessionStart hook from starting detached update and skill-sync children, which refilled the deleted temp folder with about 1 GB a run. The temp folder is removed on every exit path, and leftovers older than a day are removed at start.
+- The cleanup agent also deletes a merged unit's own build target folder.
 
 ## 1.6.0
 - `install.mjs --update-projects [--dry-run] [--adopt <CLAUDE.md>]` keeps project CLAUDE.md files current. It rewrites only the kit block (`<!-- mithtech-kit:project ... -->`), fills `{{KIT_BLOCK}}` in new files, and converts an old-template file only with `--adopt`. Each change gets a dated backup.
