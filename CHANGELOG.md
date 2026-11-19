@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- `git ship` opens and merges the PR on `origin`, even when the repo has an `upstream` remote.
+- `git ship` blocks only real `*.sync-conflict-*` files, not file names that contain "sync-conflict".
+
 ## 1.6.0
 - `install.mjs --update-projects [--dry-run] [--adopt <CLAUDE.md>]` keeps project CLAUDE.md files current. It rewrites only the kit block (`<!-- mithtech-kit:project ... -->`), fills `{{KIT_BLOCK}}` in new files, and converts an old-template file only with `--adopt`. Each change gets a dated backup.
 - It skips work in progress: uncommitted edits to the file, a merge or rebase, an open Claude session, third-party (`pull`) repos and free-form files.

@@ -52,9 +52,12 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const branch = info.branch;
   const dry = has('--dry-run');
   const sh = (cmd, a) => spawnSync(cmd, a, { cwd: top, stdio: 'inherit' }).status ?? 1;
+  // PRs go to origin, even when an `upstream` remote exists (gh would pick upstream).
+  const gh = g(top, 'remote', 'get-url', 'origin').out.match(/github\.com[:/]([^/]+\/[^/]+?)(?:\.git)?$/)?.[1];
+  const R = gh ? ['-R', gh] : [];
   if (!branch || branch === main) die(`ship runs on ${wip} or a feature branch, not ${branch || 'a detached HEAD'}`);
   if (busy(info.gitDir)) die(`finish the git operation in progress first (${busy(info.gitDir)})`);
-  if (/sync-conflict/.test(g(top, 'ls-files').out)) die('a *.sync-conflict-* file is committed; remove it first');
+  if (/\.sync-conflict-/.test(g(top, 'ls-files').out)) die('a *.sync-conflict-* file is committed; remove it first');
 
   // 1. commit and sync the branch (same safety checks as the live sync job)
   if (!dry) {
@@ -91,10 +94,10 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   if (dry) { console.log(`ship: dry run; would push ${branch}, open PR "${title}" into ${main} and squash-merge it\n\n${body}`); process.exit(0); }
   // 4. push, PR, squash-merge
   if (g(top, 'push', '-q', '-u', 'origin', `HEAD:refs/heads/${branch}`).code) die(`push of ${branch} failed`);
-  const state = spawnSync('gh', ['pr', 'view', branch, '--json', 'state', '-q', '.state'], { cwd: top, encoding: 'utf8' }).stdout?.trim();
-  if (state === 'OPEN') { if (sh('gh', ['pr', 'edit', branch, '--title', title, '--body', body])) die('could not update the PR'); }
-  else if (sh('gh', ['pr', 'create', '--base', main, '--head', branch, '--title', title, '--body', body])) die('could not open the PR');
-  if (sh('gh', ['pr', 'merge', branch, '--squash', ...(branch === wip ? [] : ['--delete-branch'])])) die('merge failed; the PR stays open');
+  const state = spawnSync('gh', ['pr', 'view', branch, ...R, '--json', 'state', '-q', '.state'], { cwd: top, encoding: 'utf8' }).stdout?.trim();
+  if (state === 'OPEN') { if (sh('gh', ['pr', 'edit', branch, ...R, '--title', title, '--body', body])) die('could not update the PR'); }
+  else if (sh('gh', ['pr', 'create', ...R, '--base', main, '--head', branch, '--title', title, '--body', body])) die('could not open the PR');
+  if (sh('gh', ['pr', 'merge', branch, ...R, '--squash', ...(branch === wip ? [] : ['--delete-branch'])])) die('merge failed; the PR stays open');
   // 5. main back into wip (identical content, so a clean merge), or back to wip after a feature branch
   g(top, 'fetch', '--quiet', 'origin');
   if (branch !== wip) {
