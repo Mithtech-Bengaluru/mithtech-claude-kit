@@ -60,7 +60,7 @@ Source: [morluto/rea](https://github.com/morluto/rea) at `af062e7a2d`
 
 Source: [pbakaus/impeccable](https://github.com/pbakaus/impeccable) at `d41d9860b0`
 
-**How to use:** Ask Claude to design, critique, audit, polish, simplify or animate a UI, or to write DESIGN.md. Example: "critique this dashboard" or "make this landing page bolder". Pair it with the TonalDepth rule for Mithtech UIs.
+**How to use:** Ask Claude to design, critique, audit, polish, simplify or animate a UI, or to write DESIGN.md. Example: "critique this dashboard" or "make this landing page bolder". Pair it with rule E25 (TonalDepth) for Mithtech UIs.
 
 | Skill | What it does |
 |---|---|
