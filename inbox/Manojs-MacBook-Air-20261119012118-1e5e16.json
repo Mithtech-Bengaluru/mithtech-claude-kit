@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "A single-branch clone (fetch refspec only main) never fetched origin/wip, so live sync showed 'unpushed' forever.",
+  "fix": "Make doctor and livesync detect a narrow remote.origin.fetch and reset it to +refs/heads/*:refs/remotes/origin/*.",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T01:21:18.946Z"
+}
