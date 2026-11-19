@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Most branches the other Mac pushed after the freeze held only Syncthing temp files, caches and build output.",
+  "fix": "Sort branch diffs into junk and real work first. Back up and drop branches that hold only junk before anyone reviews them.",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T01:21:44.556Z"
+}

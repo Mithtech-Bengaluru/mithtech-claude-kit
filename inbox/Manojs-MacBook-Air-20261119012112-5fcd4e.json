@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "A stale local origin/HEAD (or a wrong registry main) made git ship diff against the wrong base and say 'nothing to ship'.",
+  "fix": "Make ship run 'git remote set-head origin -a' and check that the registry main exists on origin before it diffs.",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T01:21:12.675Z"
+}

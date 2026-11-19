@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "writeRegistry was called with the shared folder instead of the file and wrote a tmp file in the Syncthing root.",
+  "fix": "Make writeRegistry throw unless the path ends in repos.json.",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T01:21:22.305Z"
+}
