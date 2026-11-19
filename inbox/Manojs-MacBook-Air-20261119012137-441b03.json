@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Ship refused a repo because an ordinary file name contained the words sync conflict.",
+  "fix": "Fixed in kit PR 21: ship now matches only real Syncthing conflict copies.",
+  "project": "setupClaude",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T01:21:37.357Z"
+}
