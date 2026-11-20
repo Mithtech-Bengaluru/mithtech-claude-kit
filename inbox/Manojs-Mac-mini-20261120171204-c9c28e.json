@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "Tauri Android release: R8 strips JNA, so UniFFI Kotlin fails with UnsatisfiedLinkError. tauri-android needs compileSdk 36+.",
+  "fix": "Keep com.sun.jna.** and uniffi.** in proguard-rules.pro. Set cdylib_name to the Tauri lib and re-export scaffolding.",
+  "project": "ergon",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-20T17:12:04.227Z"
+}
