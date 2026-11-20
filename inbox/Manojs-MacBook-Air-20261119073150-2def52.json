@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "Infisical trims trailing newlines from secret values, so whole-file secrets may not round-trip",
+  "fix": "Verify each upload by hash and store any file that changes in base64 form",
+  "project": "000-docker",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-19T07:31:50.652Z"
+}

@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "A test that runs a hook must switch off the detached children the hook starts. They outlive the test and refill its deleted temp folder (about 1 GB a run here).",
+  "fix": "Give the hook an off switch (MITHTECH_NO_BACKGROUND) and set it in the test env. Remove the temp folder on every exit path.",
+  "project": "setupClaude",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-19T08:31:00.631Z"
+}

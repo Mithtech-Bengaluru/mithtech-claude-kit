@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "A loopback check misses IPv4-mapped peers on a dual-stack listener, and PINs replicated to devices are not a safe network admin credential",
+  "fix": "Canonicalise the peer address before the loopback check. Bind network admin to a password that never leaves the server, plus a cookie tied to the session",
+  "project": "merqPOS",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-19T07:19:32.722Z"
+}
