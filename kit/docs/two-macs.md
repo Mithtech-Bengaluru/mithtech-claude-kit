@@ -26,6 +26,11 @@ For one person who works on the same projects on two Macs (here a MacBook Air an
   - A registry repo missing on a Mac is an empty placeholder folder. Opening it in Claude makes a partial clone (`--filter=blob:none`; Scalar for repos with more than 5,000 files).
   - A `live` repo untouched for 30 days goes back to a placeholder, but only when it is clean and pushed, with no stash, no worktree and no ignored files other than caches. `keep: true` and `frappe*/` repos are never pruned.
   - Each week, git-ignored `.next`, `dist` and `.turbo` folders are removed in projects idle for 14 days.
+- **The disk sweep** (interim, until the NEXUS cleaner ships) runs in the same job, once a day. Its settings are per Mac and never sync.
+  - It looks only at the direct children of the folders in `sweep.targetRoots` (local config). Add one with `livesync.mjs sweep --add-root <dir>`.
+  - It deletes a child only when it holds cargo's `CACHEDIR.TAG`, its last build is over 3 days old (`targetDays`), and no process has a file open in it.
+  - Under 30 GB free (`floorGB`) it runs on every job run with a 1-day limit, and sends one notification a day while the disk stays low.
+  - It refuses a root that holds the home folder, overlaps the coding root, or is a git repo.
 - **Secrets** live in `<shared root>/secrets/<repo path>/` and are linked into the repo. `secrets.mjs adopt` moves them there; `secrets.mjs link` recreates the links on the other Mac. Git never sees them.
 
 ## Setup (once per Mac)
@@ -66,6 +71,8 @@ You get a notification "<repo> paused: rebase conflict …". The other repos kee
 | `livesync.mjs repo --now` | sync this repo now |
 | `livesync.mjs clone <path>` | partial clone of a registry repo |
 | `livesync.mjs prune --dry-run` | what the daily prune would remove |
+| `livesync.mjs sweep --dry-run` | which stale build targets the disk sweep would remove, and why it keeps the rest |
+| `livesync.mjs sweep --add-root <dir>` | add a folder of per-unit build targets on this Mac |
 | `secrets.mjs adopt` / `link` / `check` | secrets in the shared folder |
 | `install.mjs --doctor` | gh, pnpm, scalar, job loaded, `CODING_ROOT`, coding folder not shared by Syncthing, registry complete, no paused repos, device prefix, unpushed or uncommitted work, old worktrees |
 
