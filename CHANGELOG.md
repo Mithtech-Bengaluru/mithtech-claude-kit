@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.6.1
 - `git ship` opens and merges the PR on `origin`, even when the repo has an `upstream` remote.
 - `git ship` blocks only real `*.sync-conflict-*` files, not file names that contain "sync-conflict".
 - Interim disk sweep in the live sync job (`livesync.mjs sweep [--dry-run] [--add-root <dir>]`). Once a day it deletes cargo build targets that are over 3 days old and not in use, under the per-Mac `sweep.targetRoots`. Under 30 GB free it runs every 10 minutes with a 1-day limit. Doctor warns while a Mac has no root. Retire it when the NEXUS cleaner ships.

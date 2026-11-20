@@ -8,7 +8,7 @@ The source of the Mithtech Claude kit. Releases go to `Mithtech-Bengaluru/mithte
 ## State
 - Default branch `main`. Work on `wip`. Ship with `git ship`.
 - Gate: `.claude/gate` (kit tests, `rules.mjs --check`, `skills.mjs docs --check`).
-- Latest release: v1.6.0 (#19). Release notes: `CHANGELOG.md`.
+- Latest release: v1.6.1 (#24, #25). Release notes: `CHANGELOG.md`.
 
 ## Open work
 - Doctor prints an empty scalar version line. Fix the version probe.
@@ -19,7 +19,6 @@ The source of the Mithtech Claude kit. Releases go to `Mithtech-Bengaluru/mithte
 - Single-branch clones never fetch `origin/wip`. Make doctor detect a narrow `remote.origin.fetch` and widen it.
 - `writeRegistry` accepts a folder path. Make it reject any path that does not end in `repos.json`.
 - `skills.mjs docs --check` checks the installed kit (`cfg.kitPath`), not the repo it runs in, so the source gate missed a stale SKILLS.md. Make docs use the script's own repo.
-- Ship fixes from 2026-11-19 (origin targeting, exact sync-conflict match) are in #21 but not yet released as a version.
 
 ## Read next
 - `README.md`, `RULES.md`, `SKILLS.md`, `CHANGELOG.md`.
