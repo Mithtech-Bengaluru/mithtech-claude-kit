@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "A camera-only 3D view mode stayed on when a ride or journey took the camera. Two cameras fought and the scene drew from inside the planet.",
+  "fix": "End camera-only modes at every entry point that takes the camera. Test by clicking the real buttons in sequence, not debug hooks.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-21T04:36:37.237Z"
+}
