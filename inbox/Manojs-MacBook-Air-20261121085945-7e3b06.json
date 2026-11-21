@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "A page-level overflow check can pass while one grid column spills past a phone viewport, and lazily painted sections screenshot blank",
+  "fix": "Measure every element's right edge against the viewport, give single-column grids a shrinkable track, and paint all sections before full-page shots",
+  "project": "Splendx",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-21T08:59:45.760Z"
+}
