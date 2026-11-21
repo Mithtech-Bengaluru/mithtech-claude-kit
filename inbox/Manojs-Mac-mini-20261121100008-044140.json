@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "TonalDepth depth tokens named row, raised and inset hold shadow values, not colours.",
+  "fix": "Use them in shadows only, and add a test that rejects them as a background.",
+  "project": "ergon",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-21T10:00:08.716Z"
+}
