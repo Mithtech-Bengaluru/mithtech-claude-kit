@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "stack-gotcha",
+  "lesson": "Ory Kratos v26 refuses the JSON Patch test operation, its session lookup carries no credentials, and Ory Hydra v26 challenges are about two kilobytes long.",
+  "fix": "Remove addresses with a plain remove patch and read the identity back, read credentials from the admin identity, and accept challenges up to eight kibibytes.",
+  "project": "ergon",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-21T12:27:53.103Z"
+}
