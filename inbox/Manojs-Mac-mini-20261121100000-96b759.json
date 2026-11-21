@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "stack-gotcha",
+  "lesson": "A hidden WKWebView window pauses animation frames, so webview benchmarks read no frames.",
+  "fix": "Turn off window occlusion detection in the test host app.",
+  "project": "ergon",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-21T10:00:00.366Z"
+}
