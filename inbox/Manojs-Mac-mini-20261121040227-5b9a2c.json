@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "The design-system repo collected consumer audits, briefs and prompts that named other projects.",
+  "fix": "Keep a design-system repo to the system and its changelog, and keep program and consumer state outside it.",
+  "project": "tonaldepth",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-21T04:02:27.463Z"
+}
