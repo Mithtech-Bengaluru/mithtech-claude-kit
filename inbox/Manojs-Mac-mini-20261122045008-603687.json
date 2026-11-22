@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "A directory ignore rule for the build folder does not cover a symlink of that name, so live sync commits the symlink.",
+  "fix": "Point builds at an outside folder through the environment. Never symlink the build folder in a synced repo.",
+  "project": "ergon",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-22T04:50:08.800Z"
+}
