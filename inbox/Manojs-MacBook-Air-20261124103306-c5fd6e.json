@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Subagents share the parent scratchpad, so a worker overwrote the coordinator's gate script and the wrong gate ran.",
+  "fix": "Give coordinator scripts unique names and tell workers to write scripts under their own worktree.",
+  "project": "FieldOps",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-24T10:33:06.227Z"
+}
