@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "After a unit deletes routes, tsc fails on stale .next/types and .next/dev/types that still import the removed pages.",
+  "fix": "Delete .next/types and .next/dev/types before the typecheck that follows a merge which removes routes.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T16:39:47.293Z"
+}
