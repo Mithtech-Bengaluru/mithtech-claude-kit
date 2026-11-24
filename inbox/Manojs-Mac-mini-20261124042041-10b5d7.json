@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Headless CDP forcePseudoState on an inner element does not give its ancestors hover or focus-within, so visual QA crops miss wrapper rings and states.",
+  "fix": "Drive hover and press with real Input mouse events, focus after a real key press, hold the button through the screenshot and crop the whole cell.",
+  "project": "tonaldepth",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T04:20:41.723Z"
+}
