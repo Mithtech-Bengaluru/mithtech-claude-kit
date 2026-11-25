@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "A script that moves overflowing rows before React hydrates breaks hydration, only on phones and only on some loads.",
+  "fix": "Opt React-owned rows out of the script. Load each phone screen many times and count page errors.",
+  "project": "web-app",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T19:27:26.037Z"
+}
