@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "Workers that start a long gate in the background often end their turn and are not woken when it finishes.",
+  "fix": "Brief workers to run the final gate in the foreground, or report its result before ending the turn.",
+  "project": "merqPOS",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T09:50:29.412Z"
+}
