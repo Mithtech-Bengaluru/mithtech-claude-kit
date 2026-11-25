@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Appending an app name to the bench app list joined it to the last line, which had no newline, and broke the bench mid-window.",
+  "fix": "Append with a leading newline and compare the app list with its saved copy before migrating.",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T06:27:53.063Z"
+}
