@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Turning maintenance mode on before a multi-step remote sequence left a production site offline for 8 hours when later steps did not run straight away.",
+  "fix": "Run the whole window as one server-side script, from maintenance on to maintenance off, after all prep and uploads are done.",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T06:27:34.712Z"
+}
