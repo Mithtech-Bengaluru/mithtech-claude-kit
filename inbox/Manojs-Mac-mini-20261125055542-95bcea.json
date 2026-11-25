@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "Bots kept posting to a form API route after its page moved to another backend.",
+  "fix": "When a form moves, close its old API route (410) and grep for callers first.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T05:55:42.307Z"
+}
