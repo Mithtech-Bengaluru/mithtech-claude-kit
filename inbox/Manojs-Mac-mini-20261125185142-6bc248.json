@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "A rollout held seven sites in maintenance for 2.5 hours while it waited on a person to run one blocked step.",
+  "fix": "Do every human step before maintenance starts, and put a time limit on maintenance with an automatic reopen.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T18:51:42.152Z"
+}
