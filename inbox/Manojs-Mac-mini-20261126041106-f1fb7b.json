@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "LinkedIn's add-to-profile link needs a fixed task code that contains a banned word, so the wording guard flagged it and the unit split the string to dodge it.",
+  "fix": "Allow that single URL value in the wording guard with a comment, and test the link's parameters against an allow-list.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-26T04:11:06.615Z"
+}
