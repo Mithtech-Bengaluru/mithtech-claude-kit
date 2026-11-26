@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "A Frappe upgrade can switch AI client access on, so anonymous demo visitors, who are desk users, gain it too.",
+  "fix": "After each upgrade, switch that access off on every public site and prove from outside that it is gone.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-26T03:30:27.430Z"
+}
