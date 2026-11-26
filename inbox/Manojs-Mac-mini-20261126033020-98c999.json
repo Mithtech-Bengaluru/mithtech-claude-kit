@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "A rollout held 7 sites in maintenance for hours while a hook-blocked step waited on a person.",
+  "fix": "Before maintenance, remove manual steps and arm a server timer that rolls back and reopens without any session.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-26T03:30:20.436Z"
+}
