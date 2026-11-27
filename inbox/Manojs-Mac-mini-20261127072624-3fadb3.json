@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "A unit that rebuilt a cross-cutting primitive was estimated at 110k tokens and took 350k, and deleted tests before any page was opened.",
+  "fix": "Estimate cross-cutting rebuilds at three times a feature unit and split them in two. Restore tests and look in a browser first.",
+  "project": "tonaldepth",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-27T07:26:24.440Z"
+}
