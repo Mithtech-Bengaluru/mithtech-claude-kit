@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "A replacement worker started after a failed start made each unit run twice, and a duplicate deleted 182 tracked files on the work branch.",
+  "fix": "After a failed start, fix the cause and wait. Never start a second session for one unit. Count deleted files before every merge.",
+  "project": "tonaldepth",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-27T07:26:32.002Z"
+}
