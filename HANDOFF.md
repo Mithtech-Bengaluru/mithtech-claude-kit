@@ -8,7 +8,7 @@ The source of the Mithtech Claude kit. Releases go to `Mithtech-Bengaluru/mithte
 ## State
 - Default branch `main`. Work on `wip`. Ship with `git ship`.
 - Gate: `.claude/gate` (kit tests, `rules.mjs --check`, `skills.mjs docs --check`).
-- Latest release: v1.6.1 (#24, #25). Release notes: `CHANGELOG.md`.
+- Latest release: v1.6.2 (#26). Release notes: `CHANGELOG.md`.
 
 ## Open work
 - Doctor prints an empty scalar version line. Fix the version probe.
