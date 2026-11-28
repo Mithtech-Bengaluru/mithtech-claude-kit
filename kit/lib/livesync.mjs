@@ -162,6 +162,8 @@ export function syncRepo(dir, o = {}) {
   if (!opt.ignoreSessions && activeSession(info.gitDir, { sessionHours: opt.sessionHours, except: opt.sessionId })) return res('skip', 'open Claude session');
   if (!info.branch) return res('skip', 'detached HEAD');
   if (g(dir, 'remote', 'get-url', 'origin').code) return res('skip', 'no origin remote');
+  const fr = opt.remote ? followRemote(dir, opt.remote) : null;
+  if (fr && !fr.moved) return res('offline', fr.note);
   if (opt.mode === 'pull') return pullOnly(dir, info, opt, res);
   let ch = changes(dir);
   if (ch.length && !opt.noIdle && Date.now() - newestChangeMs(dir, ch) < opt.idleMin * 60e3) return res('skip', 'edited in the last few minutes');
@@ -268,7 +270,33 @@ export function writeRegistry(file, repos, copies = []) {
   fs.writeFileSync(tmp, text); fs.renameSync(tmp, file);
   for (const c of copies) fs.rmSync(c, { force: true });
 }
-export const ownerOf = (url) => (String(url).match(/github\.com[:/]([^/]+)\//) || [])[1] || null;
+// Owner of a hosted repo URL (GitHub, Forgejo, any https/ssh/scp-style URL).
+export const ownerOf = (url) => (String(url).match(/^(?:[a-z+]+:\/\/(?:[^@/]+@)?[^/]+|[^@/]+@[^:/]+:)\/?([^/]+)\/[^/]+$/i) || [])[1] || null;
+// Same repo? Compare URLs without scheme, user, port, ".git" and case.
+export const sameRemote = (a, b) => {
+  const n = (u) => String(u || '').trim().toLowerCase().replace(/^[a-z+]+:\/\/(?:[^@/]+@)?/, '').replace(/^[^@/]+@([^:/]+):/, '$1/').replace(/:\d+\//, '/').replace(/\.git$|\/$/g, '');
+  return n(a) === n(b);
+};
+
+// The registry names each repo's remote. When it changed (a repo moved, e.g. GitHub -> Forgejo),
+// point origin at it and keep the old URL as remote "github" (or "old-origin"). Switches only after
+// a fetch from the new remote works. Until then the repo reports offline and pushes nowhere, so a
+// Mac without credentials for the new host never pushes work to the old, frozen remote.
+export function followRemote(dir, remote) {
+  const cur = g(dir, 'remote', 'get-url', 'origin').out;
+  if (!remote || !cur || sameRemote(cur, remote)) return null;
+  if (g(dir, 'ls-remote', '--heads', remote).code) return { moved: false, note: `registry remote ${remote} not reachable; still on ${cur}` };
+  const keep = /github\.com/i.test(cur) && g(dir, 'remote', 'get-url', 'github').code ? 'github' : 'old-origin';
+  if (!g(dir, 'remote', 'get-url', keep).code) g(dir, 'remote', 'remove', keep);
+  g(dir, 'remote', 'rename', 'origin', keep);
+  g(dir, 'remote', 'add', 'origin', remote);
+  if (g(dir, 'fetch', '--quiet', 'origin').code) { g(dir, 'remote', 'remove', 'origin'); g(dir, 'remote', 'rename', keep, 'origin'); return { moved: false, note: `fetch from ${remote} failed; still on ${cur}` }; }
+  g(dir, 'remote', 'set-head', 'origin', '-a');
+  for (const b of g(dir, 'for-each-ref', '--format=%(refname:short)', 'refs/heads').out.split('\n').filter(Boolean)) {
+    if (branchExists(dir, `refs/remotes/origin/${b}`)) g(dir, 'branch', '-q', '-u', `origin/${b}`, b);
+  }
+  return { moved: true, note: `origin moved to ${remote} (old: ${keep})` };
+}
 
 // Add local repos the registry does not know. Returns { added, noRemote }.
 export function register(root, repos, { mode = null, ownOwners = [], now = new Date().toISOString() } = {}) {

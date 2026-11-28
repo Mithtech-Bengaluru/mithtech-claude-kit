@@ -4,7 +4,7 @@ For one person who works on the same projects on two Macs (here a MacBook Air an
 
 ## The model
 
-- **Code moves only through GitHub.** Syncthing never shares the coding folder. Each Mac has its own clones at the same paths, relative to its own coding root (`/Volumes/Extreme/Coding` on one Mac, `/Volumes/bay/Coding` on the other). The kit sets `CODING_ROOT` per Mac.
+- **Code moves only through the git host** (GitHub, or Forgejo at `git.po5.in` for repos that moved). Syncthing never shares the coding folder. When a repo moves, change its `remote` in `repos.json`; each Mac switches `origin` on its next sync once it can fetch from the new host (it needs a token for that host in its git credential store). Each Mac has its own clones at the same paths, relative to its own coding root (`/Volumes/Extreme/Coding` on one Mac, `/Volumes/bay/Coding` on the other). The kit sets `CODING_ROOT` per Mac.
 - **Each repo has two branches:**
   - `wip` is the shared live branch. Both Macs commit, rebase and push it automatically.
   - `main` holds finished work only. It changes only through `git ship`.
