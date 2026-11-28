@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Leftover rows on a shared test site push new records past capped lists and oldest-first sweeps, failing unrelated tests.",
+  "fix": "Lift the cap inside the test or scope the query to the test's own records.",
+  "project": "framith_amc_service",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T10:50:57.077Z"
+}
