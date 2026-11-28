@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Sessions sharing one site undo each other: a full sync from one branch deletes the rows of another branch.",
+  "fix": "Give each programme its own site, sync only your own set on shared sites, and migrate only from the bench checkout.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T05:07:23.285Z"
+}
