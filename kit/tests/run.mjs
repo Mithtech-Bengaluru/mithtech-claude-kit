@@ -305,7 +305,7 @@ t('SKILLS.md in sync with the registry', sdc.status === 0, sdc.stderr.trim());
   fs.rmSync(path.join(repo, 'a.sync-conflict-20261117-1.md'));
   t('guard allows git add -A when no conflict file', bash('git add -A', repo).code === 0);
   t('guard allows pushing the sync branch', bash('git push origin wip', repo).code === 0);
-  liveSyncTests(t, tmp, env);
+  await liveSyncTests(t, tmp, env);
 }
 
 // project CLAUDE.md updater: marked blocks refresh, old template files need --adopt, other files stay

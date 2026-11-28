@@ -2,8 +2,10 @@
 // git ship: put the finished work of the sync branch (wip) or a feature branch on main as one commit.
 //   git ship [--gate "<cmd>"] [--no-gate] [--title "<t>"] [--dry-run]
 // Steps: sync the branch, merge the latest main into it, run the local gate, push, open a PR with the
-// gate result (GitHub Free: no CI), squash-merge it, then merge main back into wip so both Macs go on
+// gate result (the gate runs locally), squash-merge it, then merge main back into wip so both Macs go on
 // without a force-push. A feature branch is deleted after the merge. Never pushes main itself.
+// GitHub remotes use gh; any other origin is treated as Forgejo (API token from `git credential fill`
+// for that host, or FORGEJO_TOKEN).
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -27,7 +29,7 @@ export function findGate(top, flag) {
 export function prBody(gate, result, subjects = []) {
   const lines = [];
   if (subjects.length) lines.push('## Changes', ...subjects.slice(0, 30).map((s) => `- ${s}`), '');
-  lines.push('## Gate (local run, GitHub Free: no CI)');
+  lines.push('## Gate (local run)');
   if (!gate) lines.push('No gate defined for this repo (shipped with --no-gate).');
   else {
     lines.push(`Command (${gate.from}): \`${gate.cmd}\``, `Result: ${!result ? 'not run (dry run)' : result.code === 0 ? 'PASS' : `FAIL (exit ${result.code})`}`);
@@ -35,6 +37,41 @@ export function prBody(gate, result, subjects = []) {
     if (tail) lines.push('', '```', tail, '```');
   }
   return lines.join('\n');
+}
+
+// Forgejo origin -> { host, repo: 'owner/name' } (https, ssh:// with port, or scp-style URL).
+export function forgejoRepo(url) {
+  const m = String(url).trim().match(/^(?:https?:\/\/(?:[^@/]+@)?([^/:]+)(?::\d+)?|ssh:\/\/(?:[^@/]+@)?([^/:]+)(?::\d+)?|[^@/]+@([^:/]+):)\/?([^/]+\/[^/]+?)(?:\.git)?\/?$/i);
+  if (!m || /github\.com$/i.test(m[1] || m[2] || m[3])) return null;
+  return { host: m[1] || m[2] || m[3], repo: m[4] };
+}
+// Token for a Forgejo host: FORGEJO_TOKEN, else the password git's credential helper stores for it.
+export function forgejoToken(host) {
+  if (process.env.FORGEJO_TOKEN) return process.env.FORGEJO_TOKEN;
+  const r = spawnSync('git', ['credential', 'fill'], { input: `protocol=https\nhost=${host}\n\n`, encoding: 'utf8', env: { ...process.env, GIT_TERMINAL_PROMPT: '0' } });
+  return (r.stdout || '').match(/^password=(.*)$/m)?.[1] || null;
+}
+// Open or update the PR for branch -> main on Forgejo, then squash-merge it. Returns an error string or null.
+export async function forgejoShip(fj, token, { main, branch, title, body, deleteBranch, sleepMs = 3000 }) {
+  const api = async (method, p, data) => {
+    const r = await fetch(`https://${fj.host}/api/v1/repos/${fj.repo}${p}`, { method, headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' }, body: data ? JSON.stringify(data) : undefined });
+    const text = await r.text();
+    let j = null; try { j = JSON.parse(text); } catch {}
+    return { ok: r.ok, status: r.status, j, text };
+  };
+  const open = await api('GET', '/pulls?state=open&limit=50');
+  if (!open.ok) return `could not list PRs (${open.status})`;
+  let pr = (open.j || []).find((p) => p.head?.ref === branch && p.base?.ref === main);
+  if (pr) { const u = await api('PATCH', `/pulls/${pr.number}`, { title, body }); if (!u.ok) return `could not update the PR (${u.status})`; }
+  else { const c = await api('POST', '/pulls', { base: main, head: branch, title, body }); if (!c.ok) return `could not open the PR (${c.status}: ${c.j?.message || c.text.slice(0, 200)})`; pr = c.j; }
+  // Forgejo checks mergeability in the background right after a PR opens or changes: retry briefly.
+  for (let i = 0; i < 10; i++) {
+    const m = await api('POST', `/pulls/${pr.number}/merge`, { Do: 'squash', MergeTitleField: `${title} (#${pr.number})`, MergeMessageField: body, delete_branch_after_merge: deleteBranch });
+    if (m.ok) return null;
+    if (![405, 409].includes(m.status) || i === 9) return `merge failed (${m.status}: ${m.j?.message || m.text.slice(0, 200)}); the PR stays open: https://${fj.host}/${fj.repo}/pulls/${pr.number}`;
+    await new Promise((r) => setTimeout(r, sleepMs));
+  }
+  return 'merge failed';
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -53,15 +90,19 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const dry = has('--dry-run');
   const sh = (cmd, a) => spawnSync(cmd, a, { cwd: top, stdio: 'inherit' }).status ?? 1;
   // PRs go to origin, even when an `upstream` remote exists (gh would pick upstream).
-  const gh = g(top, 'remote', 'get-url', 'origin').out.match(/github\.com[:/]([^/]+\/[^/]+?)(?:\.git)?$/)?.[1];
+  const originUrl = g(top, 'remote', 'get-url', 'origin').out;
+  const gh = originUrl.match(/github\.com[:/]([^/]+\/[^/]+?)(?:\.git)?$/)?.[1];
   const R = gh ? ['-R', gh] : [];
+  const fj = gh ? null : forgejoRepo(originUrl);
+  const fjToken = fj ? forgejoToken(fj.host) : null;
+  if (fj && !fjToken) die(`no Forgejo token for ${fj.host}: store one with git credential (or set FORGEJO_TOKEN)`);
   if (!branch || branch === main) die(`ship runs on ${wip} or a feature branch, not ${branch || 'a detached HEAD'}`);
   if (busy(info.gitDir)) die(`finish the git operation in progress first (${busy(info.gitDir)})`);
   if (/\.sync-conflict-/.test(g(top, 'ls-files').out)) die('a *.sync-conflict-* file is committed; remove it first');
 
   // 1. commit and sync the branch (same safety checks as the live sync job)
   if (!dry) {
-    const s = syncRepo(top, { ...c, mode: 'live', main, noIdle: true, ignoreSessions: true, force: true });
+    const s = syncRepo(top, { ...c, mode: 'live', main, remote: e?.remote, noIdle: true, ignoreSessions: true, force: true });
     if (['paused', 'error'].includes(s.status)) die(`sync: ${s.note}. Fix it, run livesync.mjs resume, then ship again`);
     if (s.status === 'offline') die(`offline: ${s.note}`);
     if (s.refused.length) console.log(`ship: not committed (secret or too big): ${s.refused.map((f) => f.path).join(', ')}`);
@@ -94,10 +135,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   if (dry) { console.log(`ship: dry run; would push ${branch}, open PR "${title}" into ${main} and squash-merge it\n\n${body}`); process.exit(0); }
   // 4. push, PR, squash-merge
   if (g(top, 'push', '-q', '-u', 'origin', `HEAD:refs/heads/${branch}`).code) die(`push of ${branch} failed`);
-  const state = spawnSync('gh', ['pr', 'view', branch, ...R, '--json', 'state', '-q', '.state'], { cwd: top, encoding: 'utf8' }).stdout?.trim();
-  if (state === 'OPEN') { if (sh('gh', ['pr', 'edit', branch, ...R, '--title', title, '--body', body])) die('could not update the PR'); }
-  else if (sh('gh', ['pr', 'create', ...R, '--base', main, '--head', branch, '--title', title, '--body', body])) die('could not open the PR');
-  if (sh('gh', ['pr', 'merge', branch, ...R, '--squash', ...(branch === wip ? [] : ['--delete-branch'])])) die('merge failed; the PR stays open');
+  if (fj) {
+    const err = await forgejoShip(fj, fjToken, { main, branch, title, body, deleteBranch: branch !== wip });
+    if (err) die(err);
+  } else {
+    const state = spawnSync('gh', ['pr', 'view', branch, ...R, '--json', 'state', '-q', '.state'], { cwd: top, encoding: 'utf8' }).stdout?.trim();
+    if (state === 'OPEN') { if (sh('gh', ['pr', 'edit', branch, ...R, '--title', title, '--body', body])) die('could not update the PR'); }
+    else if (sh('gh', ['pr', 'create', ...R, '--base', main, '--head', branch, '--title', title, '--body', body])) die('could not open the PR');
+    if (sh('gh', ['pr', 'merge', branch, ...R, '--squash', ...(branch === wip ? [] : ['--delete-branch'])])) die('merge failed; the PR stays open');
+  }
   // 5. main back into wip (identical content, so a clean merge), or back to wip after a feature branch
   g(top, 'fetch', '--quiet', 'origin');
   if (branch !== wip) {

@@ -88,7 +88,7 @@ export function runJob(c, { force = false } = {}) {
       if (!fs.existsSync(path.join(dir, '.git'))) continue;
       const trees = e.mode === 'live' ? L.worktrees(dir).filter((w) => !w.prunable).map((w) => w.path) : [dir];
       for (const t of trees) {
-        const r = L.syncRepo(t, { ...c, mode: e.mode, main: e.main || c.main, force });
+        const r = L.syncRepo(t, { ...c, mode: e.mode, main: e.main || c.main, remote: e.remote, force });
         const name = path.relative(c.root, t).split(path.sep).join('/');
         if (r.status === 'paused') once(st, `paused:${name}:${r.note}`, 24, () => notify(`${name} paused: ${r.note}`));
         for (const f of r.refused || []) once(st, `refused:${name}:${f.path}`, 24 * 7, () => notify(`${name}: not committed ${f.path} (${f.why})`));
@@ -186,7 +186,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     const e = entryFor(c, dir);
     if (!e || !e.mode) die(`${dir} is not in the registry; run: livesync.mjs register --set <rel>=live`);
     if (e.mode === 'off') die(`${e.rel} has mode off`);
-    const r = L.syncRepo(dir, { ...c, mode: e.mode, main: e.main || c.main, noIdle: has('--now'), ignoreSessions: has('--now'), force: true });
+    const r = L.syncRepo(dir, { ...c, mode: e.mode, main: e.main || c.main, remote: e.remote, noIdle: has('--now'), ignoreSessions: has('--now'), force: true });
     console.log(`${e.rel}: ${r.status}${r.note ? ` (${r.note})` : ''}; committed ${r.committed}, pulled ${r.pulled}, pushed ${r.pushed}${r.refused.length ? `; not committed: ${r.refused.map((f) => `${f.path} (${f.why})`).join(', ')}` : ''}`);
     process.exit(['paused', 'error'].includes(r.status) ? 1 : 0);
   } else if (cmd === 'audit') {

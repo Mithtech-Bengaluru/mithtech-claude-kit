@@ -4,11 +4,11 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { KIT } from '../lib/common.mjs';
 import * as L from '../lib/livesync.mjs';
-import { findGate, prBody } from '../scripts/ship.mjs';
+import { findGate, prBody, forgejoRepo, forgejoShip } from '../scripts/ship.mjs';
 import { adopt, link } from '../scripts/secrets.mjs';
 import { liveConfig } from '../scripts/livesync.mjs';
 
-export function liveSyncTests(t, tmp, baseEnv) {
+export async function liveSyncTests(t, tmp, baseEnv) {
   const T = path.join(tmp, 'live');
   fs.mkdirSync(T, { recursive: true });
   const git = (cwd, ...a) => { const r = spawnSync('git', a, { cwd, encoding: 'utf8' }); return { code: r.status, out: (r.stdout || '').trim(), err: r.stderr }; };
@@ -112,6 +112,21 @@ export function liveSyncTests(t, tmp, baseEnv) {
   const repos2 = {}; L.register(air, repos2, { mode: 'off' });
   t('registry: register --mode off', repos2.proj.mode === 'off');
   t('registry: owner from a GitHub URL', L.ownerOf('https://github.com/suparikoli/FieldOps.git') === 'suparikoli' && L.ownerOf('git@github.com:Org/x.git') === 'Org');
+  t('registry: owner from a Forgejo URL', L.ownerOf('https://git.po5.in/mithtech/API_endpoint_finder.git') === 'mithtech' && L.ownerOf('ssh://git@git.po5.in:2222/mithtech/x.git') === 'mithtech' && L.ownerOf('/tmp/proj.git') === null);
+  t('registry: same remote ignores scheme, user, .git and case', L.sameRemote('https://github.com/A/x.git', 'git@github.com:a/X') && L.sameRemote('ssh://git@git.po5.in:2222/m/x.git', 'https://git.po5.in/m/x') && !L.sameRemote('https://github.com/a/x', 'https://git.po5.in/a/x'));
+
+  // registry remote moved (GitHub -> Forgejo): origin follows it once the new remote answers
+  {
+    const moved = path.join(T, 'moved.git'), C = path.join(T, 'mv', 'proj');
+    git(T, 'clone', '-q', '--bare', bare, moved);
+    fs.mkdirSync(path.dirname(C)); git(T, 'clone', '-q', bare, C); ident(C);
+    let fr = L.syncRepo(C, { ...opts, remote: path.join(T, 'missing.git') });
+    t('remote: an unreachable registry remote leaves origin alone and pushes nothing', fr.status === 'offline' && git(C, 'remote', 'get-url', 'origin').out === bare, JSON.stringify(fr));
+    write(path.join(C, 'moved.txt'), 'after move\n');
+    fr = L.syncRepo(C, { ...opts, remote: moved });
+    t('remote: origin follows the registry, old URL kept, push lands on the new remote', fr.status === 'ok' && git(C, 'remote', 'get-url', 'origin').out === moved && git(C, 'remote', 'get-url', 'old-origin').out === bare && git(moved, 'cat-file', '-e', 'wip:moved.txt').code === 0 && git(bare, 'cat-file', '-e', 'wip:moved.txt').code !== 0 && git(C, 'rev-parse', '--abbrev-ref', '@{u}').out === 'origin/wip', JSON.stringify(fr));
+    t('remote: no change when the registry matches', L.followRemote(C, moved) === null);
+  }
 
   // placeholders and on-demand partial clone
   const made = L.placeholders(mini, { 'apps/newproj': { remote: bare, main: 'main', mode: 'live' }, offrepo: { remote: bare, mode: 'off' } });
@@ -195,6 +210,22 @@ export function liveSyncTests(t, tmp, baseEnv) {
   t('ship gate: pnpm when the repo uses it', findGate(gr, null)?.cmd === 'pnpm run -s gate');
   fs.writeFileSync(path.join(gr, '.claude', 'gate'), '# gate\nmake check\n');
   t('ship gate: .claude/gate wins, then --gate', findGate(gr, null)?.cmd === 'make check' && findGate(gr, 'x')?.from === '--gate');
+  t('ship: Forgejo repo from https, ssh and scp URLs; GitHub is not Forgejo', forgejoRepo('https://git.po5.in/mithtech/API_endpoint_finder.git')?.repo === 'mithtech/API_endpoint_finder' && forgejoRepo('ssh://git@git.po5.in:2222/mithtech/x.git')?.host === 'git.po5.in' && forgejoRepo('git@git.po5.in:mithtech/x')?.repo === 'mithtech/x' && forgejoRepo('https://github.com/a/b.git') === null);
+  {
+    const realFetch = globalThis.fetch, calls = [];
+    let merges = 0;
+    globalThis.fetch = async (url, o) => {
+      calls.push(`${o.method} ${url.replace(/^https:\/\/[^/]+\/api\/v1\/repos\/m\/x/, '')}`);
+      const body = (j, status = 200) => ({ ok: status < 300, status, text: async () => JSON.stringify(j) });
+      if (o.method === 'GET') return body([{ number: 7, head: { ref: 'other' }, base: { ref: 'main' } }]);
+      if (o.method === 'POST' && url.endsWith('/pulls')) return body({ number: 8 }, 201);
+      if (url.endsWith('/merge')) { merges++; const d = JSON.parse(o.body); return merges === 1 ? body({ message: 'Please try again later' }, 405) : d.Do === 'squash' && d.delete_branch_after_merge === false && d.MergeTitleField === 'T (#8)' ? body({}) : body({ message: 'bad' }, 422); }
+      return body({ message: 'unexpected' }, 500);
+    };
+    const err = await forgejoShip({ host: 'h', repo: 'm/x' }, 'tok', { main: 'main', branch: 'wip', title: 'T', body: 'B', deleteBranch: false, sleepMs: 1 });
+    globalThis.fetch = realFetch;
+    t('ship Forgejo: opens a PR, retries while mergeability is pending, squash-merges, keeps wip', err === null && calls.join('|') === 'GET /pulls?state=open&limit=50|POST /pulls|POST /pulls/8/merge|POST /pulls/8/merge', `${err} ${calls.join('|')}`);
+  }
   t('ship PR body: gate result and change list', /PASS/.test(prBody({ cmd: 'c', from: 'f' }, { code: 0, out: '' }, ['add x'])) && /- add x/.test(prBody(null, null, ['add x'])) && /not run/.test(prBody({ cmd: 'c', from: 'f' }, null)));
   const sd = spawnSync(process.execPath, [path.join(KIT, 'scripts', 'ship.mjs'), '--dry-run', '--no-gate'], { cwd: A, env, encoding: 'utf8' });
   t('ship: dry run on wip shows the PR into main', sd.status === 0 && /would push wip, open PR/.test(sd.stdout), sd.stdout + sd.stderr);

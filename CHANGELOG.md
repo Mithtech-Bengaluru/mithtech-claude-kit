@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.2
+- `git ship` works with Forgejo. A non-GitHub `origin` is treated as Forgejo: the PR is opened or updated through its API and squash-merged (it retries while Forgejo is still checking mergeability). The token comes from `git credential fill` for the host, or `FORGEJO_TOKEN`. GitHub repos still use `gh`.
+- Live sync follows the registry remote. When `repos.json` names a new remote for a repo (it moved, for example GitHub to Forgejo at `git.po5.in`), each Mac points `origin` at it on the next sync and keeps the old URL as remote `github` (or `old-origin`). It switches only after a fetch from the new remote works; until then the repo reports offline and pushes nowhere, so no work lands on the old, frozen remote.
+- `ownerOf` reads the owner from any hosted URL (Forgejo, ssh with a port), not only GitHub.
+
 ## 1.6.1
 - `git ship` opens and merges the PR on `origin`, even when the repo has an `upstream` remote.
 - `git ship` blocks only real `*.sync-conflict-*` files, not file names that contain "sync-conflict".
