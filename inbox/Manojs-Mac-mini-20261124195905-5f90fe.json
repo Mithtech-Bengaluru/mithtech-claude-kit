@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "The Desk router learns DocTypes at page load. A bench migrate from a worktree deletes DocTypes held only by another branch.",
+  "fix": "Make per-visitor DocTypes at sign-in. Migrate shared dev sites from one checkout.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T19:59:05.314Z"
+}

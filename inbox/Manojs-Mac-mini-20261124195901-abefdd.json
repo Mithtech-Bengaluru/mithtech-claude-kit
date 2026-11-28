@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Custom DocPerm rows never apply to DocType, and Customize Form refuses custom DocTypes.",
+  "fix": "Share a guest's own DocType with them, and edit custom DocTypes in the DocType form.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T19:59:01.880Z"
+}

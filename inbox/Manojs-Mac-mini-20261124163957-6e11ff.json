@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "Swapping a short demo for a longer one broke a layout sized for few steps and put a journey under the wrong label.",
+  "fix": "When remapping content ids, compare step counts and labels per page and show a screenshot before merging.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T16:39:57.513Z"
+}

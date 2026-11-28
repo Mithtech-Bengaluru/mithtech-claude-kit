@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "A server rehearsal that checked migrate and figures missed a storefront 500 caused by a removed upstream helper (commera beta.6).",
+  "fix": "Rehearsals render every public route (home links, catalogue, product, cart) on the migrated copy before the window.",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T06:27:25.753Z"
+}

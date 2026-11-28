@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "A DocShare grants access after the has_permission hooks run, so a hook cannot narrow it.",
+  "fix": "Re-check content in a doc_events validate hook, as well as in has_permission.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T19:58:57.362Z"
+}

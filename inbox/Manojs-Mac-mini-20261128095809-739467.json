@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "A Tauri Android keystore adapter needs the app Java VM, and crates that forbid unsafe code cannot build one from a raw pointer.",
+  "fix": "Take the Java VM from the main webview JNI handle after the window exists, then open the vault with it.",
+  "project": "ergon",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T09:58:09.516Z"
+}

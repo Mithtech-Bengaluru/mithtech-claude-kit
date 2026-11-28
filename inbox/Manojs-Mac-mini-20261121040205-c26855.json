@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "A design fault found in one consumer (a pale dark field border) was first patched locally, so every other consumer kept the fault.",
+  "fix": "Fix design-system faults in core as tokens, publish a new version, then remove the local patch from the consumer.",
+  "project": "tonaldepth",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-21T04:02:05.194Z"
+}

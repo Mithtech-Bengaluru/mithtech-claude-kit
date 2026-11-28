@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "Headless workers start at about 54k fixed context. In one program that start and its re-reads were 58 percent of all tokens.",
+  "fix": "A lean headless start profile without MCP servers or the skills listing, with stack rules only, would cut most of that cost.",
+  "project": "Nexus",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T04:35:49.873Z"
+}

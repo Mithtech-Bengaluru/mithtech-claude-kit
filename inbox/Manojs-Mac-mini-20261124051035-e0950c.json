@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "FLAC cannot store 32-bit float audio exactly, so float WAV masters fail a lossless check after FLAC conversion.",
+  "fix": "Compress float WAV masters with WavPack and integer WAVs with FLAC. Delete a WAV only when the decoded sample digests match.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T05:10:35.093Z"
+}

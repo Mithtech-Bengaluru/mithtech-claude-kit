@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "A flaky scanner test hid a real bug: gaps timed at handler time split fast scans on a busy app and rang up the wrong item.",
+  "fix": "Time key gaps by the key event timestamp and drop a split burst. Check every flaky-test fix for a product cause.",
+  "project": "merqPOS",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T09:50:25.701Z"
+}

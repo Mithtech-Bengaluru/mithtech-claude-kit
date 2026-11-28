@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Branch tests miss background jobs: the bench worker runs the bench copy of the app, not the branch under test.",
+  "fix": "Before a gate, put each bench app copy at the tested version, rebuild, clear the cache and restart the worker.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T05:07:31.250Z"
+}

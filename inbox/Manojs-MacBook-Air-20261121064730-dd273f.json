@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "other",
+  "cause": "kit-gap",
+  "lesson": "An older Go linter release cannot read packages built by a newer Go release, so lint fails on typecheck.",
+  "fix": "Build and run the linter with the same Go version that CI uses.",
+  "project": "whatomate",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-21T06:47:30.838Z"
+}

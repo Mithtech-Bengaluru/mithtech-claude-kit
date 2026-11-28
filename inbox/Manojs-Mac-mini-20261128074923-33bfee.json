@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "stack-gotcha",
+  "lesson": "Container env vars win over site_config, so a rehearsal stack's URL, secret and release vars cause false unit test failures",
+  "fix": "run-tests under env -u for the URL and secret vars passes the affected tests",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T07:49:23.746Z"
+}

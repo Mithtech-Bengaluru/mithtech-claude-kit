@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "stack-gotcha",
+  "lesson": "Parallel worktrees that share one build output folder overwrite each other, so a build can link another branch's crate.",
+  "fix": "Give each parallel worktree its own build output folder.",
+  "project": "merqPOS",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-26T08:15:38.859Z"
+}

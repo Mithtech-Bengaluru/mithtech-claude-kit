@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "Fields showed two focus rings: the wrap ring on focus-within plus the global focus-visible ring on the bare input.",
+  "fix": "Place a zero-specificity reset for controls inside a field wrap after the global ring rule, and pin it with a contract test.",
+  "project": "tonaldepth",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-21T04:02:08.273Z"
+}

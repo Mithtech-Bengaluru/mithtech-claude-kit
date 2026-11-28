@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "India Compliance voucher from Bill of Entry is wrong when one invoice has two Bills of Entry and receipts come from the invoice.",
+  "fix": "Make one landed cost voucher per receipt by hand with each line's duty, then compare with valuation rates.",
+  "project": "FlowMentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-25T21:12:09.267Z"
+}

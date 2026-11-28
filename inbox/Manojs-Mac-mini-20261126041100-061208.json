@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "kit-gap",
+  "lesson": "Live git sync rewrote an integration unit's merge commits into linear commits and pushed unit screens into the shared branch before the owner approved the UI.",
+  "fix": "Run integration units on a branch the sync job ignores, and let the coordinator merge into the shared branch only after approval.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-26T04:11:00.168Z"
+}

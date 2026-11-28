@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "rust",
+  "cause": "kit-gap",
+  "lesson": "Separate Rust build folders for many parallel units grow very large and can fill the disk, which kills every gate.",
+  "fix": "Use line-table debug info and no incremental cache for dev builds, and delete a unit's build folder right after it merges.",
+  "project": "FieldOps",
+  "machine": "Manojs-MacBook-Air",
+  "created": "2026-11-21T04:36:45.830Z"
+}

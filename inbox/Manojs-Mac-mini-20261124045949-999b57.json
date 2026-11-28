@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "MariaDB can hang in replica init before signals work: it holds file locks, never handshakes, and launchd loops failed duplicates.",
+  "fix": "Look for a missing ready line in the error log, force-stop the hung server, let launchd restart it, then re-run tests after Redis returns.",
+  "project": "frappe16",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-24T04:59:49.736Z"
+}
