@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "A permission hook that returns nothing for no rule is read as a denial, so restricted users lose every record read.",
+  "fix": "Return an explicit yes when no rule applies, and test record-level reads as the restricted user.",
+  "project": "flowmentor",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T05:07:19.506Z"
+}
