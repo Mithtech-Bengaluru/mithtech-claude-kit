@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "nextjs",
+  "cause": "stack-gotcha",
+  "lesson": "A passing Next build can hide broken pages: cached empty database results from an earlier build skip their prerender.",
+  "fix": "After a dependency upgrade, delete the Next build folder and build with content in the database before reporting a pass.",
+  "project": "Mithtech-payload",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T07:00:26.028Z"
+}
