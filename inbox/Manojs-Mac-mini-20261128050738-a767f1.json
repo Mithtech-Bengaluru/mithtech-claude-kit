@@ -1,0 +1,10 @@
+{
+  "type": "lesson",
+  "stack": "frappe",
+  "cause": "kit-gap",
+  "lesson": "Hooks that copy a child into its parent let a user write into a parent they cannot edit, even on cancel.",
+  "fix": "Refuse a link to a parent the user may not edit, and only recalculate the parent when a child is cancelled.",
+  "project": "framith_tradedeal",
+  "machine": "Manojs-Mac-mini",
+  "created": "2026-11-28T05:07:38.230Z"
+}
